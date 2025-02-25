@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             NguyenLieuSanPhamSeeder::class,
             DaiLySeeder::class,
             PhuongTienSeeder::class,
+            NhanVienSeeder::class,
         ]);
     }
 }

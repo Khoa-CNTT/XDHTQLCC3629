@@ -1,22 +1,22 @@
 <?php
 
+use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+//auth admin
+Route::group(['prefix'  =>  '/auth-admin'], function () {
+    Route::post('/login', [NhanVienController::class, 'login']);
+    Route::post('/register', [NhanVienController::class, 'register']);
+    Route::post('/check', [NhanVienController::class, 'check']);
+    Route::get('/dang-xuat', [NhanVienController::class, 'logout']);
+    Route::get('/dang-xuat-tat-ca', [NhanVienController::class, 'logoutAll']);
+    Route::get('/kiem-tra-token-client', [NhanVienController::class, 'checkToken']);
 });
 
 //admin
