@@ -1,0 +1,123 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class SanPhamSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        DB::table('san_phams')->delete();
+
+        DB::table('san_phams')->truncate();
+
+        DB::table('san_phams')->insert([
+            ['ma_san_pham' => 'SP0001', 'ten_san_pham' =>  'iPhone 15 Pro Max - Apple', 'mo_ta' => 'Sản phẩm iPhone 15 Pro Max - Apple thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0002', 'ten_san_pham' =>  'MacBook Air M2 - Apple', 'mo_ta' => 'Sản phẩm MacBook Air M2 - Apple thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0003', 'ten_san_pham' =>  'Galaxy S23 Ultra - Samsung', 'mo_ta' => 'Sản phẩm Galaxy S23 Ultra - Samsung thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0004', 'ten_san_pham' =>  'Xiaomi 13 Pro - Xiaomi', 'mo_ta' => 'Sản phẩm Xiaomi 13 Pro - Xiaomi thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0005', 'ten_san_pham' =>  'Sony WH-1000XM5 - Sony', 'mo_ta' => 'Sản phẩm Sony WH-1000XM5 - Sony thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0006', 'ten_san_pham' =>  'Apple Watch Series 9 - Apple', 'mo_ta' => 'Sản phẩm Apple Watch Series 9 - Apple thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0007', 'ten_san_pham' =>  'Logitech MX Master 3 - Logitech', 'mo_ta' => 'Sản phẩm Logitech MX Master 3 - Logitech thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0008', 'ten_san_pham' =>  'Asus ROG Strix G16 - Asus', 'mo_ta' => 'Sản phẩm Asus ROG Strix G16 - Asus thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0009', 'ten_san_pham' =>  'Dell XPS 15 - Dell', 'mo_ta' => 'Sản phẩm Dell XPS 15 - Dell thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0010', 'ten_san_pham' =>  'Lenovo ThinkPad X1 Carbon - Lenovo', 'mo_ta' => 'Sản phẩm Lenovo ThinkPad X1 Carbon - Lenovo thuộc danh mục Điện tử & Công nghệ.', 'id_danh_muc' => '1', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0011', 'ten_san_pham' =>  'Gạo ST25 - Việt Nam', 'mo_ta' => 'Sản phẩm Gạo ST25 - Việt Nam thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0012', 'ten_san_pham' =>  'Mì ăn liền Hảo Hảo - Acecook', 'mo_ta' => 'Sản phẩm Mì ăn liền Hảo Hảo - Acecook thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0013', 'ten_san_pham' =>  'Cà phê Trung Nguyên - Trung Nguyên Legend', 'mo_ta' => 'Sản phẩm Cà phê Trung Nguyên - Trung Nguyên Legend thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0014', 'ten_san_pham' =>  'Trà xanh C2 - URC', 'mo_ta' => 'Sản phẩm Trà xanh C2 - URC thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0015', 'ten_san_pham' =>  'Nước khoáng Lavie - Nestlé', 'mo_ta' => 'Sản phẩm Nước khoáng Lavie - Nestlé thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0016', 'ten_san_pham' =>  'Sữa tươi Vinamilk - Vinamilk', 'mo_ta' => 'Sản phẩm Sữa tươi Vinamilk - Vinamilk thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0017', 'ten_san_pham' =>  'Bia Tiger - Heineken', 'mo_ta' => 'Sản phẩm Bia Tiger - Heineken thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0018', 'ten_san_pham' =>  'Bánh Chocopie - Orion', 'mo_ta' => 'Sản phẩm Bánh Chocopie - Orion thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0019', 'ten_san_pham' =>  'Dầu ăn Neptune - Calofic', 'mo_ta' => 'Sản phẩm Dầu ăn Neptune - Calofic thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0020', 'ten_san_pham' =>  'Mật ong nguyên chất Highland Bee', 'mo_ta' => 'Sản phẩm Mật ong nguyên chất Highland Bee thuộc danh mục Thực phẩm & Đồ uống.', 'id_danh_muc' => '2', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0021', 'ten_san_pham' =>  'Áo thun Uniqlo - Uniqlo', 'mo_ta' => 'Sản phẩm Áo thun Uniqlo - Uniqlo thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0022', 'ten_san_pham' =>  'Giày Nike Air Force 1 - Nike', 'mo_ta' => 'Sản phẩm Giày Nike Air Force 1 - Nike thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0023', 'ten_san_pham' =>  'Túi xách Michael Kors - Michael Kors', 'mo_ta' => 'Sản phẩm Túi xách Michael Kors - Michael Kors thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0024', 'ten_san_pham' =>  'Đồng hồ Casio G-Shock - Casio', 'mo_ta' => 'Sản phẩm Đồng hồ Casio G-Shock - Casio thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0025', 'ten_san_pham' =>  'Kính Ray-Ban Aviator - Ray-Ban', 'mo_ta' => 'Sản phẩm Kính Ray-Ban Aviator - Ray-Ban thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0026', 'ten_san_pham' =>  'Thắt lưng Gucci - Gucci', 'mo_ta' => 'Sản phẩm Thắt lưng Gucci - Gucci thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0027', 'ten_san_pham' =>  'Áo khoác The North Face - The North Face', 'mo_ta' => 'Sản phẩm Áo khoác The North Face - The North Face thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0028', 'ten_san_pham' =>  'Váy Zara - Zara', 'mo_ta' => 'Sản phẩm Váy Zara - Zara thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0029', 'ten_san_pham' =>  'Giày Adidas Ultraboost - Adidas', 'mo_ta' => 'Sản phẩm Giày Adidas Ultraboost - Adidas thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0030', 'ten_san_pham' =>  'Dây chuyền Pandora - Pandora', 'mo_ta' => 'Sản phẩm Dây chuyền Pandora - Pandora thuộc danh mục Thời trang & Phụ kiện.', 'id_danh_muc' => '3', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0031', 'ten_san_pham' =>  'Máy hút bụi Dyson V15 - Dyson', 'mo_ta' => 'Sản phẩm Máy hút bụi Dyson V15 - Dyson thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0032', 'ten_san_pham' =>  'Quạt điều hòa Sunhouse - Sunhouse', 'mo_ta' => 'Sản phẩm Quạt điều hòa Sunhouse - Sunhouse thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0033', 'ten_san_pham' =>  'Ghế sofa IKEA - IKEA', 'mo_ta' => 'Sản phẩm Ghế sofa IKEA - IKEA thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0034', 'ten_san_pham' =>  'Bàn làm việc Hòa Phát - Hòa Phát', 'mo_ta' => 'Sản phẩm Bàn làm việc Hòa Phát - Hòa Phát thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0035', 'ten_san_pham' =>  'Tủ lạnh Samsung Inverter - Samsung', 'mo_ta' => 'Sản phẩm Tủ lạnh Samsung Inverter - Samsung thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0036', 'ten_san_pham' =>  'Máy giặt LG AI DD - LG', 'mo_ta' => 'Sản phẩm Máy giặt LG AI DD - LG thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0037', 'ten_san_pham' =>  'Đèn bàn Philips LED - Philips', 'mo_ta' => 'Sản phẩm Đèn bàn Philips LED - Philips thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0038', 'ten_san_pham' =>  'Bộ chăn ga Everon - Everon', 'mo_ta' => 'Sản phẩm Bộ chăn ga Everon - Everon thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0039', 'ten_san_pham' =>  'Bếp từ Bosch - Bosch', 'mo_ta' => 'Sản phẩm Bếp từ Bosch - Bosch thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0040', 'ten_san_pham' =>  'Nồi chiên không dầu Lock&Lock - Lock&Lock', 'mo_ta' => 'Sản phẩm Nồi chiên không dầu Lock&Lock - Lock&Lock thuộc danh mục Gia dụng & Nội thất.', 'id_danh_muc' => '4', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0041', 'ten_san_pham' =>  'Sữa rửa mặt Cetaphil - Cetaphil', 'mo_ta' => 'Sản phẩm Sữa rửa mặt Cetaphil - Cetaphil thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0042', 'ten_san_pham' =>  'Kem chống nắng Anessa - Shiseido', 'mo_ta' => 'Sản phẩm Kem chống nắng Anessa - Shiseido thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0043', 'ten_san_pham' =>  'Son môi MAC Ruby Woo - MAC', 'mo_ta' => 'Sản phẩm Son môi MAC Ruby Woo - MAC thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0044', 'ten_san_pham' =>  'Dầu gội Pantene - Pantene', 'mo_ta' => 'Sản phẩm Dầu gội Pantene - Pantene thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0045', 'ten_san_pham' =>  'Nước hoa Dior Sauvage - Dior', 'mo_ta' => 'Sản phẩm Nước hoa Dior Sauvage - Dior thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0046', 'ten_san_pham' =>  'Kem dưỡng ẩm La Roche-Posay - La Roche-Posay', 'mo_ta' => 'Sản phẩm Kem dưỡng ẩm La Roche-Posay - La Roche-Posay thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0047', 'ten_san_pham' =>  'Sữa tắm Lux - Unilever', 'mo_ta' => 'Sản phẩm Sữa tắm Lux - Unilever thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0048', 'ten_san_pham' =>  'Dầu dưỡng tóc Moroccanoil - Moroccanoil', 'mo_ta' => 'Sản phẩm Dầu dưỡng tóc Moroccanoil - Moroccanoil thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0049', 'ten_san_pham' =>  'Mặt nạ đất sét Kiehl’s - Kiehl’s', 'mo_ta' => 'Sản phẩm Mặt nạ đất sét Kiehl’s - Kiehl’s thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0050', 'ten_san_pham' =>  'Nước hoa Gucci Bloom - Gucci', 'mo_ta' => 'Sản phẩm Nước hoa Gucci Bloom - Gucci thuộc danh mục Mỹ phẩm & Chăm sóc cá nhân.', 'id_danh_muc' => '5', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0051', 'ten_san_pham' =>  'Vitamin D3 Ostelin - Ostelin', 'mo_ta' => 'Sản phẩm Vitamin D3 Ostelin - Ostelin thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0052', 'ten_san_pham' =>  'Sữa Ensure Gold - Abbott', 'mo_ta' => 'Sản phẩm Sữa Ensure Gold - Abbott thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0053', 'ten_san_pham' =>  'Thực phẩm bổ sung Nutrilite - Nutrilite', 'mo_ta' => 'Sản phẩm Thực phẩm bổ sung Nutrilite - Nutrilite thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0054', 'ten_san_pham' =>  'Collagen Shiseido - Shiseido', 'mo_ta' => 'Sản phẩm Collagen Shiseido - Shiseido thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0055', 'ten_san_pham' =>  'Omega-3 Blackmores - Blackmores', 'mo_ta' => 'Sản phẩm Omega-3 Blackmores - Blackmores thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0056', 'ten_san_pham' =>  'Trà thảo mộc Dr.Thanh - Tân Hiệp Phát', 'mo_ta' => 'Sản phẩm Trà thảo mộc Dr.Thanh - Tân Hiệp Phát thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0057', 'ten_san_pham' =>  'Viên uống trắng da DHC - DHC', 'mo_ta' => 'Sản phẩm Viên uống trắng da DHC - DHC thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0058', 'ten_san_pham' =>  'Nhân sâm Hàn Quốc - Korea Ginseng', 'mo_ta' => 'Sản phẩm Nhân sâm Hàn Quốc - Korea Ginseng thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0059', 'ten_san_pham' =>  'Sữa bột PediaSure - Abbott', 'mo_ta' => 'Sản phẩm Sữa bột PediaSure - Abbott thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0060', 'ten_san_pham' =>  'Ngũ cốc Calbee - Calbee', 'mo_ta' => 'Sản phẩm Ngũ cốc Calbee - Calbee thuộc danh mục Sức khỏe & Dinh dưỡng.', 'id_danh_muc' => '6', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0061', 'ten_san_pham' =>  'Xe đạp địa hình Giant - Giant', 'mo_ta' => 'Sản phẩm Xe đạp địa hình Giant - Giant thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0062', 'ten_san_pham' =>  'Máy chạy bộ Kingsport - Kingsport', 'mo_ta' => 'Sản phẩm Máy chạy bộ Kingsport - Kingsport thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0063', 'ten_san_pham' =>  'Vợt cầu lông Yonex - Yonex', 'mo_ta' => 'Sản phẩm Vợt cầu lông Yonex - Yonex thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0064', 'ten_san_pham' =>  'Găng tay boxing Everlast - Everlast', 'mo_ta' => 'Sản phẩm Găng tay boxing Everlast - Everlast thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0065', 'ten_san_pham' =>  'Bóng rổ Spalding - Spalding', 'mo_ta' => 'Sản phẩm Bóng rổ Spalding - Spalding thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0066', 'ten_san_pham' =>  'Giày bóng đá Nike Mercurial - Nike', 'mo_ta' => 'Sản phẩm Giày bóng đá Nike Mercurial - Nike thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0067', 'ten_san_pham' =>  'Dây nhảy Adidas - Adidas', 'mo_ta' => 'Sản phẩm Dây nhảy Adidas - Adidas thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0068', 'ten_san_pham' =>  'Tạ tay Bowflex - Bowflex', 'mo_ta' => 'Sản phẩm Tạ tay Bowflex - Bowflex thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0069', 'ten_san_pham' =>  'Thảm tập yoga Liforme - Liforme', 'mo_ta' => 'Sản phẩm Thảm tập yoga Liforme - Liforme thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0070', 'ten_san_pham' =>  'Đồng hồ Garmin Forerunner 955 - Garmin', 'mo_ta' => 'Sản phẩm Đồng hồ Garmin Forerunner 955 - Garmin thuộc danh mục Thiết bị & Dụng cụ thể thao.', 'id_danh_muc' => '7', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0071', 'ten_san_pham' =>  'Sách Đắc Nhân Tâm - Dale Carnegie', 'mo_ta' => 'Sản phẩm Sách Đắc Nhân Tâm - Dale Carnegie thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0072', 'ten_san_pham' =>  'Sách Nhà Giả Kim - Paulo Coelho', 'mo_ta' => 'Sản phẩm Sách Nhà Giả Kim - Paulo Coelho thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0073', 'ten_san_pham' =>  'Bút bi Thiên Long - Thiên Long', 'mo_ta' => 'Sản phẩm Bút bi Thiên Long - Thiên Long thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0074', 'ten_san_pham' =>  'Vở ô ly Hồng Hà - Hồng Hà', 'mo_ta' => 'Sản phẩm Vở ô ly Hồng Hà - Hồng Hà thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0075', 'ten_san_pham' =>  'Bộ bút màu Faber-Castell - Faber-Castell', 'mo_ta' => 'Sản phẩm Bộ bút màu Faber-Castell - Faber-Castell thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0076', 'ten_san_pham' =>  'Bảng vẽ điện tử Wacom - Wacom', 'mo_ta' => 'Sản phẩm Bảng vẽ điện tử Wacom - Wacom thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0077', 'ten_san_pham' =>  'Keo dán Scotch - 3M', 'mo_ta' => 'Sản phẩm Keo dán Scotch - 3M thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0078', 'ten_san_pham' =>  'Sổ tay Moleskine - Moleskine', 'mo_ta' => 'Sản phẩm Sổ tay Moleskine - Moleskine thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0079', 'ten_san_pham' =>  'Bút máy Parker - Parker', 'mo_ta' => 'Sản phẩm Bút máy Parker - Parker thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0080', 'ten_san_pham' =>  'Truyện tranh One Piece - Eiichiro Oda', 'mo_ta' => 'Sản phẩm Truyện tranh One Piece - Eiichiro Oda thuộc danh mục Sách & Văn phòng phẩm.', 'id_danh_muc' => '8', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0081', 'ten_san_pham' =>  'Ô tô Toyota Vios - Toyota', 'mo_ta' => 'Sản phẩm Ô tô Toyota Vios - Toyota thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0082', 'ten_san_pham' =>  'Xe máy Honda SH 150i - Honda', 'mo_ta' => 'Sản phẩm Xe máy Honda SH 150i - Honda thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0083', 'ten_san_pham' =>  'Dầu nhớt Castrol Power1 - Castrol', 'mo_ta' => 'Sản phẩm Dầu nhớt Castrol Power1 - Castrol thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0084', 'ten_san_pham' =>  'Camera hành trình VietMap C61 - VietMap', 'mo_ta' => 'Sản phẩm Camera hành trình VietMap C61 - VietMap thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0085', 'ten_san_pham' =>  'Lốp xe Michelin - Michelin', 'mo_ta' => 'Sản phẩm Lốp xe Michelin - Michelin thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0086', 'ten_san_pham' =>  'Nón bảo hiểm Andes - Andes', 'mo_ta' => 'Sản phẩm Nón bảo hiểm Andes - Andes thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0087', 'ten_san_pham' =>  'Đèn pha Philips LED - Philips', 'mo_ta' => 'Sản phẩm Đèn pha Philips LED - Philips thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0088', 'ten_san_pham' =>  'Bọc ghế da Sparco - Sparco', 'mo_ta' => 'Sản phẩm Bọc ghế da Sparco - Sparco thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0089', 'ten_san_pham' =>  'Hệ thống loa JBL - JBL', 'mo_ta' => 'Sản phẩm Hệ thống loa JBL - JBL thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0090', 'ten_san_pham' =>  'Dụng cụ rửa xe Karcher - Karcher', 'mo_ta' => 'Sản phẩm Dụng cụ rửa xe Karcher - Karcher thuộc danh mục Ô tô & Xe máy.', 'id_danh_muc' => '9', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0091', 'ten_san_pham' =>  'Gấu bông Teddy Bear - Teddy House', 'mo_ta' => 'Sản phẩm Gấu bông Teddy Bear - Teddy House thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0092', 'ten_san_pham' =>  'LEGO Technic - LEGO', 'mo_ta' => 'Sản phẩm LEGO Technic - LEGO thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0093', 'ten_san_pham' =>  'Xe đạp trẻ em RoyalBaby - RoyalBaby', 'mo_ta' => 'Sản phẩm Xe đạp trẻ em RoyalBaby - RoyalBaby thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0094', 'ten_san_pham' =>  'Bộ đồ chơi nấu ăn KidKraft - KidKraft', 'mo_ta' => 'Sản phẩm Bộ đồ chơi nấu ăn KidKraft - KidKraft thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0095', 'ten_san_pham' =>  'Ghế ăn dặm Mastela - Mastela', 'mo_ta' => 'Sản phẩm Ghế ăn dặm Mastela - Mastela thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0096', 'ten_san_pham' =>  'Xe tập đi Zaracos - Zaracos', 'mo_ta' => 'Sản phẩm Xe tập đi Zaracos - Zaracos thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0097', 'ten_san_pham' =>  'Đồ chơi giáo dục Fisher-Price - Fisher-Price', 'mo_ta' => 'Sản phẩm Đồ chơi giáo dục Fisher-Price - Fisher-Price thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0098', 'ten_san_pham' =>  'Xe điều khiển từ xa Tamiya - Tamiya', 'mo_ta' => 'Sản phẩm Xe điều khiển từ xa Tamiya - Tamiya thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0099', 'ten_san_pham' =>  'Đồ chơi xếp hình Mega Bloks - Mega Bloks', 'mo_ta' => 'Sản phẩm Đồ chơi xếp hình Mega Bloks - Mega Bloks thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+            ['ma_san_pham' => 'SP0100', 'ten_san_pham' =>  'Đàn organ Casio SA-76 - Casio', 'mo_ta' => 'Sản phẩm Đàn organ Casio SA-76 - Casio thuộc danh mục Đồ chơi & Đồ dùng trẻ em.', 'id_danh_muc' => '10', 'transaction_hash' => ''],
+        ]);
+    }
+}

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -20,6 +21,14 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             NhaSanXuatSeeder::class,
+            DanhMucSanPhamSeeder::class,
+            SanPhamSeeder::class,
+            ChiTietSanPhamSeeder::class,
+            SanPhamNSXSeeder::class,
+            NguyenLieuSeeder::class,
+            NguyenLieuSanPhamSeeder::class,
+            DaiLySeeder::class,
+            PhuongTienSeeder::class,
         ]);
     }
 }

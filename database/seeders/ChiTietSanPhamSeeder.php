@@ -1,0 +1,123 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class ChiTietSanPhamSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        DB::table('chi_tiet_san_phams')->delete();
+
+        DB::table('chi_tiet_san_phams')->truncate();
+
+        DB::table('chi_tiet_san_phams')->insert([
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0001', 'ghi_chu' => 'Chi tiết của iPhone 15 Pro Max - Apple', 'don_gia' => '842.03', 'so_luong' => '3', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0002', 'ghi_chu' => 'Chi tiết của MacBook Air M2 - Apple', 'don_gia' => '236.45', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0003', 'ghi_chu' => 'Chi tiết của Galaxy S23 Ultra - Samsung', 'don_gia' => '435.72', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0004', 'ghi_chu' => 'Chi tiết của Xiaomi 13 Pro - Xiaomi', 'don_gia' => '107.37', 'so_luong' => '5', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0005', 'ghi_chu' => 'Chi tiết của Sony WH-1000XM5 - Sony', 'don_gia' => '716.06', 'so_luong' => '5', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0006', 'ghi_chu' => 'Chi tiết của Apple Watch Series 9 - Apple', 'don_gia' => '758.55', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0007', 'ghi_chu' => 'Chi tiết của Logitech MX Master 3 - Logitech', 'don_gia' => '115.5', 'so_luong' => '3', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0008', 'ghi_chu' => 'Chi tiết của Asus ROG Strix G16 - Asus', 'don_gia' => '867.4', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0009', 'ghi_chu' => 'Chi tiết của Dell XPS 15 - Dell', 'don_gia' => '791.06', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0001', 'ma_san_pham' =>  'SP0010', 'ghi_chu' => 'Chi tiết của Lenovo ThinkPad X1 Carbon - Lenovo', 'don_gia' => '130.19', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0011', 'ghi_chu' => 'Chi tiết của Gạo ST25 - Việt Nam', 'don_gia' => '226.93', 'so_luong' => '1', 'don_vi_tinh' => 'Kg'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0012', 'ghi_chu' => 'Chi tiết của Mì ăn liền Hảo Hảo - Acecook', 'don_gia' => '468.46', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0013', 'ghi_chu' => 'Chi tiết của Cà phê Trung Nguyên - Trung Nguyên Legend', 'don_gia' => '463.59', 'so_luong' => '3', 'don_vi_tinh' => 'Gói'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0014', 'ghi_chu' => 'Chi tiết của Trà xanh C2 - URC', 'don_gia' => '321.49', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0015', 'ghi_chu' => 'Chi tiết của Nước khoáng Lavie - Nestlé', 'don_gia' => '879.72', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0016', 'ghi_chu' => 'Chi tiết của Sữa tươi Vinamilk - Vinamilk', 'don_gia' => '252.24', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0017', 'ghi_chu' => 'Chi tiết của Bia Tiger - Heineken', 'don_gia' => '416.41', 'so_luong' => '3', 'don_vi_tinh' => 'Két'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0018', 'ghi_chu' => 'Chi tiết của Bánh Chocopie - Orion', 'don_gia' => '979.17', 'so_luong' => '2', 'don_vi_tinh' => 'Hộp'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0019', 'ghi_chu' => 'Chi tiết của Dầu ăn Neptune - Calofic', 'don_gia' => '766.07', 'so_luong' => '3', 'don_vi_tinh' => 'Chai'],
+            ['ma_don_hang' => 'DH0002', 'ma_san_pham' =>  'SP0020', 'ghi_chu' => 'Chi tiết của Mật ong nguyên chất Highland Bee', 'don_gia' => '804.07', 'so_luong' => '3', 'don_vi_tinh' => 'Chai'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0021', 'ghi_chu' => 'Chi tiết của Áo thun Uniqlo - Uniqlo', 'don_gia' => '382.22', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0022', 'ghi_chu' => 'Chi tiết của Giày Nike Air Force 1 - Nike', 'don_gia' => '551.53', 'so_luong' => '4', 'don_vi_tinh' => 'Đôi'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0023', 'ghi_chu' => 'Chi tiết của Túi xách Michael Kors - Michael Kors', 'don_gia' => '723.25', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0024', 'ghi_chu' => 'Chi tiết của Đồng hồ Casio G-Shock - Casio', 'don_gia' => '528.73', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0025', 'ghi_chu' => 'Chi tiết của Kính Ray-Ban Aviator - Ray-Ban', 'don_gia' => '182.98', 'so_luong' => '2', 'don_vi_tinh' => 'Cặp'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0026', 'ghi_chu' => 'Chi tiết của Thắt lưng Gucci - Gucci', 'don_gia' => '764.69', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0027', 'ghi_chu' => 'Chi tiết của Áo khoác The North Face - The North Face', 'don_gia' => '363.14', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0028', 'ghi_chu' => 'Chi tiết của Váy Zara - Zara', 'don_gia' => '524.93', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0029', 'ghi_chu' => 'Chi tiết của Giày Adidas Ultraboost - Adidas', 'don_gia' => '238.31', 'so_luong' => '3', 'don_vi_tinh' => 'Đôi'],
+            ['ma_don_hang' => 'DH0003', 'ma_san_pham' =>  'SP0030', 'ghi_chu' => 'Chi tiết của Dây chuyền Pandora - Pandora', 'don_gia' => '317.35', 'so_luong' => '5', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0031', 'ghi_chu' => 'Chi tiết của Máy hút bụi Dyson V15 - Dyson', 'don_gia' => '253.51', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0032', 'ghi_chu' => 'Chi tiết của Quạt điều hòa Sunhouse - Sunhouse', 'don_gia' => '656.55', 'so_luong' => '3', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0033', 'ghi_chu' => 'Chi tiết của Ghế sofa IKEA - IKEA', 'don_gia' => '392.14', 'so_luong' => '4', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0034', 'ghi_chu' => 'Chi tiết của Bàn làm việc Hòa Phát - Hòa Phát', 'don_gia' => '735.99', 'so_luong' => '3', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0035', 'ghi_chu' => 'Chi tiết của Tủ lạnh Samsung Inverter - Samsung', 'don_gia' => '419.05', 'so_luong' => '5', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0036', 'ghi_chu' => 'Chi tiết của Máy giặt LG AI DD - LG', 'don_gia' => '440.77', 'so_luong' => '3', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0037', 'ghi_chu' => 'Chi tiết của Đèn bàn Philips LED - Philips', 'don_gia' => '325.44', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0038', 'ghi_chu' => 'Chi tiết của Bộ chăn ga Everon - Everon', 'don_gia' => '582.35', 'so_luong' => '2', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0039', 'ghi_chu' => 'Chi tiết của Bếp từ Bosch - Bosch', 'don_gia' => '711.6', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0004', 'ma_san_pham' =>  'SP0040', 'ghi_chu' => 'Chi tiết của Nồi chiên không dầu Lock&Lock - Lock&Lock', 'don_gia' => '697.39', 'so_luong' => '3', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0041', 'ghi_chu' => 'Chi tiết của Sữa rửa mặt Cetaphil - Cetaphil', 'don_gia' => '635.18', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0042', 'ghi_chu' => 'Chi tiết của Kem chống nắng Anessa - Shiseido', 'don_gia' => '460.68', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0043', 'ghi_chu' => 'Chi tiết của Son môi MAC Ruby Woo - MAC', 'don_gia' => '230.81', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0044', 'ghi_chu' => 'Chi tiết của Dầu gội Pantene - Pantene', 'don_gia' => '750.66', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0045', 'ghi_chu' => 'Chi tiết của Nước hoa Dior Sauvage - Dior', 'don_gia' => '759.7', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0046', 'ghi_chu' => 'Chi tiết của Kem dưỡng ẩm La Roche-Posay - La Roche-Posay', 'don_gia' => '329.72', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0047', 'ghi_chu' => 'Chi tiết của Sữa tắm Lux - Unilever', 'don_gia' => '473.38', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0048', 'ghi_chu' => 'Chi tiết của Dầu dưỡng tóc Moroccanoil - Moroccanoil', 'don_gia' => '733.95', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0049', 'ghi_chu' => 'Chi tiết của Mặt nạ đất sét Kiehl’s - Kiehl’s', 'don_gia' => '184.2', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0005', 'ma_san_pham' =>  'SP0050', 'ghi_chu' => 'Chi tiết của Nước hoa Gucci Bloom - Gucci', 'don_gia' => '987.77', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0051', 'ghi_chu' => 'Chi tiết của Vitamin D3 Ostelin - Ostelin', 'don_gia' => '523.76', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0052', 'ghi_chu' => 'Chi tiết của Sữa Ensure Gold - Abbott', 'don_gia' => '828.16', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0053', 'ghi_chu' => 'Chi tiết của Thực phẩm bổ sung Nutrilite - Nutrilite', 'don_gia' => '623.11', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0054', 'ghi_chu' => 'Chi tiết của Collagen Shiseido - Shiseido', 'don_gia' => '480.08', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0055', 'ghi_chu' => 'Chi tiết của Omega-3 Blackmores - Blackmores', 'don_gia' => '911.3', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0056', 'ghi_chu' => 'Chi tiết của Trà thảo mộc Dr.Thanh - Tân Hiệp Phát', 'don_gia' => '769.24', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0057', 'ghi_chu' => 'Chi tiết của Viên uống trắng da DHC - DHC', 'don_gia' => '961.27', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0058', 'ghi_chu' => 'Chi tiết của Nhân sâm Hàn Quốc - Korea Ginseng', 'don_gia' => '635.43', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0059', 'ghi_chu' => 'Chi tiết của Sữa bột PediaSure - Abbott', 'don_gia' => '969.84', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0006', 'ma_san_pham' =>  'SP0060', 'ghi_chu' => 'Chi tiết của Ngũ cốc Calbee - Calbee', 'don_gia' => '591.3', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0061', 'ghi_chu' => 'Chi tiết của Xe đạp địa hình Giant - Giant', 'don_gia' => '492.9', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0062', 'ghi_chu' => 'Chi tiết của Máy chạy bộ Kingsport - Kingsport', 'don_gia' => '875.57', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0063', 'ghi_chu' => 'Chi tiết của Vợt cầu lông Yonex - Yonex', 'don_gia' => '689.65', 'so_luong' => '5', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0064', 'ghi_chu' => 'Chi tiết của Găng tay boxing Everlast - Everlast', 'don_gia' => '304.67', 'so_luong' => '5', 'don_vi_tinh' => 'Đôi'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0065', 'ghi_chu' => 'Chi tiết của Bóng rổ Spalding - Spalding', 'don_gia' => '190.05', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0066', 'ghi_chu' => 'Chi tiết của Giày bóng đá Nike Mercurial - Nike', 'don_gia' => '353.91', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0067', 'ghi_chu' => 'Chi tiết của Dây nhảy Adidas - Adidas', 'don_gia' => '567.39', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0068', 'ghi_chu' => 'Chi tiết của Tạ tay Bowflex - Bowflex', 'don_gia' => '603.29', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0069', 'ghi_chu' => 'Chi tiết của Thảm tập yoga Liforme - Liforme', 'don_gia' => '241.59', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0007', 'ma_san_pham' =>  'SP0070', 'ghi_chu' => 'Chi tiết của Đồng hồ Garmin Forerunner 955 - Garmin', 'don_gia' => '136.29', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0071', 'ghi_chu' => 'Chi tiết của Sách Đắc Nhân Tâm - Dale Carnegie', 'don_gia' => '563.15', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0072', 'ghi_chu' => 'Chi tiết của Sách Nhà Giả Kim - Paulo Coelho', 'don_gia' => '613.88', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0073', 'ghi_chu' => 'Chi tiết của Bút bi Thiên Long - Thiên Long', 'don_gia' => '952.7', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0074', 'ghi_chu' => 'Chi tiết của Vở ô ly Hồng Hà - Hồng Hà', 'don_gia' => '473.61', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0075', 'ghi_chu' => 'Chi tiết của Bộ bút màu Faber-Castell - Faber-Castell', 'don_gia' => '320.47', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0076', 'ghi_chu' => 'Chi tiết của Bảng vẽ điện tử Wacom - Wacom', 'don_gia' => '178.76', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0077', 'ghi_chu' => 'Chi tiết của Keo dán Scotch - 3M', 'don_gia' => '483.35', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0078', 'ghi_chu' => 'Chi tiết của Sổ tay Moleskine - Moleskine', 'don_gia' => '821.66', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0079', 'ghi_chu' => 'Chi tiết của Bút máy Parker - Parker', 'don_gia' => '828.61', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0008', 'ma_san_pham' =>  'SP0080', 'ghi_chu' => 'Chi tiết của Truyện tranh One Piece - Eiichiro Oda', 'don_gia' => '312.38', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0081', 'ghi_chu' => 'Chi tiết của Ô tô Toyota Vios - Toyota', 'don_gia' => '317.79', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0082', 'ghi_chu' => 'Chi tiết của Xe máy Honda SH 150i - Honda', 'don_gia' => '633.21', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0083', 'ghi_chu' => 'Chi tiết của Dầu nhớt Castrol Power1 - Castrol', 'don_gia' => '878.07', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0084', 'ghi_chu' => 'Chi tiết của Camera hành trình VietMap C61 - VietMap', 'don_gia' => '258.76', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0085', 'ghi_chu' => 'Chi tiết của Lốp xe Michelin - Michelin', 'don_gia' => '767.9', 'so_luong' => '1', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0086', 'ghi_chu' => 'Chi tiết của Nón bảo hiểm Andes - Andes', 'don_gia' => '150.2', 'so_luong' => '2', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0087', 'ghi_chu' => 'Chi tiết của Đèn pha Philips LED - Philips', 'don_gia' => '657.6', 'so_luong' => '4', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0088', 'ghi_chu' => 'Chi tiết của Bọc ghế da Sparco - Sparco', 'don_gia' => '574.04', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0089', 'ghi_chu' => 'Chi tiết của Hệ thống loa JBL - JBL', 'don_gia' => '463.6', 'so_luong' => '3', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0009', 'ma_san_pham' =>  'SP0090', 'ghi_chu' => 'Chi tiết của Dụng cụ rửa xe Karcher - Karcher', 'don_gia' => '477.27', 'so_luong' => '4', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0091', 'ghi_chu' => 'Chi tiết của Gấu bông Teddy Bear - Teddy House', 'don_gia' => '247.31', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0092', 'ghi_chu' => 'Chi tiết của LEGO Technic - LEGO', 'don_gia' => '350.16', 'so_luong' => '5', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0093', 'ghi_chu' => 'Chi tiết của Xe đạp trẻ em RoyalBaby - RoyalBaby', 'don_gia' => '247.8', 'so_luong' => '2', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0094', 'ghi_chu' => 'Chi tiết của Bộ đồ chơi nấu ăn KidKraft - KidKraft', 'don_gia' => '259.99', 'so_luong' => '2', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0095', 'ghi_chu' => 'Chi tiết của Ghế ăn dặm Mastela - Mastela', 'don_gia' => '629.09', 'so_luong' => '1', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0096', 'ghi_chu' => 'Chi tiết của Xe tập đi Zaracos - Zaracos', 'don_gia' => '865.14', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0097', 'ghi_chu' => 'Chi tiết của Đồ chơi giáo dục Fisher-Price - Fisher-Price', 'don_gia' => '573.47', 'so_luong' => '4', 'don_vi_tinh' => 'Bộ'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0098', 'ghi_chu' => 'Chi tiết của Xe điều khiển từ xa Tamiya - Tamiya', 'don_gia' => '634.23', 'so_luong' => '4', 'don_vi_tinh' => 'Chiếc'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0099', 'ghi_chu' => 'Chi tiết của Đồ chơi xếp hình Mega Bloks - Mega Bloks', 'don_gia' => '289.28', 'so_luong' => '3', 'don_vi_tinh' => 'Thùng'],
+            ['ma_don_hang' => 'DH0010', 'ma_san_pham' =>  'SP0100', 'ghi_chu' => 'Chi tiết của Đàn organ Casio SA-76 - Casio', 'don_gia' => '178.15', 'so_luong' => '1', 'don_vi_tinh' => 'Chiếc'],
+        ]);
+    }
+}

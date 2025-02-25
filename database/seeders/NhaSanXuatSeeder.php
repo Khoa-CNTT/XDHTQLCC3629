@@ -15,16 +15,16 @@ class NhaSanXuatSeeder extends Seeder
         DB::table('nha_san_xuats')->truncate();
 
         DB::table('nha_san_xuats')->insert([
-            ['ten_cong_ty' => 'Công ty TNHH ABC', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '123 Đường Lê Lợi, TP.HCM', 'so_dien_thoai' => '0901234567', 'email' => 'abc@company.com','ngay_tao' => '2024-04-13','ngay_cap_nhat' => '2025-01-10'],
-            ['ten_cong_ty' => 'Công ty CP XYZ', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '456 Đường Nguyễn Trãi, Hà Nội', 'so_dien_thoai' => '0912345678', 'email' => 'xyz@company.com','ngay_tao' => '2024-04-14','ngay_cap_nhat' => '2025-01-11'],
-            ['ten_cong_ty' => 'Tập đoàn Công nghiệp DEF', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '789 Đường Trần Hưng Đạo, Đà Nẵng', 'so_dien_thoai' => '0923456789', 'email' => 'def@company.com','ngay_tao' => '2024-04-15','ngay_cap_nhat' => '2025-01-12'],
-            ['ten_cong_ty' => 'Nhà máy GHI Việt Nam', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '321 Đường Lý Thường Kiệt, Bình Dương', 'so_dien_thoai' => '0934567890', 'email' => 'ghi@company.com','ngay_tao' => '2024-04-16','ngay_cap_nhat' => '2025-01-13'],
-            ['ten_cong_ty' => 'Công ty TNHH JKL', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '654 Đường Phạm Văn Đồng, Hải Phòng', 'so_dien_thoai' => '0945678901', 'email' => 'jkl@company.com','ngay_tao' => '2024-04-17','ngay_cap_nhat' => '2025-01-14'],
-            ['ten_cong_ty' => 'Công ty Sản Xuất MNO', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '987 Đường Hoàng Văn Thụ, Cần Thơ', 'so_dien_thoai' => '0956789012', 'email' => 'mno@company.com','ngay_tao' => '2024-04-18','ngay_cap_nhat' => '2025-01-15'],
-            ['ten_cong_ty' => 'Công ty TNHH PQR', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '147 Đường Nguyễn Văn Cừ, Đà Lạt', 'so_dien_thoai' => '0967890123', 'email' => 'pqr@company.com','ngay_tao' => '2024-04-19','ngay_cap_nhat' => '2025-01-16'],
-            ['ten_cong_ty' => 'Nhà sản xuất STU', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '258 Đường Võ Thị Sáu, Nha Trang', 'so_dien_thoai' => '0978901234', 'email' => 'stu@company.com','ngay_tao' => '2024-04-20','ngay_cap_nhat' => '2025-01-17'],
-            ['ten_cong_ty' => 'Công ty CP VWX', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '369 Đường Quang Trung, Vũng Tàu', 'so_dien_thoai' => '0989012345', 'email' => 'vwx@company.com','ngay_tao' => '2024-04-21','ngay_cap_nhat' => '2025-01-18'],
-            ['ten_cong_ty' => 'Tập đoàn YZ Việt Nam', 'loai_doi_tac' =>  'Nhà sản xuất', 'dia_chi' => '741 Đường Điện Biên Phủ, Huế', 'so_dien_thoai' => '0990123456', 'email' => 'yz@company.com','ngay_tao' => '2024-04-22','ngay_cap_nhat' => '2025-01-19'],
+            ['ten_cong_ty' => 'Vinamilk', 'loai_doi_tac' =>  '1', 'dia_chi' => '10 Tân Lập, Bình Thạnh, TP.HCM', 'so_dien_thoai' => '0912345679', 'email' => 'contact@vinamilk.com.vn','ngay_cap_nhat' => '2025-02-24'],
+            ['ten_cong_ty' => 'Hoà Phát Furniture', 'loai_doi_tac' =>  '2', 'dia_chi' => '643 Nguyễn Văn Cừ, quận Long Biên, Hà Nội, Việt Nam', 'so_dien_thoai' => '0912345680', 'email' => 'contact@hoaphat.com.vn','ngay_cap_nhat' => '2025-02-25'],
+            ['ten_cong_ty' => 'Sony Electronics', 'loai_doi_tac' =>  '3', 'dia_chi' => 'Tòa nhà Sony, Quận 1, TP.HCM', 'so_dien_thoai' => '0912345681', 'email' => 'support@sony.com.vn','ngay_cap_nhat' => '2025-02-26'],
+            ['ten_cong_ty' => 'Unilever', 'loai_doi_tac' =>  '4', 'dia_chi' => '156 Nguyễn Lương Bằng, Q.7, TP.HCM', 'so_dien_thoai' => '0912345682', 'email' => 'hotro@unilever.com','ngay_cap_nhat' => '2025-02-27'],
+            ['ten_cong_ty' => 'Nike', 'loai_doi_tac' =>  '5', 'dia_chi' => 'KCN Nhơn Trạch, Đồng Nai', 'so_dien_thoai' => '0912345683', 'email' => 'sales@nike.com','ngay_cap_nhat' => '2025-02-28'],
+            ['ten_cong_ty' => 'Zara', 'loai_doi_tac' =>  '6', 'dia_chi' => 'Zara Tower, Cầu Giấy, Hà Nội', 'so_dien_thoai' => '0912345684', 'email' => 'contact@zara.com','ngay_cap_nhat' => '2025-02-28'],
+            ['ten_cong_ty' => 'Nhã Nam', 'loai_doi_tac' =>  '7', 'dia_chi' => 'Số 59 Đinh Tiên Hoàng, Hà Nội', 'so_dien_thoai' => '0912345685', 'email' => 'info@nhanam.vn','ngay_cap_nhat' => '2025-02-21'],
+            ['ten_cong_ty' => 'Toyota', 'loai_doi_tac' =>  '8', 'dia_chi' => 'KCN Vĩnh Phúc, Vĩnh Phúc', 'so_dien_thoai' => '0912345686', 'email' => 'toyota@toyota.com.vn','ngay_cap_nhat' => '2025-02-22'],
+            ['ten_cong_ty' => 'Fisher-Price', 'loai_doi_tac' =>  '9', 'dia_chi' => 'KCN Bình Dương, Bình Dương', 'so_dien_thoai' => '0912345687', 'email' => 'contact@fisherprice.com','ngay_cap_nhat' => '2025-02-25'],
+            ['ten_cong_ty' => 'Blackmores', 'loai_doi_tac' =>  '10', 'dia_chi' => 'KCN Củ Chi, TP.HCM', 'so_dien_thoai' => '0912345688', 'email' => 'support@blackmores.com','ngay_cap_nhat' => '2025-02-12'],
         ]);
     }
 }
