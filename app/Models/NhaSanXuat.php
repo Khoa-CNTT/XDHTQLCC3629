@@ -17,6 +17,7 @@ class NhaSanXuat extends Model
         "email",
         "ngay_tao",
         "ngay_cap_nhat",
-        "tinh_trang"
+        "tinh_trang",
+        "password"
     ];
 }

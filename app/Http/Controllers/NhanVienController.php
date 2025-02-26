@@ -74,4 +74,71 @@ class NhanVienController extends Controller
             ], 401);
         }
     }
+
+    public function logout()
+    {
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $check_user =  DB::table('personal_access_tokens')
+                            ->where('id', $user->currentAccessToken()->id)
+                            ->first();
+            if($check_user->tokenable_type === "App\\Models\\NhanVien") {
+                DB::table('personal_access_tokens')
+                    ->where('id', $user->currentAccessToken()->id)
+                    ->delete();
+                return response()->json([
+                    'message'   =>  'Đăng xuất thành công!',
+                    'status'    =>  true,
+                ], 200);
+            }
+
+            return response()->json([
+                'message'   =>  'Bạn cần đăng nhập!',
+                'status'    =>  false,
+            ], 401);
+        } else {
+            return response()->json([
+                'message'   =>  'Bạn cần đăng nhập!',
+                'status'    =>  false,
+            ]);
+        }
+    }
+
+    public function logoutAll()
+    {
+        $user = Auth::guard('sanctum')->user();
+        if ($user) {
+            $tokens = $user->tokens;
+            foreach ($tokens as $key => $value) {
+                $value->delete();
+            }
+
+            return response()->json([
+                'message'   =>  'Đã đăng xuất tất cả thành công!',
+                'status'    =>  true,
+            ]);
+        } else {
+            return response()->json([
+                'message'   =>  'Bạn cần đăng nhập hệ thống',
+                'status'    =>  false,
+            ]);
+        }
+    }
+
+    public function checkToken()
+    {
+        // Lấy thông tin từ Authorization : 'Bearer ' gửi lên
+        $user = Auth::guard('sanctum')->user();
+        if($user && $user instanceof \App\Models\NhanVien) {
+            return response()->json([
+                'status'    =>  true,
+                'message'   =>  "Oke, bạn có thể đi qua",
+            ]);
+        } else {
+            return response()->json([
+                'status'    =>  false,
+                'message'   =>  "Bạn cần đăng nhập hệ thống trước",
+            ]);
+        }
+    }
 }
