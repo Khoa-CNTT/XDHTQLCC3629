@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
 use Illuminate\Http\Request;
@@ -27,5 +28,13 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::delete('/xoa-nha-san-xuat/{id}', [NhaSanXuatController::class, 'deleteNhaSanXuat']);
         Route::post('/cap-nhat-nha-san-xuat', [NhaSanXuatController::class, 'updateNhaSanXuat']);
         Route::post('/doi-tinh-trang-nha-san-xuat', [NhaSanXuatController::class, 'doiTinhTrangNhaSanXuat']);
+    });
+    Route::group(['prefix'  =>  '/dai-ly'], function () {
+        Route::get('/lay-du-lieu', [DaiLyController::class, 'getData']);
+        Route::post('/tim-dai-ly', [DaiLyController::class, 'searchDaiLy']);
+        Route::post('/them-moi-dai-ly', [DaiLyController::class, 'createDaiLy']);
+        Route::delete('/xoa-dai-ly/{id}', [DaiLyController::class, 'deleteDaiLy']);
+        Route::post('/cap-nhat-dai-ly', [DaiLyController::class, 'updateDaiLy']);
+        Route::post('/doi-tinh-trang-dai-ly', [DaiLyController::class, 'doiTinhTrangDaiLy']);
     });
 });
