@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jenssegers\Agent\Agent;
 
+use function Laravel\Prompts\password;
+
 class NhanVienController extends Controller
 {
     public function login(Request $request)
@@ -138,6 +140,175 @@ class NhanVienController extends Controller
             return response()->json([
                 'status'    =>  false,
                 'message'   =>  "Bạn cần đăng nhập hệ thống trước",
+            ]);
+        }
+    }
+
+
+
+
+
+    //admin - quản lý nhân viên
+
+
+
+    public function getData()
+    {
+        // $id_chuc_nang   = ;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //     ->where('id_chuc_nang', $id_chuc_nang)
+        //     ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        $data = NhanVien::get();
+
+        return response()->json([
+            'status'    =>  true,
+            'nhan_vien' => $data
+        ]);
+    }
+
+    public function createNhanVien(Request $request)
+    {
+        // $id_chuc_nang   = ;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //     ->where('id_chuc_nang', $id_chuc_nang)
+        //     ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        NhanVien::create([
+            'ho_ten'    =>  $request->ho_ten,
+            'email'  =>  $request->email,
+            'password'       =>  bcrypt($request->password),
+            'id_chuc_vu' =>  $request->id_chuc_vu,
+            'tinh_trang'    =>  $request->tinh_trang
+        ]);
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã tạo mới nhân viên thành công!'
+        ]);
+    }
+
+    public function updateNhanVien(Request $request)
+    {
+        // $id_chuc_nang   = ;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //                             ->where('id_chuc_nang', $id_chuc_nang)
+        //                             ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        try {
+            $data   = $request->all();
+            NhanVien::find($request->id)->update($data);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã cập nhật thành công nhân viên!',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi',
+            ]);
+        }
+    }
+    public function deleteNhanVien($id)
+    {
+        // $id_chuc_nang   = ;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //     ->where('id_chuc_nang', $id_chuc_nang)
+        //     ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        try {
+            NhanVien::where('id', $id)->delete();
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Xóa nhân viên thành công!',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi xóa nhân viên',
+            ]);
+        }
+    }
+    public function searchNhanVien(Request $request)
+    {
+        // $id_chuc_nang   = 2;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //     ->where('id_chuc_nang', $id_chuc_nang)
+        //     ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        $key = "%" . $request->abc . "%";
+
+        $data   = NhanVien::where('ho_ten', 'like', $key)
+            ->get();
+
+        return response()->json([
+            'status'    =>  true,
+            'nhan_vien'  =>  $data,
+        ]);
+    }
+
+    public function doiTinhTrangNhanVien(Request $request)
+    {
+        // $id_chuc_nang   = ;
+        // $user   =  Auth::guard('sanctum')->user();
+        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
+        //     ->where('id_chuc_nang', $id_chuc_nang)
+        //     ->first();
+        // if (!$check) {
+        //     return response()->json([
+        //         'status'    =>  false,
+        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
+        //     ]);
+        // }
+        try {
+            if ($request->tinh_trang == 1) {
+                $tinh_trang_moi = 0;
+            } else {
+                $tinh_trang_moi = 1;
+            }
+            NhanVien::where('id', $request->id)->update([
+                'tinh_trang'    =>  $tinh_trang_moi
+            ]);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã đổi trạng thái thành công',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi đổi trạng thái',
             ]);
         }
     }

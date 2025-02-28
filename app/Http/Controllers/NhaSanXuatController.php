@@ -62,7 +62,7 @@ class NhaSanXuatController extends Controller
         ]);
         return response()->json([
             'status'    =>  true,
-            'message'   =>  'Đã tạo mới tỉnh thành thành công!'
+            'message'   =>  'Đã tạo mới NSX thành công!'
         ]);
     }
 

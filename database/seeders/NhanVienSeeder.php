@@ -19,7 +19,7 @@ class NhanVienSeeder extends Seeder
 
         DB::table('nhan_viens')->insert([
             ['ho_ten' => 'Mai Xuân Tùng', 'email' =>  'maitung801@gmail.com', 'password' => bcrypt('123456'), 'id_chuc_vu' => '1'],
-            ['ho_ten' => 'Lê Anh Xuân', 'email' =>  'xuanbake123@gmail.com', 'password' => bcrypt('123456'), 'id_chuc_vu' => '1'],
+            ['ho_ten' => 'Lê Anh Xuân', 'email' =>  'xuanbake58@gmail.com', 'password' => bcrypt('123456'), 'id_chuc_vu' => '1'],
             ['ho_ten' => 'Văn Quý Hưng', 'email' =>  'quyhung180603@gmail.com', 'password' => bcrypt('123456'), 'id_chuc_vu' => '1'],
             ['ho_ten' => 'Nguyễn Hữu Thiên', 'email' =>  'huuthien123@gmail.com', 'password' => bcrypt('123456'), 'id_chuc_vu' => '1'],
         ]);
