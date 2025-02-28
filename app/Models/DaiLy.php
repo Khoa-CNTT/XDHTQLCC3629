@@ -12,7 +12,7 @@ class DaiLy extends Model
     protected $fillable = [
         "ten_cong_ty",
         "email",
-        "matkhau",
+        "mat_khau",
         "dia_chi",
         "so_dien_thoai",
         "tinh_trang"
