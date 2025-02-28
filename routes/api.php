@@ -38,3 +38,13 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/doi-tinh-trang-dai-ly', [DaiLyController::class, 'doiTinhTrangDaiLy']);
     });
 });
+Route::group(['prefix'  =>  '/admin'], function () {
+    Route::group(['prefix'  =>  '/nhan-vien'], function () {
+        Route::get('/lay-du-lieu', [NhanVienController::class, 'getData']);
+        Route::post('/them-moi-nhan-vien', [NhanVienController::class, 'createNhanVien']);
+        Route::post('/cap-nhat-nhan-vien', [NhanVienController::class, 'updateNhanVien']);
+        Route::post('/tim-nhan-vien', [NhanVienController::class, 'searchNhanVien']);
+        Route::delete('/xoa-nhan-vien/{id}', [NhanVienController::class, 'deleteNhanVien']);
+        Route::post('/doi-tinh-trang-nhan-vien', [NhanVienController::class, 'doiTinhTrangNhanVien']);
+    });
+});
