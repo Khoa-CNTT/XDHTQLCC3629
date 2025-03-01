@@ -47,8 +47,6 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/cap-nhat-danh-muc', [DanhMucSanPhamController::class, 'updateDanhMuc']);
         Route::post('/doi-tinh-trang-danh-muc', [DanhMucSanPhamController::class, 'doiTinhTrangDanhMuc']);
     });
-});
-Route::group(['prefix'  =>  '/admin'], function () {
     Route::group(['prefix'  =>  '/nhan-vien'], function () {
         Route::get('/lay-du-lieu', [NhanVienController::class, 'getData']);
         Route::post('/them-moi-nhan-vien', [NhanVienController::class, 'createNhanVien']);
