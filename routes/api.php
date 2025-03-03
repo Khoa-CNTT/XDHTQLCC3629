@@ -4,6 +4,7 @@ use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
 use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
+use App\Http\Controllers\SanPhamController;
 use App\Models\DanhMucSanPham;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -54,5 +55,14 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-nhan-vien', [NhanVienController::class, 'searchNhanVien']);
         Route::delete('/xoa-nhan-vien/{id}', [NhanVienController::class, 'deleteNhanVien']);
         Route::post('/doi-tinh-trang-nhan-vien', [NhanVienController::class, 'doiTinhTrangNhanVien']);
+    });
+    Route::group(['prefix'  =>  '/san-pham'], function () {
+        Route::get('/lay-du-lieu', [SanPhamController::class, 'getData']);
+        Route::get('/lay-du-lieu-danh-muc', [SanPhamController::class, 'getDataDanhMuc']);
+        Route::post('/them-moi-san-pham', [SanPhamController::class, 'createSanPham']);
+        Route::post('/cap-nhat-san-pham', [SanPhamController::class, 'updateSanPham']);
+        Route::post('/tim-san-pham', [SanPhamController::class, 'searchSanPham']);
+        Route::delete('/xoa-san-pham/{id}', [SanPhamController::class, 'deleteSanPham']);
+        Route::post('/doi-tinh-trang-san-pham', [SanPhamController::class, 'doiTinhTrangSanPham']);
     });
 });
