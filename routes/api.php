@@ -58,7 +58,6 @@ Route::group(['prefix'  =>  '/admin'], function () {
     });
     Route::group(['prefix'  =>  '/san-pham'], function () {
         Route::get('/lay-du-lieu', [SanPhamController::class, 'getData']);
-        Route::get('/lay-du-lieu-danh-muc', [SanPhamController::class, 'getDataDanhMuc']);
         Route::post('/them-moi-san-pham', [SanPhamController::class, 'createSanPham']);
         Route::post('/cap-nhat-san-pham', [SanPhamController::class, 'updateSanPham']);
         Route::post('/tim-san-pham', [SanPhamController::class, 'searchSanPham']);
