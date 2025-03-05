@@ -4,6 +4,7 @@ use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
 use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
+use App\Http\Controllers\PhuongTienController;
 use App\Http\Controllers\SanPhamController;
 use App\Models\DanhMucSanPham;
 use Illuminate\Http\Request;
@@ -64,5 +65,13 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-san-pham', [SanPhamController::class, 'searchSanPham']);
         Route::delete('/xoa-san-pham/{id}', [SanPhamController::class, 'deleteSanPham']);
         Route::post('/doi-tinh-trang-san-pham', [SanPhamController::class, 'doiTinhTrangSanPham']);
+    });
+    Route::group(['prefix'  =>  '/phuong-tien'], function () {
+        Route::get('/lay-du-lieu', [PhuongTienController::class, 'getData']);
+        Route::post('/them-moi-phuong-tien', [PhuongTienController::class, 'createPhuongTien']);
+        Route::post('/cap-nhat-phuong-tien', [PhuongTienController::class, 'updatePhuongTien']);
+        Route::post('/tim-phuong-tien', [PhuongTienController::class, 'searchPhuongTien']);
+        Route::delete('/xoa-phuong-tien/{id}', [PhuongTienController::class, 'deletePhuongTien']);
+        Route::post('/doi-tinh-trang-phuong-tien', [PhuongTienController::class, 'doiTinhTrangPhuongTien']);
     });
 });
