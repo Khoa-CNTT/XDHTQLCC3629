@@ -20,7 +20,7 @@ class SanPhamController extends Controller
             'san_pham'  =>  $data
         ]);
     }
-   
+
     public function createSanPham(Request $request)
     {
         $data   =   $request->all();
@@ -30,7 +30,8 @@ class SanPhamController extends Controller
             'mo_ta'              =>  $request->mo_ta,
             'id_danh_muc'        =>  $request->id_danh_muc,
             'transaction_hash'   =>  $request->transaction_hash,
-            'tinh_trang'         =>  $request->tinh_trang
+            'tinh_trang'         =>  $request->tinh_trang,
+            'hinh_anh'           =>  $request->hinh_anh
         ]);
         return response()->json([
             'status'    =>  true,
@@ -48,7 +49,8 @@ class SanPhamController extends Controller
                     'mo_ta'              =>  $request->mo_ta,
                     'id_danh_muc'        =>  $request->id_danh_muc,
                     'transaction_hash'   =>  $request->transaction_hash,
-                    'tinh_trang'         =>  $request->tinh_trang
+                    'tinh_trang'         =>  $request->tinh_trang,
+                    'hinh_anh'           =>  $request->hinh_anh
                 ]);
             return response()->json([
                 'status'            =>   true,
