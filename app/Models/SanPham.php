@@ -15,6 +15,7 @@ class SanPham extends Model
         "mo_ta",
         "id_danh_muc",
         "transaction_hash",
-        "tinh_trang"
+        "tinh_trang",
+        "hinh_anh"
     ];
 }
