@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
+use App\Http\Controllers\NguyenLieuController;
+use App\Http\Controllers\NguyenLieuSanPhamController;
 use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
 use App\Http\Controllers\SanPhamController;
@@ -64,5 +66,22 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-san-pham', [SanPhamController::class, 'searchSanPham']);
         Route::delete('/xoa-san-pham/{id}', [SanPhamController::class, 'deleteSanPham']);
         Route::post('/doi-tinh-trang-san-pham', [SanPhamController::class, 'doiTinhTrangSanPham']);
+    });
+    Route::group(['prefix'  =>  '/nguyen-lieu'], function () {
+        Route::get('/lay-du-lieu', [NguyenLieuController::class, 'getData']);
+        Route::post('/doi-tinh-trang', [NguyenLieuController::class, 'changeTrangthai']);
+        Route::post('/them-moi-nguyen-lieu', [NguyenLieuController::class, 'createNguyenLieu']);
+        Route::post('/cap-nhat-nguyen-lieu', [NguyenLieuController::class, 'updateNguyenLieu']);
+        Route::delete('/xoa-nguyen-lieu/{id}', [NguyenLieuController::class, 'deleteNguyenLieu']);
+        Route::post('/tim-nguyen-lieu', [NguyenLieuController::class, 'searchNguyenLieu']);
+    });
+    Route::group(['prefix'  =>  '/nguyen-lieu-san-pham'], function () {
+        Route::get('/lay-du-lieu', [NguyenLieuSanPhamController::class, 'getData']);
+        Route::get('/lay-du-lieu-nguyen-lieu-san-pham', [NguyenLieuSanPhamController::class, 'getDataDanhMuc']);
+        Route::post('/them-moi-nguyen-lieu-san-pham', [NguyenLieuSanPhamController::class, 'createNguyenLieuSanPham']);
+        Route::post('/cap-nhat-nguyen-lieu-san-pham', [NguyenLieuSanPhamController::class, 'updateNguyenLieuSanPham']);
+        Route::delete('/xoa-nguyen-lieu-san-pham/{id}', [NguyenLieuSanPhamController::class, 'deleteNguyenLieuSanPham']);
+        Route::post('/doi-tinh-trang', [NguyenLieuSanPhamController::class, 'changeTrangthai']);
+        Route::post('/tim-nguyen-lieu-san-pham', [NguyenLieuSanPhamController::class, 'searchNguyenLieuSanPham']);
     });
 });
