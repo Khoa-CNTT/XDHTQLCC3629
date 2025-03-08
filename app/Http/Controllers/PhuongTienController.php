@@ -3,63 +3,112 @@
 namespace App\Http\Controllers;
 
 use App\Models\PhuongTien;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PhuongTienController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return view();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getData()
     {
-        //
+        $data = PhuongTien::get();
+
+        return response()->json([
+            'status'    =>  true,
+            'phuong_tien' => $data
+        ]);
+    }
+    public function createPhuongTien(Request $request)
+    {
+        PhuongTien::create([
+            'ma_phuong_tien'        =>  $request->ma_phuong_tien,
+            'ten_phuong_tien'       =>  $request->ten_phuong_tien,
+            'tinh_trang'            =>  $request->tinh_trang
+        ]);
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã tạo mới phương tiện thành công!'
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function searchPhuongTien(Request $request)
     {
-        //
+        $key = "%" . $request->abc . "%";
+
+        $data   = PhuongTien::where('ten_phuong_tien', 'like', $key)
+            ->get();
+
+        return response()->json([
+            'status'    =>  true,
+            'phuong_tien'  =>  $data,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PhuongTien $phuongTien)
+    public function deletePhuongTien($id)
     {
-        //
+        try {
+            PhuongTien::where('id', $id)->delete();
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Xóa phương tiện thành công!',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi xóa phương tiện',
+            ]);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(PhuongTien $phuongTien)
+    public function updatePhuongTien(Request $request)
     {
-        //
+        try {
+            PhuongTien::where('id', $request->id)
+                ->update([
+                    'ma_phuong_tien'        =>  $request->ma_phuong_tien,
+                    'ten_phuong_tien'       =>  $request->ten_phuong_tien,
+                    'tinh_trang'            =>  $request->tinh_trang
+                ]);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã cập nhật thành công phương tiện' . $request->ten_phuong_tien,
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi cập nhật thông tin phương tiện',
+            ]);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, PhuongTien $phuongTien)
+    public function doiTinhTrangPhuongTien(Request $request)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(PhuongTien $phuongTien)
-    {
-        //
+        try {
+            if ($request->tinh_trang == 1) {
+                $tinh_trang_moi = 0;
+            } else {
+                $tinh_trang_moi = 1;
+            }
+            PhuongTien::where('id', $request->id)->update([
+                'tinh_trang'    =>  $tinh_trang_moi
+            ]);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã đổi trạng thái thành công',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi đổi trạng thái',
+            ]);
+        }
     }
 }

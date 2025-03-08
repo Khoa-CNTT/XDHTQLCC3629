@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('id_danh_muc')->nullable();
             $table->string('transaction_hash')->nullable();
             $table->integer('tinh_trang')->default(1);
+            $table->text('hinh_anh')->nullable();
             $table->timestamps();
         });
     }
