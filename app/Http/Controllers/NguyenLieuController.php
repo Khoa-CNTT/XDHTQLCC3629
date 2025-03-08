@@ -3,63 +3,108 @@
 namespace App\Http\Controllers;
 
 use App\Models\NguyenLieu;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class NguyenLieuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getData()
     {
-        //
-    }
+        $data = NguyenLieu::get();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json([
+            'status'    =>  true,
+            'nguyen_lieu' => $data
+        ]);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function changeTrangthai(Request $request)
     {
-        //
+        try {
+            if ($request->tinh_trang == 1) {
+                $tinh_trang_moi = 0;
+            } else {
+                $tinh_trang_moi = 1;
+            }
+            NguyenLieu::where('id', $request->id)->update([
+                'tinh_trang'    =>  $tinh_trang_moi
+            ]);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã đổi trạng thái thành công',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi đổi trạng thái',
+            ]);
+        }
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(NguyenLieu $nguyenLieu)
+    public function createNguyenLieu(Request $request)
     {
-        //
+        $data   =   $request->all();
+        NguyenLieu::create([
+            'ma_nguyen_lieu'        =>  $request->ma_nguyen_lieu,
+            'ten_nguyen_lieu'       =>  $request->ten_nguyen_lieu,
+            'ma_lo_hang'            =>  $request->ma_lo_hang,
+            'ma_nha_cung_cap'       =>  $request->ma_nha_cung_cap,
+            'tinh_trang'            =>  $request->tinh_trang
+        ]);
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã tạo mới nguyên liệu thành công!'
+        ]);
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(NguyenLieu $nguyenLieu)
+    public function updateNguyenLieu(Request $request)
     {
-        //
+        try {
+            NguyenLieu::where('id', $request->id)
+                ->update([
+                    'ma_nguyen_lieu'        =>  $request->ma_nguyen_lieu,
+                    'ten_nguyen_lieu'       =>  $request->ten_nguyen_lieu,
+                    'ma_lo_hang'            =>  $request->ma_lo_hang,
+                    'ma_nha_cung_cap'       =>  $request->ma_nha_cung_cap,
+                    'tinh_trang'            =>  $request->tinh_trang
+                ]);
+            return response()->json([
+                'status'            =>   true,
+                'message'           =>   'Đã cập nhật thành công nguyên liệu',
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi cập nhật thông tin nguyên liệu',
+            ]);
+        }
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, NguyenLieu $nguyenLieu)
+    public function deleteNguyenLieu($id)
     {
-        //
+        $data   =   NguyenLieu::where('id', $id)->first();
+        if ($data) {
+            $data->delete();
+            return response()->json([
+                'status'    =>   true,
+                'message'   =>   'Đã xóa nguyên liệu thành công!'
+            ]);
+        } else {
+            return response()->json([
+                'status'    =>   false,
+                'message'   =>   'Không tìm được nguyên liệu để xóa!'
+            ]);
+        }
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(NguyenLieu $nguyenLieu)
+    public function searchNguyenLieu(Request $request)
     {
-        //
+        $key = "%" . $request->abc . "%";
+
+        $data   = NguyenLieu::where('ten_nguyen_lieu', 'like', $key)
+            ->get();
+
+        return response()->json([
+            'status'    =>  true,
+            'nguyen_lieu'  =>  $data,
+        ]);
     }
 }

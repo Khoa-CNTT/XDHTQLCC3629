@@ -2,64 +2,110 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NguyenLieu;
 use App\Models\NguyenLieuSanPham;
 use Illuminate\Http\Request;
 
 class NguyenLieuSanPhamController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function getdata()
     {
-        //
+        $data = NguyenLieuSanPham::join('nguyen_lieus', 'nguyen_lieu_san_phams.id_nguyen_lieu', '=', 'nguyen_lieus.id')
+            ->select('nguyen_lieu_san_phams.*', 'nguyen_lieus.ten_nguyen_lieu')
+            ->get();
+        return response()->json([
+            'status'    => true,
+            'san_pham'  => $data
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function getDataDanhMuc()
     {
-        //
+        $data = NguyenLieu::all();
+
+        return response()->json([
+            'status'    => true,
+            'danh_muc' => $data
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function searchNguyenLieuSanPham(Request $request)
     {
-        //
+        $key = "%" . $request->abc . "%";
+        $id_nguyen_lieu = $request->id_nguyen_lieu;
+
+        $query = NguyenLieuSanPham::join('nguyen_lieus', 'nguyen_lieu_san_phams.id_nguyen_lieu', '=', 'nguyen_lieus.id')
+            ->select('nguyen_lieu_san_phams.*', 'nguyen_lieus.ten_nguyen_lieu')
+            ->where('nguyen_lieu_san_phams.ma_san_pham', 'like', $key);
+
+        // Nếu có id_nguyen_lieu, lọc thêm theo nguyên liệu
+        if ($id_nguyen_lieu) {
+            $query->where('nguyen_lieu_san_phams.id_nguyen_lieu', $id_nguyen_lieu);
+        }
+
+        $data = $query->get();
+
+        return response()->json([
+            'status' => true,
+            'nguyen_lieu' => $data,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(NguyenLieuSanPham $nguyenLieuSanPham)
+    public function createNguyenLieuSanPham(Request $request)
     {
-        //
+        NguyenLieuSanPham::create([
+            'ma_san_pham'          => $request->ma_san_pham,
+            'id_nguyen_lieu'       => $request->id_nguyen_lieu,
+            'so_luong_nguyen_lieu' => $request->so_luong_nguyen_lieu,
+            'tinh_trang'           => $request->tinh_trang,
+        ]);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Đã tạo mới sản phẩm thành công!',
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(NguyenLieuSanPham $nguyenLieuSanPham)
+    public function updateNguyenLieuSanPham(Request $request)
     {
-        //
+        NguyenLieuSanPham::where('id', $request->id)
+            ->update([
+                'ma_san_pham'          => $request->ma_san_pham,
+                'id_nguyen_lieu'       => $request->id_nguyen_lieu,
+                'so_luong_nguyen_lieu' => $request->so_luong_nguyen_lieu,
+                'tinh_trang'           => $request->tinh_trang,
+            ]);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Đã cập nhật thành công sản phẩm ' . $request->ten_san_pham,
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, NguyenLieuSanPham $nguyenLieuSanPham)
+    public function deleteNguyenLieuSanPham($id)
     {
-        //
+        $data = NguyenLieuSanPham::where('id', $id)->first();
+        if ($data) {
+            $data->delete();
+            return response()->json([
+                'status'  => true,
+                'message' => 'Đã xóa nguyên liệu thành công!',
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Không tìm được nguyên liệu để xóa!',
+            ]);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(NguyenLieuSanPham $nguyenLieuSanPham)
+    public function changeTrangthai(Request $request)
     {
-        //
+        $tinh_trang_moi = $request->tinh_trang == 1 ? 0 : 1;
+        NguyenLieuSanPham::where('id', $request->id)->update([
+            'tinh_trang' => $tinh_trang_moi,
+        ]);
+        return response()->json([
+            'status'  => true,
+            'message' => 'Đã đổi trạng thái thành công',
+        ]);
     }
 }
