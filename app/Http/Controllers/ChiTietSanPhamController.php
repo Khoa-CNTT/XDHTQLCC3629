@@ -17,7 +17,7 @@ class ChiTietSanPhamController extends Controller
         return response()->json([
             'status'    =>  true,
             'chi_tiet_san_pham'  =>  $data
-        ]);
+        ]);// dsafdsfadfadfafa 
     }
 
     public function createChiTietSP(Request $request)
