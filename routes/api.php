@@ -95,20 +95,21 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::delete('/xoa-phuong-tien/{id}', [PhuongTienController::class, 'deletePhuongTien']);
         Route::post('/doi-tinh-trang-phuong-tien', [PhuongTienController::class, 'doiTinhTrangPhuongTien']);
     });
-    Route::group(['prefix'  =>  '/san-pham-nsx'], function () {
-        Route::get('/lay-du-lieu', [SanPhamNSXController::class, 'getData']);
-        Route::post('/them-moi-san-pham-nsx', [SanPhamNSXController::class, 'createSanPhamNSX']);
-        Route::post('/cap-nhat-san-pham-nsx', [SanPhamNSXController::class, 'updateSanPhamNSX']);
-        Route::post('/tim-san-pham-nsx', [SanPhamNSXController::class, 'searchSanPhamNSX']);
-        Route::delete('/xoa-san-pham-nsx/{id}', [SanPhamNSXController::class, 'deleteSanPhamNSX']);
-        Route::post('/doi-tinh-trang-san-pham-nsx', [SanPhamNSXController::class, 'doiTinhTrangSanPhamNSX']);
-    });
-    Route::group(['prefix'  =>  '/chi-tiet-san-pham'], function () {
-        Route::get('/lay-du-lieu', [ChiTietSanPhamController::class, 'getData']);
-        Route::post('/them-moi-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'createChiTietSP']);
-        Route::post('/cap-nhat-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'updateChiTietSP']);
-        Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
-        Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
-        Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
-    });
+
+    // Route::group(['prefix'  =>  '/san-pham-nsx'], function () {
+    //     Route::get('/lay-du-lieu', [SanPhamNSXController::class, 'getData']);
+    //     Route::post('/them-moi-san-pham-nsx', [SanPhamNSXController::class, 'createSanPhamNSX']);
+    //     Route::post('/cap-nhat-san-pham-nsx', [SanPhamNSXController::class, 'updateSanPhamNSX']);
+    //     Route::post('/tim-san-pham-nsx', [SanPhamNSXController::class, 'searchSanPhamNSX']);
+    //     Route::delete('/xoa-san-pham-nsx/{id}', [SanPhamNSXController::class, 'deleteSanPhamNSX']);
+    //     Route::post('/doi-tinh-trang-san-pham-nsx', [SanPhamNSXController::class, 'doiTinhTrangSanPhamNSX']);
+    // });
+    // Route::group(['prefix'  =>  '/chi-tiet-san-pham'], function () {
+    //     Route::get('/lay-du-lieu', [ChiTietSanPhamController::class, 'getData']);
+    //     Route::post('/them-moi-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'createChiTietSP']);
+    //     Route::post('/cap-nhat-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'updateChiTietSP']);
+    //     Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
+    //     Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
+    //     Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
+    // });
 });
