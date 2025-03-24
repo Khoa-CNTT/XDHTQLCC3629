@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('ten_cong_ty')->nullable();
             $table->string('email')->nullable();
-            $table->string('mat_khau')->nullable();
+            $table->string('password')->nullable();
             $table->string('dia_chi')->nullable();
             $table->string('so_dien_thoai')->nullable();
             $table->integer('tinh_trang')->default(1);

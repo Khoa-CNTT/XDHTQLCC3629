@@ -14,10 +14,11 @@ use App\Models\DanhMucSanPham;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
+Route::get('/check-nguoi-dung', [NhanVienController::class, 'checkNguoiDung']);
 //auth admin
 Route::group(['prefix'  =>  '/auth-admin'], function () {
     Route::post('/login', [NhanVienController::class, 'login']);
@@ -96,20 +97,20 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/doi-tinh-trang-phuong-tien', [PhuongTienController::class, 'doiTinhTrangPhuongTien']);
     });
 
-    // Route::group(['prefix'  =>  '/san-pham-nsx'], function () {
-    //     Route::get('/lay-du-lieu', [SanPhamNSXController::class, 'getData']);
-    //     Route::post('/them-moi-san-pham-nsx', [SanPhamNSXController::class, 'createSanPhamNSX']);
-    //     Route::post('/cap-nhat-san-pham-nsx', [SanPhamNSXController::class, 'updateSanPhamNSX']);
-    //     Route::post('/tim-san-pham-nsx', [SanPhamNSXController::class, 'searchSanPhamNSX']);
-    //     Route::delete('/xoa-san-pham-nsx/{id}', [SanPhamNSXController::class, 'deleteSanPhamNSX']);
-    //     Route::post('/doi-tinh-trang-san-pham-nsx', [SanPhamNSXController::class, 'doiTinhTrangSanPhamNSX']);
-    // });
-    // Route::group(['prefix'  =>  '/chi-tiet-san-pham'], function () {
-    //     Route::get('/lay-du-lieu', [ChiTietSanPhamController::class, 'getData']);
-    //     Route::post('/them-moi-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'createChiTietSP']);
-    //     Route::post('/cap-nhat-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'updateChiTietSP']);
-    //     Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
-    //     Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
-    //     Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
-    // });
+    Route::group(['prefix'  =>  '/san-pham-nsx'], function () {
+        Route::get('/lay-du-lieu', [SanPhamNSXController::class, 'getData']);
+        Route::post('/them-moi-san-pham-nsx', [SanPhamNSXController::class, 'createSanPhamNSX']);
+        Route::post('/cap-nhat-san-pham-nsx', [SanPhamNSXController::class, 'updateSanPhamNSX']);
+        Route::post('/tim-san-pham-nsx', [SanPhamNSXController::class, 'searchSanPhamNSX']);
+        Route::delete('/xoa-san-pham-nsx/{id}', [SanPhamNSXController::class, 'deleteSanPhamNSX']);
+        Route::post('/doi-tinh-trang-san-pham-nsx', [SanPhamNSXController::class, 'doiTinhTrangSanPhamNSX']);
+    });
+    Route::group(['prefix'  =>  '/chi-tiet-san-pham'], function () {
+        Route::get('/lay-du-lieu', [ChiTietSanPhamController::class, 'getData']);
+        Route::post('/them-moi-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'createChiTietSP']);
+        Route::post('/cap-nhat-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'updateChiTietSP']);
+        Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
+        Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
+        Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
+    });
 });

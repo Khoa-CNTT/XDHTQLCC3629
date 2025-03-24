@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DaiLy;
 use App\Models\NhanVien;
+use App\Models\NhaSanXuat;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Js;
 use Jenssegers\Agent\Agent;
 
 use function Laravel\Prompts\password;
@@ -16,94 +20,121 @@ class NhanVienController extends Controller
 {
     public function login(Request $request)
     {
-        $check  = Auth::guard('nhan_vien')->attempt(['email' => $request->email, 'password' => $request->password]);
-        // check sẽ trả về true hoặc false
-        if ($check == true) {  // có
-            // Lấy thông tin người đã đăng nhập
-            $user  = Auth::guard('nhan_vien')->user();
-            $token = $user->createToken('api-token-nhanvien')->plainTextToken;
-            return response()->json([
-                'message'   =>  'Đăng nhập thành công!',
-                'status'    =>  true,
-                'token'     =>  $token,
-                'user'      =>  $user,
+        $list       = ['nhan_vien', 'nha_san_xuat', 'dai_ly'];
+        $list_token = ['api_token_nhanvien', 'api_token_nhasanxuat', 'api_token_daily'];
+        $list_model = [
+            NhanVien::class,
+            NhaSanXuat::class,
+            DaiLy::class
+        ];
+        for ($i=0; $i < count($list); $i++) {
+            $check = Auth::guard($list[$i])->attempt([ //thử xác thực đăng nhập với từng loại tài khoản.
+                'email'     => $request->email,
+                'password'  => $request->password,
             ]);
-        } else {
-            return response()->json([
-                'message'   =>  'Đăng nhập thất bại!',
-                'status'    =>  false
-            ]);
+
+            if($check) {
+                $user =  Auth::guard($list[$i])->user(); //Lấy thông tin người dùng theo guard tương ứng
+                if($user && $user instanceof $list_model[$i]) {
+                    return response()->json([
+                        'status'    => true,
+                        'message'   => 'Đăng nhập thành công!',
+                        'token'     => $user->createToken($list_token[$i])->plainTextToken //tạo token tương ứng
+                    ]);
+                }
+            }
         }
+        return response()->json([
+            'status'  => false,
+            'message' => 'Đăng nhập thất bại!'
+        ]);
     }
 
     public function check(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
-        if ($user) {
-            $agent = new Agent();
-            $device     = $agent->device();
-            $os         = $agent->platform();
-            $browser    = $agent->browser();
-
-            $check_user =  DB::table('personal_access_tokens')
-                ->where('id', $user->currentAccessToken()->id)
-                ->first();
-
-            if ($check_user->tokenable_type === "App\\Models\\NhanVien") {
-                DB::table('personal_access_tokens')
-                    ->where('id', $user->currentAccessToken()->id)
-                    ->update([
-                        'ip'            =>  request()->ip(),
-                        'device'        =>  $device,
-                        'os'            =>  $os,
-                        'trinh_duyet'   =>  $browser,
-                    ]);
-                return response()->json([
-                    'email'     =>  $user->email,
-                    'ho_ten'    =>  $user->ho_ten,
-                    'list'      =>  $user->tokens,
-                ], 200);
-            }
-
+        if (!$user) {
             return response()->json([
-                'message'   =>  'Bạn Chưa Đăng Nhập ADMIN',
-                'status'    =>  false,
-            ], 401);
-        } else {
-            return response()->json([
-                'message'   =>  'Bạn Cần Đăng Nhập Hệ Thống',
-                'status'    =>  false,
+                'message'   => 'Bạn Cần Đăng Nhập Hệ Thống',
+                'status'    => false,
             ], 401);
         }
+
+        $agent = new Agent();
+        $device   = $agent->device();
+        $os       = $agent->platform();
+        $browser  = $agent->browser();
+
+        $check_user = DB::table('personal_access_tokens')
+            ->where('id', $user->currentAccessToken()->id)
+            ->first();
+
+        $valid_types = [
+            "App\\Models\\NhanVien",
+            "App\\Models\\DaiLy",
+            "App\\Models\\NhaSanXuat"
+        ];
+
+        if (!in_array($check_user->tokenable_type, $valid_types)) {
+            return response()->json([
+                'message'   => 'Bạn Chưa Đăng Nhập',
+                'status'    => false,
+            ], 401);
+        }
+
+        DB::table('personal_access_tokens')
+            ->where('id', $user->currentAccessToken()->id)
+            ->update([
+                'ip'         => request()->ip(),
+                'device'     => $device,
+                'os'         => $os,
+                'trinh_duyet'=> $browser,
+            ]);
+
+        return response()->json([
+            'email'          => $user->email,
+            'ho_ten'         => $user->ho_ten ?? $user->ten_cong_ty,
+            'list'           => $user->tokens,
+            'loai_tai_khoan' => $user->loai_tai_khoan,
+        ], 200);
     }
+
 
     public function logout()
     {
         $user = Auth::guard('sanctum')->user();
-        if ($user) {
-            $check_user =  DB::table('personal_access_tokens')
-                            ->where('id', $user->currentAccessToken()->id)
-                            ->first();
-            if($check_user->tokenable_type === "App\\Models\\NhanVien") {
-                DB::table('personal_access_tokens')
-                    ->where('id', $user->currentAccessToken()->id)
-                    ->delete();
-                return response()->json([
-                    'message'   =>  'Đăng xuất thành công!',
-                    'status'    =>  true,
-                ], 200);
-            }
-
+        if (!$user) {
             return response()->json([
-                'message'   =>  'Bạn cần đăng nhập!',
-                'status'    =>  false,
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
             ], 401);
-        } else {
-            return response()->json([
-                'message'   =>  'Bạn cần đăng nhập!',
-                'status'    =>  false,
-            ]);
         }
+
+        $check_user = DB::table('personal_access_tokens')
+            ->where('id', $user->currentAccessToken()->id)
+            ->first();
+
+        $valid_types = [
+            "App\\Models\\NhanVien",
+            "App\\Models\\DaiLy",
+            "App\\Models\\NhaSanXuat"
+        ];
+
+        if (!in_array($check_user->tokenable_type, $valid_types)) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+
+        DB::table('personal_access_tokens')
+            ->where('id', $user->currentAccessToken()->id)
+            ->delete();
+
+        return response()->json([
+            'message' => 'Đăng xuất thành công!',
+            'status'  => true,
+        ], 200);
     }
 
     public function logoutAll()
@@ -129,29 +160,25 @@ class NhanVienController extends Controller
 
     public function checkToken()
     {
-        // Lấy thông tin từ Authorization : 'Bearer ' gửi lên
+        // Lấy thông tin từ Authorization: 'Bearer ' gửi lên
         $user = Auth::guard('sanctum')->user();
-        if($user && $user instanceof \App\Models\NhanVien) {
+
+        if ($user instanceof \App\Models\NhanVien ||
+            $user instanceof \App\Models\DaiLy ||
+            $user instanceof \App\Models\NhaSanXuat) {
             return response()->json([
-                'status'    =>  true,
-                'message'   =>  "Oke, bạn có thể đi qua",
-            ]);
-        } else {
-            return response()->json([
-                'status'    =>  false,
-                'message'   =>  "Bạn cần đăng nhập hệ thống trước",
+                'status'  => true,
+                'message' => "Oke, bạn có thể đi qua",
             ]);
         }
+
+        return response()->json([
+            'status'  => false,
+            'message' => "Bạn cần đăng nhập hệ thống trước",
+        ]);
     }
 
-
-
-
-
     //admin - quản lý nhân viên
-
-
-
     public function getData()
     {
         // $id_chuc_nang   = ;
@@ -311,5 +338,20 @@ class NhanVienController extends Controller
                 'message'           =>   'Có lỗi khi đổi trạng thái',
             ]);
         }
+    }
+
+    public function checkNguoiDung()
+    {
+        $user = Auth::guard('sanctum')->user();
+        $check = 0; // mặc định đầu tiên hắn là admin trước
+        if($user &&  $user instanceof NhaSanXuat) {
+            $check = 1; // hắn là nsx
+        } elseif ($user &&  $user instanceof DaiLy){
+            $check = 2; // hắn là đại lý
+        }
+
+        return response()->json([
+            'data' => $check
+        ]);
     }
 }

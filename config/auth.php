@@ -44,6 +44,14 @@ return [
             'driver'    => 'session',
             'provider'  => 'nhan_viens',
         ],
+        'dai_ly' => [
+            'driver'    => 'session',
+            'provider'  => 'dai_lys',
+        ],
+        'nha_san_xuat' => [
+            'driver'    => 'session',
+            'provider'  => 'nha_san_xuats',
+        ],
     ],
 
     /*
@@ -71,6 +79,14 @@ return [
         'nhan_viens'   => [
             'driver'    => 'eloquent',
             'model'     => App\Models\NhanVien::class,
+        ],
+        'dai_lys'   => [
+            'driver'    => 'eloquent',
+            'model'     => App\Models\DaiLy::class,
+        ],
+        'nha_san_xuats'   => [
+            'driver'    => 'eloquent',
+            'model'     => App\Models\NhaSanXuat::class,
         ],
 
         // 'users' => [
