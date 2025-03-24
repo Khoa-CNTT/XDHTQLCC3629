@@ -4,15 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class DaiLy extends Model
+class DaiLy extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'dai_lies';
     protected $fillable = [
         "ten_cong_ty",
         "email",
-        "mat_khau",
+        "password",
         "dia_chi",
         "so_dien_thoai",
         "tinh_trang"

@@ -45,7 +45,7 @@ class DaiLyController extends Controller
         DaiLy::create([
             'ten_cong_ty'   =>  $request->ten_cong_ty,
             'email'         =>  $request->email,
-            'mat_khau'      =>  $request->password,
+            'password'      =>  $request->password,
             'dia_chi'       =>  $request->dia_chi,
             'so_dien_thoai' =>  $request->so_dien_thoai,
             'tinh_trang'    =>  $request->tinh_trang
@@ -104,7 +104,7 @@ class DaiLyController extends Controller
                 ->update([
                     'ten_cong_ty'   =>  $request->ten_cong_ty,
                     'email'         =>  $request->email,
-                    'mat_khau'      =>  $request->password,
+                    'password'      =>  $request->password,
                     'dia_chi'       =>  $request->dia_chi,
                     'so_dien_thoai' =>  $request->so_dien_thoai,
                     'tinh_trang'    =>  $request->tinh_trang
