@@ -69,6 +69,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-san-pham', [SanPhamController::class, 'searchSanPham']);
         Route::delete('/xoa-san-pham/{id}', [SanPhamController::class, 'deleteSanPham']);
         Route::post('/doi-tinh-trang-san-pham', [SanPhamController::class, 'doiTinhTrangSanPham']);
+        Route::get('/get-data-by-id', [SanPhamController::class, 'getDataByID']);
     });
 
     Route::group(['prefix'  =>  '/nguyen-lieu'], function () {

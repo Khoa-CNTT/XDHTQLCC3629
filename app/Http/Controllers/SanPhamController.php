@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DaiLy;
 use App\Models\DanhMucSanPham;
+use App\Models\NhaSanXuat;
 use App\Models\SanPham;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SanPhamController extends Controller
@@ -116,6 +119,58 @@ class SanPhamController extends Controller
                 'status'            =>   false,
                 'message'           =>   'Có lỗi khi đổi trạng thái',
             ]);
+        }
+    }
+
+    //get data theo id nhà sản xuất
+    public function getDataByID(){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        } elseif($user && $user instanceof DaiLy) {
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id','san_pham_n_s_x_e_s.id_san_pham')
+            ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->join('chi_tiet_san_phams', 'san_phams.ma_san_pham', 'chi_tiet_san_phams.ma_san_pham')
+            ->select('san_phams.id',
+                    'san_phams.ten_san_pham',
+                    'nha_san_xuats.ten_cong_ty',
+                    'san_phams.hinh_anh',
+                    'chi_tiet_san_phams.so_luong',
+                    'chi_tiet_san_phams.don_gia',
+                    'chi_tiet_san_phams.don_vi_tinh') //get để nhóm ở groupby
+            ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
+            ->get()
+            ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
+            $check = 2;
+            return response()->json([
+                'status'    =>      true,
+                'data'      =>      $list_san_pham,
+                'check'     =>      $check,
+            ]);
+        }
+        // elseif($user && $user instanceof NhaSanXuat) {
+        //     $id_nha_san_xuat = $user->id;
+        //     // Lấy danh sách sản phẩm của nhà sản xuất này
+        //     $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
+        //     ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+        //     ->select('san_phams.id',
+        //             'san_phams.ten_san_pham',
+        //             'nha_san_xuats.ten_cong_ty',
+        //             'san_phams.hinh_anh')
+        //     ->where('nha_san_xuats.id', $id_nha_san_xuat)->get();
+        //     $check = 1;
+        //     return response()->json([
+        //         'status'    =>      true,
+        //         'data'      =>      $list_san_pham,
+        //         'check'     =>      $check,
+        //     ]);
+        // }
+        else {
+            return response()->json([
+            ], 401);
         }
     }
 }
