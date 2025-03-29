@@ -16,7 +16,9 @@ class SanPhamController extends Controller
     public function getdata()
     {
         $data = SanPham::join('danh_muc_san_phams', 'san_phams.id_danh_muc','danh_muc_san_phams.id')
-                        ->select('san_phams.*','danh_muc_san_phams.ten_danh_muc')
+                        ->join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
+                        ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+                        ->select('san_phams.*','danh_muc_san_phams.ten_danh_muc', 'nha_san_xuats.ten_cong_ty', 'nha_san_xuats.id as nsx_id')
                         ->get();
         return response()->json([
             'status'    =>  true,
@@ -73,6 +75,7 @@ class SanPhamController extends Controller
         $key = "%" . $request->abc . "%";
 
         $data   = SanPham::where('ten_san_pham', 'like', $key)
+            ->where('ten_cong_ty', 'like', $key)
             ->get();
 
         return response()->json([
@@ -123,7 +126,7 @@ class SanPhamController extends Controller
     }
 
     //get data theo id nhà sản xuất
-    public function getDataByID(){
+    public function getDataByUser(){
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -133,14 +136,14 @@ class SanPhamController extends Controller
         } elseif($user && $user instanceof DaiLy) {
             $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id','san_pham_n_s_x_e_s.id_san_pham')
             ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-            ->join('chi_tiet_san_phams', 'san_phams.ma_san_pham', 'chi_tiet_san_phams.ma_san_pham')
+            ->where('san_phams.tinh_trang', '1')
             ->select('san_phams.id',
                     'san_phams.ten_san_pham',
                     'nha_san_xuats.ten_cong_ty',
                     'san_phams.hinh_anh',
-                    'chi_tiet_san_phams.so_luong',
-                    'chi_tiet_san_phams.don_gia',
-                    'chi_tiet_san_phams.don_vi_tinh') //get để nhóm ở groupby
+                    'san_phams.so_luong_ton_kho',
+                    'san_phams.gia_ban',
+                    'san_phams.don_vi_tinh') //get để nhóm ở groupby
             ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
             ->get()
             ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
@@ -172,5 +175,26 @@ class SanPhamController extends Controller
             return response()->json([
             ], 401);
         }
+    }
+
+    public function getDataByIDSanPham(Request $request){
+        $data = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id','san_pham_n_s_x_e_s.id_san_pham')
+        ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+        ->where('san_phams.id', $request->id)
+        ->select('san_phams.id',
+                'san_phams.ten_san_pham',
+                'nha_san_xuats.ten_cong_ty',
+                'nha_san_xuats.id as nha_san_xuat_id',
+                'san_phams.hinh_anh',
+                'san_phams.so_luong_ton_kho',
+                'san_phams.gia_ban',
+                'san_phams.don_vi_tinh', //get để nhóm ở groupby
+                'san_phams.mo_ta',) //get để nhóm ở groupby
+        ->first();
+
+        return response()->json([
+            'chi_tiet_san_pham'     =>      $data,
+            'status'                =>      true
+        ]);
     }
 }
