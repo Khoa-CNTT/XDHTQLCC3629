@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChiTietSanPhamController;
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
+use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\NguyenLieuController;
 use App\Http\Controllers\NguyenLieuSanPhamController;
 use App\Http\Controllers\NhanVienController;
@@ -114,5 +115,10 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
         Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
         Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
+    });
+    Route::group(['prefix'  =>  '/gio-hang'], function () {
+        Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
+        Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
+        Route::post('/cap-nhat-so-luong', [GioHangController::class, 'capNhatSoLuong']);
     });
 });
