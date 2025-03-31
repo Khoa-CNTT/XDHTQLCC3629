@@ -120,5 +120,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
         Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
         Route::post('/cap-nhat-so-luong', [GioHangController::class, 'capNhatSoLuong']);
+        Route::post('/xoa-san-pham', [GioHangController::class, 'xoaSanPham']);
+        Route::post('/dat-hang', [GioHangController::class, 'datHang']);
     });
 });

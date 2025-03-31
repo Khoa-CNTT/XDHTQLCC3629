@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaiLy;
+use App\Models\DonHang;
 use App\Models\GioHang;
+use App\Models\LichSuDonHang;
 use App\Models\SanPham;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class GioHangController extends Controller
 {
@@ -112,4 +116,100 @@ class GioHangController extends Controller
             'data' => $cartItem
         ]);
     }
+
+    public function xoaSanPham(Request $request)
+    {
+        // Tìm sản phẩm trong giỏ hàng
+        $sanPham = GioHang::where('id', $request->id)->first();
+
+        if (!$sanPham) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Sản phẩm không tồn tại trong giỏ hàng'
+            ], 404);
+        }
+
+        $sanPham->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Xóa sản phẩm thành công'
+        ]);
+    }
+
+    public function datHang(Request $request)
+{
+    $user = Auth::guard('sanctum')->user();
+    $user_id = $user->id; // Lấy ID user
+    $sanPhamChon = $request->input('san_pham_chon', []); // Danh sách sản phẩm được chọn
+
+    if (!is_array($sanPhamChon) || empty($sanPhamChon)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Không có sản phẩm nào được chọn'
+        ], 400);
+    }
+
+    // Lấy danh sách ID sản phẩm từ danh sách được chọn
+    $sanPhamIds = array_map('intval', $sanPhamChon);
+
+    // Tìm sản phẩm trong giỏ hàng dựa trên ID sản phẩm đã chọn
+    $gioHangItems = GioHang::where('user_id', $user_id)
+        ->whereIn('id', $sanPhamIds) // 🔍 Nên dùng id của bảng giỏ hàng
+        ->get();
+
+    if ($gioHangItems->isEmpty()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Sản phẩm không hợp lệ hoặc không có trong giỏ hàng'
+        ], 400);
+    }
+
+    DB::beginTransaction();
+    try {
+        // Tính tổng tiền từ giỏ hàng
+        $tongTien = $gioHangItems->sum(fn($item) => $item->don_gia * $item->so_luong);
+
+        // Tạo đơn hàng mới
+        $donHang = DonHang::create([
+            'ma_don_hang' => Str::uuid(),
+            'user_id' => $user_id,
+            'tong_tien' => $tongTien,
+            'tinh_trang' => 0, // Mới đặt hàng
+        ]);
+
+        // Lưu vào lịch sử đơn hàng
+        foreach ($gioHangItems as $item) {
+            LichSuDonHang::create([
+                'user_id' => $user_id,
+                'id_don_hang' => $donHang->id,
+                'id_san_pham' => $item->id_san_pham,
+                'don_gia' => $item->don_gia,
+                'so_luong' => $item->so_luong,
+                'tinh_trang' => 0, // Chờ xử lý
+            ]);
+        }
+
+        // Xóa sản phẩm đã đặt khỏi giỏ hàng
+        GioHang::where('user_id', $user_id)
+            ->whereIn('id', $sanPhamIds) // Đúng ID giỏ hàng
+            ->delete();
+
+        DB::commit();
+        return response()->json([
+            'status' => true,
+            'message' => 'Đặt hàng thành công',
+            'don_hang' => $donHang
+        ], 200);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => false,
+            'message' => 'Đặt hàng thất bại',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
 }
