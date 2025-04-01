@@ -16,7 +16,6 @@ return new class extends Migration
             $table->uuid('ma_don_hang')->unique();
             $table->integer('user_id')->nullable();
             $table->integer('id_nguoi_duyet')->nullable();
-            $table->integer('id_nha_san_xuat')->nullable();
             $table->integer('id_van_chuyen')->nullable();
             $table->timestamp('ngay_dat')->useCurrent();
             $table->date('ngay_giao')->nullable();
