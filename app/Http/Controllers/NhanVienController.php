@@ -92,10 +92,13 @@ class NhanVienController extends Controller
             ]);
 
         return response()->json([
-            'email'          => $user->email,
-            'ho_ten'         => $user->ho_ten ?? $user->ten_cong_ty,
-            'list'           => $user->tokens,
-            'loai_tai_khoan' => $user->loai_tai_khoan,
+            'email'             =>      $user->email,
+            'ho_ten'            =>      $user->ho_ten ?? $user->ten_cong_ty,
+            'list'              =>      $user->tokens,
+            'loai_tai_khoan'    =>      $user->loai_tai_khoan,
+            'so_dien_thoai'     =>      $user->so_dien_thoai,
+            'dia_chi'           =>      $user->dia_chi,
+            'user_id'           =>      $user->id,
         ], 200);
     }
 

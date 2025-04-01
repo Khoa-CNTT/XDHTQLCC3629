@@ -15,7 +15,6 @@ class DonHang extends Model
         "ma_don_hang",
         "user_id",
         "id_nguoi_duyet",
-        "id_nha_san_xuat",
         "id_van_chuyen",
         "ngay_dat",
         "ngay_giao",
