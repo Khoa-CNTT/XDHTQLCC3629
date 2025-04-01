@@ -28,7 +28,6 @@ Route::group(['prefix'  =>  '/auth-admin'], function () {
     Route::get('/dang-xuat-tat-ca', [NhanVienController::class, 'logoutAll']);
     Route::get('/kiem-tra-token', [NhanVienController::class, 'checkToken']);
 });
-
 //admin
 Route::group(['prefix'  =>  '/admin'], function () {
     Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
