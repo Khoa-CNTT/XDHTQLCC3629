@@ -122,4 +122,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/xoa-san-pham', [GioHangController::class, 'xoaSanPham']);
         Route::post('/dat-hang', [GioHangController::class, 'datHang']);
     });
+    Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
+        Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
+    });
 });
