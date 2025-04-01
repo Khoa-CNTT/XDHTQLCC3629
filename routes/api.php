@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChiTietSanPhamController;
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
+use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\NguyenLieuController;
 use App\Http\Controllers\NguyenLieuSanPhamController;
 use App\Http\Controllers\NhanVienController;
@@ -114,7 +115,11 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
         Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
     });
-    Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
-        Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
+    Route::group(['prefix'  =>  '/gio-hang'], function () {
+        Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
+        Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
+        Route::post('/cap-nhat-so-luong', [GioHangController::class, 'capNhatSoLuong']);
+        Route::post('/xoa-san-pham', [GioHangController::class, 'xoaSanPham']);
+        Route::post('/dat-hang', [GioHangController::class, 'datHang']);
     });
 });
