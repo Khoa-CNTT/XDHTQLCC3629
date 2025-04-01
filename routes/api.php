@@ -27,7 +27,6 @@ Route::group(['prefix'  =>  '/auth-admin'], function () {
     Route::get('/dang-xuat-tat-ca', [NhanVienController::class, 'logoutAll']);
     Route::get('/kiem-tra-token', [NhanVienController::class, 'checkToken']);
 });
-
 //admin
 Route::group(['prefix'  =>  '/admin'], function () {
     Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
@@ -114,5 +113,8 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'searchChiTietSP']);
         Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
         Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
+    });
+    Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
+        Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
     });
 });

@@ -11,10 +11,10 @@ class SanPhamNSXController extends Controller
 {
     public function getdata()
     {
-        $data = SanPhamNSX::join('nha_san_xuats', 'san_pham_n_s_x_e_s.id_nha_san_xuat','nha_san_xuats.id')
-                        ->join('san_phams', 'san_pham_n_s_x_e_s.id_san_pham','san_phams.id')
-                        ->select('san_pham_n_s_x_e_s.*','nha_san_xuats.ten_cong_ty','san_phams.ma_san_pham', 'san_phams.ten_san_pham', 'nha_san_xuats.ten_cong_ty')
-                        ->get();
+        $data = SanPhamNSX::join('nha_san_xuats', 'san_pham_n_s_x_e_s.id_nha_san_xuat', 'nha_san_xuats.id')
+            ->join('san_phams', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
+            ->select('san_pham_n_s_x_e_s.*', 'nha_san_xuats.ten_cong_ty', 'san_phams.ma_san_pham', 'san_phams.ten_san_pham', 'nha_san_xuats.ten_cong_ty')
+            ->get();
         return response()->json([
             'status'    =>  true,
             'san_pham_nsx'  =>  $data
@@ -94,23 +94,19 @@ class SanPhamNSXController extends Controller
     public function doiTinhTrangSanPhamNSX(Request $request)
     {
         try {
-            if ($request->tinh_trang == 1) {
-                $tinh_trang_moi = 0;
-            } else {
-                $tinh_trang_moi = 1;
-            }
+            $tinh_trang_moi = $request->tinh_trang == 1 ? 0 : 1; 
             SanPhamNSX::where('id', $request->id)->update([
-                'tinh_trang'    =>  $tinh_trang_moi
+                'tinh_trang' => $tinh_trang_moi
             ]);
             return response()->json([
-                'status'            =>   true,
-                'message'           =>   'Đã đổi trạng thái thành công',
+                'status' => true,
+                'message' => 'Đã đổi trạng thái thành công',
             ]);
         } catch (Exception $e) {
             Log::info("Lỗi", $e);
             return response()->json([
-                'status'            =>   false,
-                'message'           =>   'Có lỗi khi đổi trạng thái',
+                'status' => false,
+                'message' => 'Có lỗi khi đổi trạng thái',
             ]);
         }
     }

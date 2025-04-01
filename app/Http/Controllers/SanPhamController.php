@@ -15,11 +15,11 @@ class SanPhamController extends Controller
 {
     public function getdata()
     {
-        $data = SanPham::join('danh_muc_san_phams', 'san_phams.id_danh_muc','danh_muc_san_phams.id')
-                        ->join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
-                        ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-                        ->select('san_phams.*','danh_muc_san_phams.ten_danh_muc', 'nha_san_xuats.ten_cong_ty', 'nha_san_xuats.id as nsx_id')
-                        ->get();
+        $data = SanPham::join('danh_muc_san_phams', 'san_phams.id_danh_muc', 'danh_muc_san_phams.id')
+            ->join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
+            ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->select('san_phams.*', 'danh_muc_san_phams.ten_danh_muc', 'nha_san_xuats.ten_cong_ty', 'nha_san_xuats.id as nsx_id')
+            ->get();
         return response()->json([
             'status'    =>  true,
             'san_pham'  =>  $data
@@ -126,62 +126,69 @@ class SanPhamController extends Controller
     }
 
     //get data theo id nhà sản xuất
-    public function getDataByUser(){
+    public function getDataByUser()
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DaiLy) {
-            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id','san_pham_n_s_x_e_s.id_san_pham')
-            ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-            ->where('san_phams.tinh_trang', '1')
-            ->select('san_phams.id',
+        } elseif ($user && $user instanceof DaiLy) {
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', 'san_pham_n_s_x_e_s.id_san_pham')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+                ->where('san_phams.tinh_trang', '1')
+                ->select(
+                    'san_phams.id',
                     'san_phams.ten_san_pham',
                     'nha_san_xuats.ten_cong_ty',
                     'san_phams.hinh_anh',
                     'san_phams.so_luong_ton_kho',
                     'san_phams.gia_ban',
-                    'san_phams.don_vi_tinh') //get để nhóm ở groupby
-            ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
-            ->get()
-            ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
+                    'san_phams.don_vi_tinh'
+                ) //get để nhóm ở groupby
+                ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
+                ->get()
+                ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
             $check = 2;
             return response()->json([
                 'status'    =>      true,
                 'data'      =>      $list_san_pham,
                 'check'     =>      $check,
             ]);
-        }
-        // elseif($user && $user instanceof NhaSanXuat) {
-        //     $id_nha_san_xuat = $user->id;
-        //     // Lấy danh sách sản phẩm của nhà sản xuất này
-        //     $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
-        //     ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-        //     ->select('san_phams.id',
-        //             'san_phams.ten_san_pham',
-        //             'nha_san_xuats.ten_cong_ty',
-        //             'san_phams.hinh_anh')
-        //     ->where('nha_san_xuats.id', $id_nha_san_xuat)->get();
-        //     $check = 1;
-        //     return response()->json([
-        //         'status'    =>      true,
-        //         'data'      =>      $list_san_pham,
-        //         'check'     =>      $check,
-        //     ]);
-        // }
-        else {
+        } elseif ($user && $user instanceof NhaSanXuat) {
+            $id_nha_san_xuat = $user->id;
+            // Lấy danh sách sản phẩm của nhà sản xuất này
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+                ->select(
+                    'san_phams.id',
+                    'san_phams.ten_san_pham',
+                    'nha_san_xuats.ten_cong_ty',
+                    'san_pham_n_s_x_e_s.ma_lo_hang',
+                    'san_pham_n_s_x_e_s.ngay_san_xuat',
+                    'san_pham_n_s_x_e_s.tinh_trang',
+                    'san_phams.hinh_anh'
+                )
+                ->where('nha_san_xuats.id', $id_nha_san_xuat)->get();
+            $check = 1;
             return response()->json([
-            ], 401);
+                'status'    =>      true,
+                'data'      =>      $list_san_pham,
+                'check'     =>      $check,
+            ]);
+        } else {
+            return response()->json([], 401);
         }
     }
 
-    public function getDataByIDSanPham(Request $request){
-        $data = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id','san_pham_n_s_x_e_s.id_san_pham')
-        ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-        ->where('san_phams.id', $request->id)
-        ->select('san_phams.id',
+    public function getDataByIDSanPham(Request $request)
+    {
+        $data = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', 'san_pham_n_s_x_e_s.id_san_pham')
+            ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->where('san_phams.id', $request->id)
+            ->select(
+                'san_phams.id',
                 'san_phams.ten_san_pham',
                 'nha_san_xuats.ten_cong_ty',
                 'nha_san_xuats.id as nha_san_xuat_id',
@@ -189,12 +196,58 @@ class SanPhamController extends Controller
                 'san_phams.so_luong_ton_kho',
                 'san_phams.gia_ban',
                 'san_phams.don_vi_tinh', //get để nhóm ở groupby
-                'san_phams.mo_ta',) //get để nhóm ở groupby
-        ->first();
+                'san_phams.mo_ta',
+            ) //get để nhóm ở groupby
+            ->first();
 
         return response()->json([
             'chi_tiet_san_pham'     =>      $data,
             'status'                =>      true
+        ]);
+    }
+    public function searchSanPhamNSX(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+        $key = "%" . $request->abc . "%";
+
+        // Kiểm tra xem người dùng đã đăng nhập
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status' => false,
+            ], 401);
+        }
+
+        // Tìm kiếm sản phẩm theo tài khoản
+        $query = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
+            ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->where(function ($q) use ($key) {
+                $q->where('san_phams.ten_san_pham', 'like', $key)
+                    ->orWhere('nha_san_xuats.ten_cong_ty', 'like', $key);
+            });
+
+        if ($user instanceof DaiLy) {
+            $query->where('san_phams.tinh_trang', '1');
+        } elseif ($user instanceof NhaSanXuat) {
+            $query->where('nha_san_xuats.id', $user->id);
+        }
+
+        $data = $query->select(
+            'san_phams.id',
+            'san_phams.ten_san_pham',
+            'nha_san_xuats.ten_cong_ty',
+            'san_phams.hinh_anh',
+            'san_pham_n_s_x_e_s.ma_lo_hang',
+            'san_pham_n_s_x_e_s.ngay_san_xuat',
+            'san_pham_n_s_x_e_s.tinh_trang',
+            'san_phams.so_luong_ton_kho',
+            'san_phams.gia_ban',
+            'san_phams.don_vi_tinh'
+        )->get();
+
+        return response()->json([
+            'status' => true,
+            'san_pham' => $data,
         ]);
     }
 }
