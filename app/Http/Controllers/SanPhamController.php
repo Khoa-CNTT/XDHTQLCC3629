@@ -134,9 +134,12 @@ class SanPhamController extends Controller
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif ($user && $user instanceof DaiLy) {
-            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', 'san_pham_n_s_x_e_s.id_san_pham')
-                ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+        }
+
+        // Dữ liệu cho DaiLy
+        if ($user instanceof DaiLy) {
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
                 ->where('san_phams.tinh_trang', '1')
                 ->select(
                     'san_phams.id',
@@ -145,41 +148,48 @@ class SanPhamController extends Controller
                     'san_phams.hinh_anh',
                     'san_phams.so_luong_ton_kho',
                     'san_phams.gia_ban',
-                    'san_phams.don_vi_tinh'
-                ) //get để nhóm ở groupby
-                ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
-                ->get()
-                ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
-            $check = 2;
+                    'san_phams.don_vi_tinh',
+                    'san_phams.tinh_trang',
+                    'danh_muc_san_phams.ten_danh_muc', // Thêm tên danh mục
+                    'san_phams.id_danh_muc'
+                )
+                ->get();
+
             return response()->json([
-                'status'    =>      true,
-                'data'      =>      $list_san_pham,
-                'check'     =>      $check,
+                'status' => true,
+                'data' => $list_san_pham,
             ]);
-        } elseif ($user && $user instanceof NhaSanXuat) {
+        }
+
+        // Dữ liệu cho NhaSanXuat
+        if ($user instanceof NhaSanXuat) {
             $id_nha_san_xuat = $user->id;
-            // Lấy danh sách sản phẩm của nhà sản xuất này
-            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_pham_n_s_x_e_s.id_san_pham', 'san_phams.id')
-                ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+                ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
+                ->where('nha_san_xuats.id', $id_nha_san_xuat)
                 ->select(
                     'san_phams.id',
                     'san_phams.ten_san_pham',
                     'nha_san_xuats.ten_cong_ty',
-                    'san_pham_n_s_x_e_s.ma_lo_hang',
-                    'san_pham_n_s_x_e_s.ngay_san_xuat',
-                    'san_pham_n_s_x_e_s.tinh_trang',
-                    'san_phams.hinh_anh'
+                    'san_phams.hinh_anh',
+                    'san_phams.so_luong_ton_kho',
+                    'san_phams.gia_ban',
+                    'san_phams.don_vi_tinh',
+                    'san_phams.tinh_trang',
+                    'danh_muc_san_phams.ten_danh_muc', // Thêm tên danh mục
+                    'san_phams.id_danh_muc'
                 )
-                ->where('nha_san_xuats.id', $id_nha_san_xuat)->get();
-            $check = 1;
+                ->get();
+
             return response()->json([
-                'status'    =>      true,
-                'data'      =>      $list_san_pham,
-                'check'     =>      $check,
+                'status' => true,
+                'data' => $list_san_pham,
             ]);
-        } else {
-            return response()->json([], 401);
         }
+
+        return response()->json([], 401);
     }
 
     public function getDataByIDSanPham(Request $request)
@@ -210,7 +220,6 @@ class SanPhamController extends Controller
         $user = Auth::guard('sanctum')->user();
         $key = "%" . $request->abc . "%";
 
-        // Kiểm tra xem người dùng đã đăng nhập
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
@@ -218,9 +227,9 @@ class SanPhamController extends Controller
             ], 401);
         }
 
-        // Tìm kiếm sản phẩm theo tài khoản
         $query = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
             ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
             ->where(function ($q) use ($key) {
                 $q->where('san_phams.ten_san_pham', 'like', $key)
                     ->orWhere('nha_san_xuats.ten_cong_ty', 'like', $key);
@@ -242,12 +251,40 @@ class SanPhamController extends Controller
             'san_pham_n_s_x_e_s.tinh_trang',
             'san_phams.so_luong_ton_kho',
             'san_phams.gia_ban',
-            'san_phams.don_vi_tinh'
+            'san_phams.don_vi_tinh',
+            'danh_muc_san_phams.ten_danh_muc' // Thêm tên danh mục
         )->get();
 
         return response()->json([
             'status' => true,
             'san_pham' => $data,
         ]);
+    }
+    public function updateSanPhamNSX(Request $request)
+    {
+        try {
+            SanPham::where('id', $request->id)
+                ->update([
+                    'ma_san_pham' => $request->ma_san_pham,
+                    'ten_san_pham' => $request->ten_san_pham,
+                    'mo_ta' => $request->mo_ta,
+                    'id_danh_muc' => $request->id_danh_muc,
+                    'hinh_anh' => $request->hinh_anh,
+                    'so_luong_ton_kho' => $request->so_luong_ton_kho,
+                    'gia_ban' => $request->gia_ban,
+                    'don_vi_tinh' => $request->don_vi_tinh,
+                    'tinh_trang' => $request->tinh_trang,
+                ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'Đã cập nhật thành công sản phẩm ' . $request->ten_san_pham,
+            ]);
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi khi cập nhật thông tin sản phẩm',
+            ]);
+        }
     }
 }

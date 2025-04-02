@@ -124,5 +124,6 @@ Route::group(['prefix'  =>  '/admin'], function () {
     });
     Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
         Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
+        Route::post('/update-san-pham-nha-san-xuat', [SanPhamController::class, 'updateSanPhamNSX']);
     });
 });
