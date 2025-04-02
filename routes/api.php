@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChiTietSanPhamController;
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
+use App\Http\Controllers\DonHangController;
 use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\NguyenLieuController;
 use App\Http\Controllers\NguyenLieuSanPhamController;
@@ -138,6 +139,6 @@ Route::group(['prefix'  =>  '/dai-ly'], function () {
         Route::post('/lay-du-lieu-san-pham/data', [SanPhamController::class, 'getDataByIDSanPham']);
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
-
+        Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
     });
 });
