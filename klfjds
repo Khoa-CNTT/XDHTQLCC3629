@@ -1,0 +1,56 @@
+beec17b MaiXuanTung <119039828+MaiXuanTung@users.noreply.github.com> Merge pull request #4 from Khoa-CNTT/update_README
+57ec83c Mai Xuan Tung <maitung801@gmail.com> update README.md
+56e4d70 MaiXuanTung <119039828+MaiXuanTung@users.noreply.github.com> Merge pull request #3 from Khoa-CNTT/Add_Readme
+fb0ee65 Mai Xuan Tung <maitung801@gmail.com> Tạo file README.md để chứa đường dẫn kho Git FE
+02348fe MaiXuanTung <119039828+MaiXuanTung@users.noreply.github.com> Merge pull request #2 from Khoa-CNTT/TungBE-1/4/2025-3rd
+71a0988 MaiXuanTung <119039828+MaiXuanTung@users.noreply.github.com> Merge pull request #1 from Khoa-CNTT/TungBE-1/4/2025
+0f1b8fc Mai Xuan Tung <maitung801@gmail.com> fix hàm datHang, sửa dữ liệu bảng donhangs, licsudonhangs
+72b3b18 Mai Xuan Tung <maitung801@gmail.com> fix conflit
+02beb25 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'ThienBE1/4' into 'main'
+5d7b5c0 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'main' into 'ThienBE1/4'
+6ccd9ed thiendev12345 <huuthien034501@gmail.com> search vs getdata theo user
+1c04c7f Mai Xuan Tung <maitung801@gmail.com> Merge branch 'TungBE-31/3/2025' into 'main'
+1f79084 Mai Xuan Tung <maitung801@gmail.com> tạo bảng đơn hàng, lịch sử đơn hàng, hoàn thiện chức năng thêm vào giỏ hàng + lở dở đặt hàng
+2314bfa Mai Xuan Tung <maitung801@gmail.com> Merge branch 'TungBE-30/3/2025' into 'main'
+f492fa6 Mai Xuan Tung <maitung801@gmail.com> Tạo migration GioHang
+22d8b19 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'TungBE-29/3/2025' into 'main'
+f0eecef Mai Xuan Tung <maitung801@gmail.com> Tạo hàm get chi tiết sản phẩm cho đại lý
+956a9f3 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'TungBE_26/3/2025' into 'main'
+5498965 Mai Xuan Tung <maitung801@gmail.com> tạo api get sản phẩm theo id người dùng
+e4e69e8 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'TungBE_24/3/2025' into 'main'
+03745df Mai Xuan Tung <maitung801@gmail.com> Fix đăng nhập, chia đăng nhập theo từng loại tài khoản
+2078453 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'fix_HungQuy_BE_12/3/25' into 'main'
+fffd4be hung van <quyhung1682003@gmail.com> CRUD Chi Tiet SP, CRUD San Pham NSX
+ad13b0e hung van <quyhung1682003@gmail.com> CRUD Chi Tiet SP, CRUD San Pham NSX
+61c27d9 hung van <quyhung1682003@gmail.com> CRUD Chi Tiet SP, CRUD San Pham NSX
+25dd8f8 Xuan Le <leanhxuan26022003@gmail.com> Edit SanPhamSeeder.php
+a046877 Xuan Le <leanhxuan26022003@gmail.com> fix api.php
+360c188 Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'ThienBE8/3' into 'main'
+72c93bd Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'main' into 'ThienBE8/3'
+fcb0245 thiendev12345 <huuthien034501@gmail.com> nguyen lieu vs nguyen lieu sp
+cdb6aa6 Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'XuanBE6/3' into 'main'
+d7c9305 unknown <leanhxuan26022003@gmail.com> thêm hình ảnh của sản phẩm
+069f1fd Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'Hung_BE_5/3' into 'main'
+d2735a3 hung van <quyhung1682003@gmail.com> CRUD Phương tiện
+3a8617c Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'XuanfixBE4/3' into 'main'
+dc28b19 unknown <leanhxuan26022003@gmail.com> fix lỗi vặt
+3cace6e Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Hung_BE_3/3/2025' into 'main'
+846935b hung van <quyhung1682003@gmail.com> CRUD Sản Phẩm
+5e2d5c6 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Tung_BE_1/3/2025' into 'main'
+a4f5afd Mai Xuan Tung <maitung801@gmail.com> Fix api nhân viên
+d262fe9 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Hung_BE_1/3/2025' into 'main'
+5c5f3be hung van <quyhung1682003@gmail.com> CRUD Danh Muc SP
+77f91a9 Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'XuanBE280225' into 'main'
+c92217f unknown <leanhxuan26022003@gmail.com> CRUD Nhan Vien
+1c49010 Xuan Le <leanhxuan26022003@gmail.com> Merge branch 'Hung_BE_28/2/2025' into 'main'
+88145de hung van <quyhung1682003@gmail.com> CRUD Đại Lý
+acdbec2 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Tung_BE_26/2/2025' into 'main'
+4dcaeca Mai Xuan Tung <maitung801@gmail.com> CRUD page nhà sản xuất + thêm password cho nsx + fix seeder nsx
+427a003 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Tung_BE_25/2/2025' into 'main'
+93d01e1 Mai Xuan Tung <maitung801@gmail.com> Seeder nhân viên + fnc login, check trong NhanVienController
+0bb90b9 Mai Xuan Tung <maitung801@gmail.com> Merge branch 'Tung_CreateDB' into 'main'
+acd5c09 Mai Xuan Tung <maitung801@gmail.com> Tạo dữ liệu cho database + update table nhà sx
+9195b1b Mai Xuan Tung <maitung801@gmail.com> Merge branch 'master' into 'main'
+fa3013b Mai Xuan Tung <maitung801@gmail.com> Merge branch 'main' into 'master'
+0ef6ebe Mai Xuan Tung <maitung801@gmail.com> Initial Commit
+7ee9605 Mai Xuan Tung <maitung801@gmail.com> Initial commit

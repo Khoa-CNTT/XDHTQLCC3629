@@ -3,6 +3,7 @@
 use App\Http\Controllers\ChiTietSanPhamController;
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
+use App\Http\Controllers\DonViVanChuyenController;
 use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\NguyenLieuController;
 use App\Http\Controllers\NguyenLieuSanPhamController;
@@ -97,6 +98,14 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-phuong-tien', [PhuongTienController::class, 'searchPhuongTien']);
         Route::delete('/xoa-phuong-tien/{id}', [PhuongTienController::class, 'deletePhuongTien']);
         Route::post('/doi-tinh-trang-phuong-tien', [PhuongTienController::class, 'doiTinhTrangPhuongTien']);
+    });
+    Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
+        Route::get('/lay-du-lieu', [DonViVanChuyenController::class, 'getData']);
+        Route::post('/them-moi-don-vi-van-chuyen', [DonViVanChuyenController::class, 'createDVVC']);
+        Route::post('/cap-nhat-don-vi-van-chuyen', [DonViVanChuyenController::class, 'updateDVVC']);
+        Route::post('/tim-don-vi-van-chuyen', [DonViVanChuyenController::class, 'searchDVVC']);
+        Route::delete('/xoa-don-vi-van-chuyen/{id}', [DonViVanChuyenController::class, 'deleteDVVC']);
+        Route::post('/doi-tinh-trang-don-vi-van-chuyen', [DonViVanChuyenController::class, 'doiTinhTrangDVVC']);
     });
 
     Route::group(['prefix'  =>  '/san-pham-nsx'], function () {
