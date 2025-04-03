@@ -144,27 +144,27 @@ class GioHangController extends Controller
         try {
             // Tạo đơn hàng mới
             $donHang = DonHang::create([
-                'ma_don_hang'           =>      Str::uuid(),
-                'user_id'               =>      $request->user_id,
-                'id_nguoi_duyet'        =>      null,
-                'id_van_chuyen'         =>      null,
-                'ngay_dat'              =>      now(),
-                'ngay_giao'             =>      now()->addDays(4),
-                'tong_tien'             =>      0,
-                'tinh_trang'            =>      0,
-                'tinh_trang_thanh_toan' =>      0
+                'ma_don_hang'           => Str::uuid(),
+                'user_id'               => $request->user_id,
+                'id_nguoi_duyet'        => null,
+                'id_van_chuyen'         => null,
+                'ngay_dat'              => now(),
+                'ngay_giao'             => now()->addDays(4),
+                'tong_tien'             => 0,
+                'tinh_trang'            => 0,
+                'tinh_trang_thanh_toan' => 0
             ]);
             $tongTien = 0;
-            // Duyệt qua danh sách sản phẩm để lưu vào lịch sử đơn hàng và trừ số lượng
+            // Duyệt qua danh sách sản phẩm đã chọn từ request
             foreach ($request->san_pham as $sp) {
                 LichSuDonHang::create([
-                    'user_id'           =>      $request->user_id,
-                    'id_don_hang'       =>      $donHang->id,
-                    'id_san_pham'       =>      $sp['id_san_pham'],
-                    'id_nha_san_xuat'   =>      $sp['id_nha_san_xuat'],
-                    'don_gia'           =>      $sp['don_gia'],
-                    'so_luong'          =>      $sp['so_luong'],
-                    'tinh_trang'        =>      1
+                    'user_id'           => $request->user_id,
+                    'id_don_hang'       => $donHang->id,
+                    'id_san_pham'       => $sp['id_san_pham'],
+                    'id_nha_san_xuat'   => $sp['id_nha_san_xuat'],
+                    'don_gia'           => $sp['don_gia'],
+                    'so_luong'          => $sp['so_luong'],
+                    'tinh_trang'        => 1
                 ]);
                 $tongTien += $sp['so_luong'] * $sp['don_gia'];
                 // Trừ số lượng sản phẩm trong kho
@@ -191,9 +191,14 @@ class GioHangController extends Controller
                     ]);
                 }
             }
+            // Cập nhật tổng tiền cho đơn hàng
             $donHang->update(['tong_tien' => $tongTien]);
-            // Xóa giỏ hàng sau khi đặt hàng thành công
-            GioHang::where('user_id', $request->user_id)->delete();
+            // Xóa các sản phẩm đã được chọn trong giỏ hàng của người dùng
+            foreach ($request->san_pham as $sp) {
+                GioHang::where('user_id', $request->user_id)
+                    ->where('id_san_pham', $sp['id_san_pham']) // Chỉ xóa sản phẩm đã được chọn
+                    ->delete();
+            }
             DB::commit();
             return response()->json([
                 'success' => true,
