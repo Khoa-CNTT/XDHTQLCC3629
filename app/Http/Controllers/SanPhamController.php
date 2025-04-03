@@ -252,7 +252,7 @@ class SanPhamController extends Controller
             'san_phams.so_luong_ton_kho',
             'san_phams.gia_ban',
             'san_phams.don_vi_tinh',
-            'danh_muc_san_phams.ten_danh_muc' // Thêm tên danh mục
+            'danh_muc_san_phams.ten_danh_muc'
         )->get();
 
         return response()->json([
