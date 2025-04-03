@@ -135,8 +135,8 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/update-san-pham-nha-san-xuat', [SanPhamController::class, 'updateSanPhamNSX']);
     });
 });
-//đại lý
-Route::group(['prefix'  =>  '/dai-ly'], function () {
+//user
+Route::group(['prefix'  =>  '/user'], function () {
     Route::group(['prefix'  =>  '/gio-hang'], function () {
         Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
         Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
