@@ -138,8 +138,8 @@ class SanPhamController extends Controller
 
         // Dữ liệu cho DaiLy
         if ($user instanceof DaiLy) {
-            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
-                ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', 'san_pham_n_s_x_e_s.id_san_pham')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
                 ->where('san_phams.tinh_trang', '1')
                 ->select(
                     'san_phams.id',
@@ -148,16 +148,16 @@ class SanPhamController extends Controller
                     'san_phams.hinh_anh',
                     'san_phams.so_luong_ton_kho',
                     'san_phams.gia_ban',
-                    'san_phams.don_vi_tinh',
-                    'san_phams.tinh_trang',
-                    'danh_muc_san_phams.ten_danh_muc', // Thêm tên danh mục
-                    'san_phams.id_danh_muc'
-                )
-                ->get();
-
+                    'san_phams.don_vi_tinh'
+                ) //get để nhóm ở groupby
+                ->orderBy('nha_san_xuats.id') // Sắp xếp theo nhà sản xuất
+                ->get()
+                ->groupBy('ten_cong_ty'); // Nhóm theo ID nhà sản xuất
+            $check = 2;
             return response()->json([
-                'status' => true,
-                'data' => $list_san_pham,
+                'status'    =>      true,
+                'data'      =>      $list_san_pham,
+                'check'     =>      $check,
             ]);
         }
 
