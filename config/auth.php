@@ -52,6 +52,10 @@ return [
             'driver'    => 'session',
             'provider'  => 'nha_san_xuats',
         ],
+        'don_vi_van_chuyen' => [
+            'driver'    => 'session',
+            'provider'  => 'don_vi_van_chuyens',
+        ],
     ],
 
     /*
@@ -88,6 +92,10 @@ return [
             'driver'    => 'eloquent',
             'model'     => App\Models\NhaSanXuat::class,
         ],
+        'don_vi_van_chuyens' => [
+            'driver'    => 'eloquent',
+            'model'     => App\Models\DonViVanChuyen::class,
+        ]
 
         // 'users' => [
         //     'driver' => 'database',

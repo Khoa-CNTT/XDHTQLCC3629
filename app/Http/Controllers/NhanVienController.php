@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaiLy;
+use App\Models\DonViVanChuyen;
 use App\Models\NhanVien;
 use App\Models\NhaSanXuat;
 use App\Models\User;
@@ -20,12 +21,13 @@ class NhanVienController extends Controller
 {
     public function login(Request $request)
     {
-        $list       = ['nhan_vien', 'nha_san_xuat', 'dai_ly'];
-        $list_token = ['api_token_nhanvien', 'api_token_nhasanxuat', 'api_token_daily'];
+        $list       = ['nhan_vien', 'nha_san_xuat', 'dai_ly', 'don_vi_van_chuyen'];
+        $list_token = ['api_token_nhanvien', 'api_token_nhasanxuat', 'api_token_daily', 'api_token_donvivanchuyen'];
         $list_model = [
             NhanVien::class,
             NhaSanXuat::class,
-            DaiLy::class
+            DaiLy::class,
+            DonViVanChuyen::class
         ];
         for ($i=0; $i < count($list); $i++) {
             $check = Auth::guard($list[$i])->attempt([ //thử xác thực đăng nhập với từng loại tài khoản.
@@ -72,7 +74,8 @@ class NhanVienController extends Controller
         $valid_types = [
             "App\\Models\\NhanVien",
             "App\\Models\\DaiLy",
-            "App\\Models\\NhaSanXuat"
+            "App\\Models\\NhaSanXuat",
+            "App\\Models\\DonViVanChuyen",
         ];
 
         if (!in_array($check_user->tokenable_type, $valid_types)) {
@@ -120,7 +123,8 @@ class NhanVienController extends Controller
         $valid_types = [
             "App\\Models\\NhanVien",
             "App\\Models\\DaiLy",
-            "App\\Models\\NhaSanXuat"
+            "App\\Models\\NhaSanXuat",
+            "App\\Models\\DonViVanChuyen",
         ];
 
         if (!in_array($check_user->tokenable_type, $valid_types)) {
@@ -168,7 +172,7 @@ class NhanVienController extends Controller
 
         if ($user instanceof \App\Models\NhanVien ||
             $user instanceof \App\Models\DaiLy ||
-            $user instanceof \App\Models\NhaSanXuat) {
+            $user instanceof \App\Models\NhaSanXuat ||  $user instanceof \App\Models\DonViVanChuyen) {
             return response()->json([
                 'status'  => true,
                 'message' => "Oke, bạn có thể đi qua",
@@ -351,6 +355,8 @@ class NhanVienController extends Controller
             $check = 1; // hắn là nsx
         } elseif ($user &&  $user instanceof DaiLy){
             $check = 2; // hắn là đại lý
+        } elseif ($user &&  $user instanceof DonViVanChuyen){
+            $check = 3; // hắn là đại lý
         }
 
         return response()->json([
