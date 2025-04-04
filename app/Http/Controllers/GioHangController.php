@@ -147,7 +147,6 @@ class GioHangController extends Controller
                 'ma_don_hang'           => Str::uuid(),
                 'user_id'               => $request->user_id,
                 'id_nguoi_duyet'        => null,
-                'id_van_chuyen'         => null,
                 'ngay_dat'              => now(),
                 'ngay_giao'             => now()->addDays(4),
                 'tong_tien'             => $request->tong_tien,
@@ -155,8 +154,10 @@ class GioHangController extends Controller
                 'tinh_trang'            => 0,
                 'tinh_trang_thanh_toan' => 0
             ]);
+
             // Duyệt qua danh sách sản phẩm đã chọn từ request
             foreach ($request->san_pham as $sp) {
+                // Tạo lịch sử đơn hàng cho mỗi sản phẩm
                 LichSuDonHang::create([
                     'user_id'           => $request->user_id,
                     'id_don_hang'       => $donHang->id,
@@ -164,17 +165,17 @@ class GioHangController extends Controller
                     'id_nha_san_xuat'   => $sp['id_nha_san_xuat'],
                     'don_gia'           => $sp['don_gia'],
                     'so_luong'          => $sp['so_luong'],
-                    'tinh_trang'        => 1
+                    'tinh_trang'        => 0,
+                    'cuoc_van_chuyen'   => $request->cuoc_van_chuyen ?? 0
                 ]);
-                // Trừ số lượng sản phẩm trong kho
+
+                // Kiểm tra và trừ số lượng sản phẩm trong kho
                 $sanPham = SanPham::find($sp['id_san_pham']);
                 if ($sanPham) {
-                    // Kiểm tra xem số lượng tồn kho có đủ không
                     if ($sanPham->so_luong_ton_kho >= $sp['so_luong']) {
                         $sanPham->so_luong_ton_kho -= $sp['so_luong'];
                         $sanPham->save();
                     } else {
-                        // Nếu không đủ số lượng, trả lỗi
                         DB::rollBack();
                         return response()->json([
                             'success' => false,
@@ -182,7 +183,6 @@ class GioHangController extends Controller
                         ]);
                     }
                 } else {
-                    // Nếu không tìm thấy sản phẩm
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
@@ -190,10 +190,37 @@ class GioHangController extends Controller
                     ]);
                 }
             }
+            // Kiểm tra và cập nhật thông tin đơn vị vận chuyển cho từng sản phẩm
+            if (!empty($request->don_vi_van_chuyen) && is_array($request->don_vi_van_chuyen)) {
+                foreach ($request->don_vi_van_chuyen as $dvvc) {
+                    // Tìm tất cả sản phẩm trong lichSuDonHang tương ứng với nhà sản xuất
+                    $lichSuList = LichSuDonHang::where('id_don_hang', $donHang->id)
+                        ->where('id_nha_san_xuat', $dvvc['id_nha_san_xuat'])
+                        ->get(); // Sử dụng get() để lấy tất cả các sản phẩm có cùng nhà sản xuất
+                    if ($lichSuList->isEmpty()) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Không tìm thấy sản phẩm của nhà sản xuất có id: ' . $dvvc['id_nha_san_xuat']
+                        ]);
+                    }
+                    // Cập nhật đơn vị vận chuyển cho tất cả sản phẩm của nhà sản xuất này
+                    foreach ($lichSuList as $lichSu) {
+                        $lichSu->id_don_vi_van_chuyen = $dvvc['id_don_vi_van_chuyen'];
+                        $lichSu->save();
+                    }
+                }
+            } else {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không có thông tin đơn vị vận chuyển!'
+                ]);
+            }
             // Xóa các sản phẩm đã được chọn trong giỏ hàng của người dùng
             foreach ($request->san_pham as $sp) {
                 GioHang::where('user_id', $request->user_id)
-                    ->where('id_san_pham', $sp['id_san_pham']) // Chỉ xóa sản phẩm đã được chọn
+                    ->where('id_san_pham', $sp['id_san_pham'])
                     ->delete();
             }
             DB::commit();
