@@ -112,7 +112,8 @@ class DonViVanChuyenController extends Controller
     {
         $data = DonViVanChuyen::
                 select('don_vi_van_chuyens.ten_cong_ty',
-                        'don_vi_van_chuyens.cuoc_van_chuyen')
+                        'don_vi_van_chuyens.cuoc_van_chuyen',
+                        'don_vi_van_chuyens.id')
                 ->get();
 
         return response()->json([

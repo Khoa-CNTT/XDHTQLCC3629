@@ -15,12 +15,12 @@ class DonHang extends Model
         "ma_don_hang",
         "user_id",
         "id_nguoi_duyet",
-        "id_van_chuyen",
         "ngay_dat",
         "ngay_giao",
         "tong_tien",
         "tinh_trang",
-        "tinh_trang_thanh_toan"
+        "tinh_trang_thanh_toan",
+        "cuoc_van_chuyen"
     ];
 
     protected static function boot()
