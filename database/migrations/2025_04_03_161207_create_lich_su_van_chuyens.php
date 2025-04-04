@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gio_hangs', function (Blueprint $table) {
+        Schema::create('lich_su_van_chuyens', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable();
             $table->integer('id_don_hang')->nullable();
-            $table->integer('id_san_pham')->nullable();
-            $table->decimal('don_gia', 15, 3)->nullable();
-            $table->integer('so_luong')->nullable();
+            $table->integer('id_don_vi_van_chuyen')->nullable();
+            $table->string('dia_diem_hien_tai')->nullable();
+            $table->timestamp('thoi_gian_cap_nhat')->nullable()->useCurrent();
+            $table->tinyInteger('tinh_trang')->nullable()->default(0); // 0: Đã nhận, 1: Đang vận chuyển, 2: Đã giao hàng
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gio_hangs');
+        Schema::dropIfExists('lich_su_van_chuyens');
     }
 };

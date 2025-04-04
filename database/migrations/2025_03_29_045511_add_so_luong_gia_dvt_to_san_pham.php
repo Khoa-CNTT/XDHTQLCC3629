@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('san_phams', function (Blueprint $table) {
             $table->integer('so_luong_ton_kho')->nullable();
-            $table->decimal('gia_ban')->nullable();
+            $table->decimal('gia_ban', 15, 3)->nullable();
             $table->string('don_vi_tinh')->nullable();
         });
     }

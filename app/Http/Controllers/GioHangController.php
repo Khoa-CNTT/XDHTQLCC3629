@@ -150,11 +150,11 @@ class GioHangController extends Controller
                 'id_van_chuyen'         => null,
                 'ngay_dat'              => now(),
                 'ngay_giao'             => now()->addDays(4),
-                'tong_tien'             => 0,
+                'tong_tien'             => $request->tong_tien,
+                'cuoc_van_chuyen'       => $request->cuoc_van_chuyen ?? 0,
                 'tinh_trang'            => 0,
                 'tinh_trang_thanh_toan' => 0
             ]);
-            $tongTien = 0;
             // Duyệt qua danh sách sản phẩm đã chọn từ request
             foreach ($request->san_pham as $sp) {
                 LichSuDonHang::create([
@@ -166,7 +166,6 @@ class GioHangController extends Controller
                     'so_luong'          => $sp['so_luong'],
                     'tinh_trang'        => 1
                 ]);
-                $tongTien += $sp['so_luong'] * $sp['don_gia'];
                 // Trừ số lượng sản phẩm trong kho
                 $sanPham = SanPham::find($sp['id_san_pham']);
                 if ($sanPham) {
@@ -191,8 +190,6 @@ class GioHangController extends Controller
                     ]);
                 }
             }
-            // Cập nhật tổng tiền cho đơn hàng
-            $donHang->update(['tong_tien' => $tongTien]);
             // Xóa các sản phẩm đã được chọn trong giỏ hàng của người dùng
             foreach ($request->san_pham as $sp) {
                 GioHang::where('user_id', $request->user_id)

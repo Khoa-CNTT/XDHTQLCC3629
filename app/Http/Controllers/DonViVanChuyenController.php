@@ -107,4 +107,17 @@ class DonViVanChuyenController extends Controller
             ]);
         }
     }
+
+    public function getDataForDaiLy()
+    {
+        $data = DonViVanChuyen::
+                select('don_vi_van_chuyens.ten_cong_ty',
+                        'don_vi_van_chuyens.cuoc_van_chuyen')
+                ->get();
+
+        return response()->json([
+            'status'    =>  true,
+            'data'      => $data
+        ]);
+    }
 }
