@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('ma_don_hang')->nullable();
             $table->string('ma_san_pham')->nullable();
             $table->text('ghi_chu')->nullable();
-            $table->decimal('don_gia')->nullable();
+            $table->decimal('don_gia', 15, 3)->nullable();
             $table->integer('so_luong')->nullable();
             $table->string('don_vi_tinh')->nullable();
             $table->integer('tinh_trang')->default(1);

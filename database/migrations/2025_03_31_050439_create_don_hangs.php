@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamp('ngay_dat')->useCurrent();
             $table->date('ngay_giao')->nullable();
             $table->integer('tong_tien')->nullable();
-            $table->integer('tinh_trang')->default(0)->nullable();
+            $table->integer('tinh_trang')->default(0)->nullable();// 0: Chờ xác nhận, 1: Đang chuẩn bị hàng, 2: Đang vận chuyển, 3: Hoàn thành, 4: Hủy
             $table->timestamps();
         });
     }

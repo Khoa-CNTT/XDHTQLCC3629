@@ -151,4 +151,7 @@ Route::group(['prefix'  =>  '/user'], function () {
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
     });
+    Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
+        Route::get('/lay-du-lieu', [DonViVanChuyenController::class, 'getDataForDaiLy']);
+    });
 });

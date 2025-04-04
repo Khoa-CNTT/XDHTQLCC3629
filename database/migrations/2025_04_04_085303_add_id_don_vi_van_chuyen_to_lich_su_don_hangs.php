@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('don_hangs', function (Blueprint $table) {
-            $table->integer('tinh_trang_thanh_toan')->default(0)->nullable();// 0: Chưa thanh toán, 1: Đã thanh toán
+        Schema::table('lich_su_don_hangs', function (Blueprint $table) {
+            $table->integer('id_don_vi_van_chuyen')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('don_hangs', function (Blueprint $table) {
+        Schema::table('lich_su_don_hangs', function (Blueprint $table) {
             //
         });
     }

@@ -16,9 +16,9 @@ return new class extends Migration
             $table->integer('user_id')->nullable();
             $table->integer('id_don_hang')->nullable();
             $table->integer('id_san_pham')->nullable();
-            $table->decimal('don_gia')->nullable();
+            $table->decimal('don_gia', 15, 3)->nullable();
             $table->integer('so_luong')->nullable();
-            $table->integer('tinh_trang')->nullable()->default(0);
+            $table->integer('tinh_trang')->nullable()->default(0);// 0: Chờ xác nhận, 1: Đang chuẩn bị, 2: Đã xong, 3: Đang vận chuyển, 4: Giao thành công, 5: Đã hủy
             $table->timestamps();
         });
     }
