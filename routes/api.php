@@ -134,6 +134,12 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
         Route::post('/update-san-pham-nha-san-xuat', [SanPhamController::class, 'updateSanPhamNSX']);
     });
+    Route::group(['prefix'  =>  '/don-hang'], function () {
+        Route::get('/lay-du-lieu', [DonHangController::class, 'getDataForAdmin']);
+        Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHangAdmin']);
+        Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangAdmin']);
+        Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietAdmin']);
+    });
 });
 //user
 Route::group(['prefix'  =>  '/user'], function () {
@@ -151,6 +157,7 @@ Route::group(['prefix'  =>  '/user'], function () {
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
         Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTiet']);
+        Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHang']);
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
         Route::get('/lay-du-lieu', [DonViVanChuyenController::class, 'getDataForDaiLy']);
