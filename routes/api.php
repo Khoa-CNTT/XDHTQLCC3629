@@ -155,9 +155,16 @@ Route::group(['prefix'  =>  '/user'], function () {
         Route::post('/lay-du-lieu-san-pham/data', [SanPhamController::class, 'getDataByIDSanPham']);
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
-        Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
-        Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTiet']);
-        Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHang']);
+        Route::group(['prefix'  =>  '/dai-ly'], function () {
+            Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
+            Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTiet']);
+            Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHang']);
+        });
+        //nhà sản xuất
+        Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
+            Route::get('/lay-du-lieu-cho-nsx', [DonHangController::class, 'getDataForNSX']);
+            Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangNSX']);
+        });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
         Route::get('/lay-du-lieu', [DonViVanChuyenController::class, 'getDataForDaiLy']);
