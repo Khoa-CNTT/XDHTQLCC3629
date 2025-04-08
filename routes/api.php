@@ -165,6 +165,10 @@ Route::group(['prefix'  =>  '/user'], function () {
             Route::get('/lay-du-lieu-cho-nsx', [DonHangController::class, 'getDataForNSX']);
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangNSX']);
         });
+        Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
+            Route::get('/lay-du-lieu-cho-dvvc', [DonHangController::class, 'getDataForDVVC']);
+            Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangDVVC']);
+        });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
         Route::get('/lay-du-lieu', [DonViVanChuyenController::class, 'getDataForDaiLy']);
