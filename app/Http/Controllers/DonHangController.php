@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DaiLy;
 use App\Models\DonHang;
+use App\Models\DonViVanChuyen;
 use App\Models\LichSuDonHang;
 use App\Models\NhanVien;
 use App\Models\NhaSanXuat;
@@ -61,6 +62,7 @@ class DonHangController extends Controller
                 'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
                 'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
                 'don_vi_van_chuyens.cuoc_van_chuyen',
+                'lich_su_don_hangs.tinh_trang',
             )
             ->get();
             return response()->json([
@@ -83,6 +85,9 @@ class DonHangController extends Controller
                     $tinh_trang_moi = 4;
                 }
                 DonHang::where('id', $request->id)->update([
+                    'tinh_trang'    =>  $tinh_trang_moi
+                ]);
+                LichSuDonHang::where('id', $request->id)->update([
                     'tinh_trang'    =>  $tinh_trang_moi
                 ]);
                 return response()->json([
@@ -266,8 +271,78 @@ class DonHangController extends Controller
                 if ($request->tinh_trang == 1) {
                     $tinh_trang_moi_nsx = 2;
                 }
-                LichSuDonHang::where('id_don_hang', $request->id_don_hang)->update([
+                LichSuDonHang::where('id', $request->id)->update([
                     'tinh_trang'        =>  $tinh_trang_moi_nsx,
+                ]);
+                DonHang::where('id', $request->id_don_hang)->update([
+                    'tinh_trang'        =>  $tinh_trang_moi_nsx,
+                ]);
+                return response()->json([
+                    'status'            =>   true,
+                    'message'           =>   'Xác nhận thành công!',
+                ]);
+            } catch (Exception $e) {
+                Log::info("Lỗi", $e);
+                return response()->json([
+                    'status'            =>   false,
+                    'message'           =>   'Có lỗi khi xác nhận',
+                ]);
+            }
+        }
+    }
+
+    //đơn vị vận chuyển
+    public function getDataForDVVC(){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        } elseif($user && $user instanceof DonViVanChuyen) {
+            $user_id = $user->id;
+            $list_don_hang = LichSuDonHang::
+                where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
+                ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
+                ->where('lich_su_don_hangs.tinh_trang', '!=', 1)
+                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
+                ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'nha_san_xuats.ten_cong_ty as ten_nsx',
+                    'dai_lies.ten_cong_ty as ten_khach_hang',
+                    'don_hangs.ngay_dat',
+                    'don_hangs.tinh_trang_thanh_toan',
+                )
+                ->get();
+            return response()->json([
+                'status'    =>      true,
+                'data'      =>      $list_don_hang,
+            ]);
+        }
+    }
+
+    public function xacNhanDonHangDVVC(Request $request){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        } elseif($user && $user instanceof DonViVanChuyen) {
+            try {
+                if ($request->tinh_trang == 2) {
+                    $tinh_trang_moi_dvvc = 5;
+                }
+                LichSuDonHang::where('id', $request->id)->update([
+                    'tinh_trang'        =>  $tinh_trang_moi_dvvc,
+                ]);
+                DonHang::where('id', $request->id_don_hang)->update([
+                    'tinh_trang'        =>  $tinh_trang_moi_dvvc,
                 ]);
                 return response()->json([
                     'status'            =>   true,

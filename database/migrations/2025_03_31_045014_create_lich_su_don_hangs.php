@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('don_gia', 15, 3)->nullable();
             $table->integer('so_luong')->nullable();
             $table->integer('tinh_trang')->nullable()->default(0);
-            //Đại lý: 0: Chờ xác nhận, 1: Đã xác nhận, 2: Đang giao hàng, 3: Done, 4: Đã hủy
+            //Đại lý: 0: Chờ xác nhận, 1: Đã xác nhận, 2: Đang chuẩn bị hàng, 5: Đang giao hàng, 3: Done, 4: Đã hủy
             //Nhà sản xuất: 0: Chờ xác nhận, 1: Đang chuẩn bị hàng, 2: Chuẩn bị hàng xong (giao cho đv vc), 5: Đang giao hàng, 4: Đã hủy, 3: Done
             $table->timestamps();
         });
