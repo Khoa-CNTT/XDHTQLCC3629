@@ -94,7 +94,7 @@ class SanPhamNSXController extends Controller
     public function doiTinhTrangSanPhamNSX(Request $request)
     {
         try {
-            $tinh_trang_moi = $request->tinh_trang == 1 ? 0 : 1; 
+            $tinh_trang_moi = $request->tinh_trang == 1 ? 0 : 1;
             SanPhamNSX::where('id', $request->id)->update([
                 'tinh_trang' => $tinh_trang_moi
             ]);

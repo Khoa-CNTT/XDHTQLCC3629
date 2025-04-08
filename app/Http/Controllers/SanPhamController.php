@@ -13,6 +13,24 @@ use Illuminate\Support\Facades\Log;
 
 class SanPhamController extends Controller
 {
+    public function getUserInfo()
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => true,
+            'user' => [
+                'id_nha_san_xuat' => $user->id_nha_san_xuat,
+                'ten_cong_ty' => $user->ten_cong_ty,
+            ]
+        ]);
+    }
     public function getdata()
     {
         $data = SanPham::join('danh_muc_san_phams', 'san_phams.id_danh_muc', 'danh_muc_san_phams.id')
@@ -286,5 +304,27 @@ class SanPhamController extends Controller
                 'message' => 'Có lỗi khi cập nhật thông tin sản phẩm',
             ]);
         }
+    }
+    public function createSanPhamNSX(Request $request)
+    {
+        $data   =   $request->all();
+        SanPham::create([
+            'ma_san_pham'        =>  $request->ma_san_pham,
+            'ten_san_pham'       =>  $request->ten_san_pham,
+            'mo_ta'              =>  $request->mo_ta,
+            'id_danh_muc'        =>  $request->id_danh_muc,
+            'ten_cong_ty'        =>  $request->ten_cong_ty,
+            'hinh_anh'        =>  $request->hinh_anh,
+            'so_luong_ton_kho'        =>  $request->so_luong_ton_kho,
+            'gia_ban'        =>  $request->gia_ban,
+            'don_vi_tinh'        =>  $request->don_vi_tinh,
+            'transaction_hash'   =>  $request->transaction_hash,
+            'tinh_trang'         =>  $request->tinh_trang,
+            'ngay_san_xuat'           =>  $request->ngay_san_xuat
+        ]);
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã tạo mới sản phẩm thành công!'
+        ]);
     }
 }

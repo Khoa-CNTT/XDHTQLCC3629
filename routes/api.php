@@ -114,6 +114,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/tim-san-pham-nsx', [SanPhamNSXController::class, 'searchSanPhamNSX']);
         Route::delete('/xoa-san-pham-nsx/{id}', [SanPhamNSXController::class, 'deleteSanPhamNSX']);
         Route::post('/doi-tinh-trang-san-pham-nsx', [SanPhamNSXController::class, 'doiTinhTrangSanPhamNSX']);
+        Route::get('/user/info', [SanPhamController::class, 'getUserInfo']);
     });
     Route::group(['prefix'  =>  '/chi-tiet-san-pham'], function () {
         Route::get('/lay-du-lieu', [ChiTietSanPhamController::class, 'getData']);
@@ -133,6 +134,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
     Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
         Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
         Route::post('/update-san-pham-nha-san-xuat', [SanPhamController::class, 'updateSanPhamNSX']);
+        Route::post('/create-san-pham-nha-san-xuat', [SanPhamController::class, 'createSanPhamNSX']);
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::get('/lay-du-lieu', [DonHangController::class, 'getDataForAdmin']);
