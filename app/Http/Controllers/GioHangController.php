@@ -155,9 +155,13 @@ class GioHangController extends Controller
                 'tinh_trang_thanh_toan' => 0
             ]);
 
+            $cuocVCMap = collect($request->chi_tiet_cuoc_vc)->keyBy('id_nha_san_xuat')->toArray();
             // Duyệt qua danh sách sản phẩm đã chọn từ request
             foreach ($request->san_pham as $sp) {
-                // Tạo lịch sử đơn hàng cho mỗi sản phẩm
+                // Lấy cuốc vận chuyển tương ứng theo index
+                $idNSX = $sp['id_nha_san_xuat'];
+                $cuocVC = $cuocVCMap[$idNSX]['cuoc_van_chuyen'] ?? 0;
+
                 LichSuDonHang::create([
                     'user_id'           => $request->user_id,
                     'id_don_hang'       => $donHang->id,
@@ -166,7 +170,7 @@ class GioHangController extends Controller
                     'don_gia'           => $sp['don_gia'],
                     'so_luong'          => $sp['so_luong'],
                     'tinh_trang'        => 0,
-                    'cuoc_van_chuyen'   => $request->cuoc_van_chuyen ?? 0
+                    'cuoc_van_chuyen'   => $cuocVC
                 ]);
 
                 // Kiểm tra và trừ số lượng sản phẩm trong kho

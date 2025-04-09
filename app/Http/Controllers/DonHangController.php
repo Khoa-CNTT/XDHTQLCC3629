@@ -5,13 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\DaiLy;
 use App\Models\DonHang;
 use App\Models\DonViVanChuyen;
+use App\Models\KhoTrungChuyen;
 use App\Models\LichSuDonHang;
+use App\Models\LichSuVanChuyen;
 use App\Models\NhanVien;
 use App\Models\NhaSanXuat;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class DonHangController extends Controller
 {
@@ -87,7 +92,7 @@ class DonHangController extends Controller
                 DonHang::where('id', $request->id)->update([
                     'tinh_trang'    =>  $tinh_trang_moi
                 ]);
-                LichSuDonHang::where('id', $request->id)->update([
+                LichSuDonHang::where('id_don_hang', $request->id)->update([
                     'tinh_trang'    =>  $tinh_trang_moi
                 ]);
                 return response()->json([
@@ -292,67 +297,287 @@ class DonHangController extends Controller
     }
 
     //đơn vị vận chuyển
-    public function getDataForDVVC(){
+    public function getDataForDVVC() {
         $user = Auth::guard('sanctum')->user();
+
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DonViVanChuyen) {
-            $user_id = $user->id;
-            $list_don_hang = LichSuDonHang::
-                where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
-                ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
-                ->where('lich_su_don_hangs.tinh_trang', '!=', 1)
-                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-                ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
-                ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
-                ->select(
-                    'lich_su_don_hangs.*',
-                    'san_phams.ten_san_pham',
-                    'san_phams.hinh_anh',
-                    'nha_san_xuats.ten_cong_ty as ten_nsx',
-                    'dai_lies.ten_cong_ty as ten_khach_hang',
-                    'don_hangs.ngay_dat',
-                    'don_hangs.tinh_trang_thanh_toan',
-                )
-                ->get();
+        }
+
+        if ($user instanceof DonViVanChuyen) {
+            try {
+                $user_id = $user->id;
+
+                $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
+                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0, 1])
+                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                    ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
+                    ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+                    ->select(
+                        'lich_su_don_hangs.*',
+                        'san_phams.ten_san_pham',
+                        'san_phams.hinh_anh',
+                        'nha_san_xuats.ten_cong_ty as ten_nsx',
+                        'dai_lies.ten_cong_ty as ten_khach_hang',
+                        'don_hangs.ngay_dat',
+                        'don_hangs.tinh_trang_thanh_toan',
+                        'don_hangs.tinh_trang as tinh_trang_don_hang',
+                        'lich_su_don_hangs.id as id_lich_su_don_hang'
+                    )
+                    ->get();
+
+                // Gộp lại theo đơn hàng
+                $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
+                    $first = $items->first();
+
+                    // Tổng tiền sản phẩm = ∑ (giá × số lượng)
+                    $tong_tien_san_pham = $items->sum(function ($item) {
+                        return $item->don_gia * $item->so_luong;
+                    });
+
+                    //Gom theo id_nha_san_xuat để tránh trùng cước
+                    $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
+                        return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
+                    });
+
+                    $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
+
+                    return [
+                        'id_don_hang'            => $id,
+                        'ten_khach_hang'         => $first->ten_khach_hang,
+                        'ngay_dat'               => $first->ngay_dat,
+                        'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
+                        'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
+                        'tong_tien_san_pham'     => $tong_tien_san_pham,
+                        'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
+                        'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                        'san_phams'              => $items->map(function ($item) {
+                            return [
+                                'id_san_pham'       => $item->id_san_pham,
+                                'ten_san_pham'      => $item->ten_san_pham,
+                                'hinh_anh'          => $item->hinh_anh,
+                                'so_luong'          => $item->so_luong,
+                                'tinh_trang'        => $item->tinh_trang,
+                                'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
+                                'ten_nsx'           => $item->ten_nsx,
+                                'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                            ];
+                        })->values()
+                    ];
+                })->values();
+
+                return response()->json([
+                    'status' => true,
+                    'data'   => $grouped,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Lỗi khi lấy dữ liệu đơn hàng cho DVVC: " . $e->getMessage());
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Đã xảy ra lỗi khi xử lý dữ liệu',
+                ]);
+            }
+        }
+    }
+
+    public function xacNhanDonHangDVVC(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
             return response()->json([
-                'status'    =>      true,
-                'data'      =>      $list_don_hang,
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+
+        if (!($user instanceof DonViVanChuyen)) {
+            return response()->json([
+                'message' => 'Bạn không có quyền thực hiện hành động này!',
+                'status'  => false,
+            ], 403);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            if ($request->tinh_trang_don_hang != 2) {
+                return response()->json([
+                    'message' => 'Trạng thái không hợp lệ để xác nhận!',
+                    'status'  => false,
+                ]);
+            }
+
+            $tinh_trang_moi_dvvc = 5;
+
+            // Cập nhật đơn hàng và toàn bộ sản phẩm
+            DonHang::where('id', $request->id_don_hang)->update([
+                'tinh_trang' => $tinh_trang_moi_dvvc,
+            ]);
+
+            foreach ($request->san_phams as $sp) {
+                if (isset($sp['id_lich_su_don_hang'])) {
+                    LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
+                        'tinh_trang' => $tinh_trang_moi_dvvc,
+                    ]);
+                }
+            }
+
+            $chiTietDonHang = LichSuDonHang::where('id_don_hang', $request->id_don_hang)
+                            ->where('id_don_vi_van_chuyen', $user->id)
+                            ->get();
+
+            if ($chiTietDonHang->isEmpty()) {
+                return response()->json([
+                    'message' => 'Không tìm thấy sản phẩm nào cần vận chuyển cho đơn vị hiện tại!',
+                    'status' => false,
+                ]);
+            }
+
+            $nhomTheoNSX = $chiTietDonHang->groupBy('id_nha_san_xuat');
+
+            foreach ($nhomTheoNSX as $nsxId => $sanPhamTheoNSX) {
+                $nsx = NhaSanXuat::find($nsxId);
+
+                if (!$nsx) {
+                    throw new \Exception("Không tìm thấy nhà sản xuất ID: $nsxId");
+                }
+
+                $tinhShop = $this->timTinhTuDiaChi($nsx->dia_chi, $this->dsTinhThanhPho());
+
+                // Tìm kho khớp tỉnh
+                $tatCaKho = KhoTrungChuyen::all();
+                $khoPhuHop = null;
+                foreach ($tatCaKho as $khoItem) {
+                    $tinhTrongKho = $this->timTinhTuDiaChi($khoItem->dia_chi, $this->dsTinhThanhPho());
+                    if ($tinhTrongKho && strtolower($tinhTrongKho) == strtolower($tinhShop)) {
+                        $khoPhuHop = $khoItem;
+                        break;
+                    }
+                }
+
+                // Nếu không tìm được kho phù hợp, dùng random
+                if (!$khoPhuHop) {
+                    $khoPhuHop = KhoTrungChuyen::inRandomOrder()->first();
+                    Log::warning("Không tìm được kho đúng tỉnh [$tinhShop], dùng random: ID {$khoPhuHop->id}");
+                }
+
+                LichSuVanChuyen::create([
+                    'id_don_hang'          => $request->id_don_hang,
+                    'id_kho_hang'          => $khoPhuHop->id,
+                    'id_don_vi_van_chuyen' => $user->id,
+                    'id_nha_san_xuat'      => $nsxId,
+                    'thoi_gian_den'        => Carbon::now(),
+                    'thoi_gian_di'         => null,
+                    'thu_tu'               => 1,
+                    'mo_ta'                => 'Lấy hàng từ kho trung chuyển ' . $khoPhuHop->ten_kho,
+                    'tinh_trang'           => 0,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Xác nhận thành công!',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi xác nhận đơn vị vận chuyển: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Lỗi: ' . $e->getMessage(),
             ]);
         }
     }
 
-    public function xacNhanDonHangDVVC(Request $request){
+    private function timTinhTuDiaChi($diaChi, $dsTinh)
+    {
+        $alias = [
+            'TP.HCM' => 'Hồ Chí Minh',
+            'TP HCM' => 'Hồ Chí Minh',
+            'Tp.HCM' => 'Hồ Chí Minh',
+            'TP Hà Nội' => 'Hà Nội',
+            'Tp.HN' => 'Hà Nội',
+            'TP. HCM' => 'Hồ Chí Minh',
+        ];
+
+        $diaChiLower = Str::lower($diaChi);
+
+        // So sánh alias trước
+        foreach ($alias as $vietTat => $dayDu) {
+            if (Str::contains($diaChiLower, Str::lower($vietTat))) {
+                return $dayDu;
+            }
+        }
+
+        // So sánh với danh sách tỉnh
+        foreach ($dsTinh as $tinh) {
+            if (Str::contains($diaChiLower, Str::lower($tinh))) {
+                return $tinh;
+            }
+        }
+
+        return null;
+    }
+
+    private function dsTinhThanhPho()
+    {
+        return [
+            "Hà Nội", "Hồ Chí Minh", "TP.HCM", "Đà Nẵng", "Cần Thơ",
+            "Hải Phòng", "Bắc Ninh", "Thanh Hóa", "Nghệ An", "Hà Tĩnh",
+            "Bình Dương", "Đồng Nai", "Long An", "Bình Thuận", "Quảng Ninh",
+            "Quảng Nam", "Thừa Thiên Huế", "Bình Định", "Khánh Hòa",
+            "Vĩnh Long", "Ninh Bình", "Phú Thọ", "Lâm Đồng", "Tiền Giang",
+            "Hậu Giang", "Sóc Trăng", "Trà Vinh", "Bến Tre", "An Giang",
+            "Kiên Giang", "Tây Ninh", "Bạc Liêu", "Cà Mau", "Đắk Lắk", "Đắk Nông",
+            "Gia Lai", "Kon Tum", "Ninh Thuận", "Phú Yên", "Quảng Bình",
+            "Quảng Trị", "Lạng Sơn", "Lào Cai", "Yên Bái", "Hòa Bình", "Tuyên Quang"
+        ];
+    }
+
+    public function getDataChiTietForDVVC(Request $request){
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DonViVanChuyen) {
-            try {
-                if ($request->tinh_trang == 2) {
-                    $tinh_trang_moi_dvvc = 5;
-                }
-                LichSuDonHang::where('id', $request->id)->update([
-                    'tinh_trang'        =>  $tinh_trang_moi_dvvc,
-                ]);
-                DonHang::where('id', $request->id_don_hang)->update([
-                    'tinh_trang'        =>  $tinh_trang_moi_dvvc,
-                ]);
+        }
+        if ($user instanceof DonViVanChuyen) {
+            $user_id = $user->id;
+            try{
+                $list_chi_tiet_don_hang = LichSuDonHang::
+                where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
+                ->where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
+                ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
+                ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
+                ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
+                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                    'don_vi_van_chuyens.cuoc_van_chuyen',
+                    'lich_su_don_hangs.tinh_trang',
+                )
+                ->get();
                 return response()->json([
-                    'status'            =>   true,
-                    'message'           =>   'Xác nhận thành công!',
+                    'status'    =>      true,
+                    'data'      =>      $list_chi_tiet_don_hang,
                 ]);
-            } catch (Exception $e) {
-                Log::info("Lỗi", $e);
+            } catch (\Exception $e) {
+                Log::error("Lỗi khi lấy chi tiết đơn hàng cho DVVC: " . $e->getMessage());
+
                 return response()->json([
-                    'status'            =>   false,
-                    'message'           =>   'Có lỗi khi xác nhận',
+                    'status'  => false,
+                    'message' => 'Đã xảy ra lỗi khi xử lý dữ liệu.',
                 ]);
             }
         }

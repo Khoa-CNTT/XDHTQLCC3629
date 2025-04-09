@@ -11,9 +11,13 @@ class LichSuVanChuyen extends Model
     protected $table = "lich_su_van_chuyens";
     protected $fillable = [
         "id_don_hang",
+        "id_kho_hang",
         "id_don_vi_van_chuyen",
-        "dia_diem_hien_tai",
-        "thoi_gian_cap_nhat",
-        "tinh_trang(",
+        "id_nha_san_xuat",
+        "thoi_gian_den",
+        "thoi_gian_di",
+        "thu_tu",
+        "mo_ta",
+        "tinh_trang",
     ];
 }
