@@ -116,6 +116,7 @@ class DonHangController extends Controller
             $list_don_hang = DonHang::
             join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
             ->select('don_hangs.ngay_dat',
+                    'don_hangs.user_id',
                     'don_hangs.ngay_giao',
                     'don_hangs.tong_tien',
                     'don_hangs.tinh_trang',
