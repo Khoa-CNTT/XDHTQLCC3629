@@ -278,46 +278,77 @@ class SanPhamController extends Controller
         $user = Auth::guard('sanctum')->user();
         $key = "%" . $request->abc . "%";
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'Bạn cần đăng nhập!',
-                'status' => false,
-            ], 401);
-        }
-
-        $query = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
-            ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-            ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
-            ->where(function ($q) use ($key) {
-                $q->where('san_phams.ten_san_pham', 'like', $key)
-                    ->orWhere('nha_san_xuats.ten_cong_ty', 'like', $key);
-            });
-
-        if ($user instanceof DaiLy) {
-            $query->where('san_phams.tinh_trang', '1');
-        } elseif ($user instanceof NhaSanXuat) {
-            $query->where('nha_san_xuats.id', $user->id);
-        }
-
-        $data = $query->select(
+        $data   = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
+        ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+        ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
+        //->where('nha_san_xuats.id', $id_nha_san_xuat)
+        ->where('nha_san_xuats.id', $user->id)
+        ->where('ten_san_pham', 'like', $key)
+        ->select(
             'san_phams.id',
             'san_phams.ten_san_pham',
             'nha_san_xuats.ten_cong_ty',
-            'san_phams.mo_ta',
             'san_phams.hinh_anh',
-            'san_pham_n_s_x_e_s.ma_lo_hang',
-            'san_pham_n_s_x_e_s.ngay_san_xuat',
-            'san_pham_n_s_x_e_s.tinh_trang',
+            'san_phams.mo_ta',
             'san_phams.so_luong_ton_kho',
             'san_phams.gia_ban',
             'san_phams.don_vi_tinh',
+            'san_pham_n_s_x_e_s.ma_lo_hang',
+            'san_pham_n_s_x_e_s.ngay_san_xuat',
+            'san_phams.tinh_trang',
             'danh_muc_san_phams.ten_danh_muc'
-        )->get();
+        )
+            ->get();
 
         return response()->json([
-            'status' => true,
-            'san_pham' => $data,
+            'status'    =>  true,
+            'san_pham'  =>  $data,
         ]);
+
+
+        // $user = Auth::guard('sanctum')->user();
+        // $key = "%" . $request->abc . "%";
+
+        // if (!$user) {
+        //     return response()->json([
+        //         'message' => 'Bạn cần đăng nhập!',
+        //         'status' => false,
+        //     ], 401);
+        // }
+
+        // $query = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
+        //     ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+        //     ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
+        //     ->where(function ($q) use ($key) {
+        //         $q->where('san_phams.ten_san_pham', 'like', $key)
+        //             ->orWhere('nha_san_xuats.ten_cong_ty', 'like', $key);
+        //     });
+
+        // if ($user instanceof DaiLy) {
+        //     $query->where('san_phams.tinh_trang', '1');
+        // } elseif ($user instanceof NhaSanXuat) {
+        //     $query->where('nha_san_xuats.id', $user->id);
+        // }
+
+        // $data = $query->select(
+        //     'san_phams.id',
+        //     'san_phams.ten_san_pham',
+        //     'nha_san_xuats.ten_cong_ty',
+        //     'san_phams.mo_ta',
+        //     'san_phams.hinh_anh',
+        //     'san_pham_n_s_x_e_s.ma_lo_hang',
+        //     'san_pham_n_s_x_e_s.ngay_san_xuat',
+        //     'san_pham_n_s_x_e_s.tinh_trang',
+        //     'san_phams.so_luong_ton_kho',
+        //     'san_phams.gia_ban',
+        //     'san_phams.don_vi_tinh',
+        //     'danh_muc_san_phams.ten_danh_muc'
+        // )->get();
+
+        // return response()->json([
+        //     'status' => true,
+        //     'san_pham' => $data,
+        // ]);
     }
     public function updateSanPhamCuaNSX(Request $request)
     {
@@ -346,4 +377,6 @@ class SanPhamController extends Controller
             ]);
         }
     }
+
+
 }

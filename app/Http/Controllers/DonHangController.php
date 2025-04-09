@@ -254,6 +254,7 @@ class DonHangController extends Controller
                     'san_phams.hinh_anh',
                     'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
                     'dai_lies.ten_cong_ty as ten_khach_hang',
+                    'dai_lies.id as user_id',
                     'don_hangs.ngay_dat',
                     'don_hangs.tinh_trang_thanh_toan',
                 )
@@ -325,6 +326,7 @@ class DonHangController extends Controller
                         'nha_san_xuats.ten_cong_ty as ten_nsx',
                         'dai_lies.ten_cong_ty as ten_khach_hang',
                         'don_hangs.ngay_dat',
+                        'dai_lies.id as user_id',
                         'don_hangs.tinh_trang_thanh_toan',
                         'don_hangs.tinh_trang as tinh_trang_don_hang',
                         'lich_su_don_hangs.id as id_lich_su_don_hang'
@@ -349,6 +351,7 @@ class DonHangController extends Controller
 
                     return [
                         'id_don_hang'            => $id,
+                        'user_id'                => $first->user_id,
                         'ten_khach_hang'         => $first->ten_khach_hang,
                         'ngay_dat'               => $first->ngay_dat,
                         'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
@@ -582,5 +585,135 @@ class DonHangController extends Controller
                 ]);
             }
         }
+    }
+
+    // search cho đơn hàng bên Admin
+    public function searchDonHangAdmin(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+        $key = "%" . $request->abc . "%";
+
+        $data = DonHang::join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
+                        ->where('ten_cong_ty', 'like', $key)
+                        ->select('don_hangs.ngay_dat',
+                                'don_hangs.user_id',
+                                'don_hangs.ngay_giao',
+                                'don_hangs.tong_tien',
+                                'don_hangs.tinh_trang',
+                                'don_hangs.tinh_trang_thanh_toan',
+                                'don_hangs.id',
+                                'dai_lies.ten_cong_ty as ten_dai_ly')
+                        ->get();
+        return response()->json([
+            'status'    =>      true,
+            'data'      =>      $data,
+        ]);
+    }
+
+
+    // search cho đơn hàng bên nsx
+    public function searchDonHangNSX(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+        $user_id = $user->id;
+        $key = "%" . $request->abc . "%";
+
+        $data =  LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
+                ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
+                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+                ->where('ten_san_pham', 'like', $key)
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                    'dai_lies.ten_cong_ty as ten_khach_hang',
+                    'dai_lies.id as user_id',
+                    'don_hangs.ngay_dat',
+                    'don_hangs.tinh_trang_thanh_toan',
+                )
+                ->get();
+        return response()->json([
+            'status'    =>      true,
+            'data'      =>      $data,
+        ]);
+    }
+
+    // search cho đơn hàng bên Đvvc
+    public function searchDonHangDVVC(Request $request)
+    {
+        $user = Auth::guard('sanctum')->user();
+        $user_id = $user->id;
+        $key = "%" . $request->abc . "%";
+
+        $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
+                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0, 1])
+                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                    ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
+                    ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+                    ->where('dai_lies.ten_cong_ty', 'like', $key)
+                    ->select(
+                        'lich_su_don_hangs.*',
+                        'san_phams.ten_san_pham',
+                        'san_phams.hinh_anh',
+                        'nha_san_xuats.ten_cong_ty as ten_nsx',
+                        'dai_lies.ten_cong_ty as ten_khach_hang',
+                        'don_hangs.ngay_dat',
+                        'dai_lies.id as user_id',
+                        'don_hangs.tinh_trang_thanh_toan',
+                        'don_hangs.tinh_trang as tinh_trang_don_hang',
+                        'lich_su_don_hangs.id as id_lich_su_don_hang'
+                    )
+                    ->get();
+
+            // Gộp lại theo đơn hàng
+            $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
+                $first = $items->first();
+
+            // Tổng tiền sản phẩm = ∑ (giá × số lượng)
+            $tong_tien_san_pham = $items->sum(function ($item) {
+                return $item->don_gia * $item->so_luong;
+            });
+
+        //Gom theo id_nha_san_xuat để tránh trùng cước
+        $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
+            return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
+        });
+
+        $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
+
+        return [
+            'id_don_hang'            => $id,
+            'user_id'                => $first->user_id,
+            'ten_khach_hang'         => $first->ten_khach_hang,
+            'ngay_dat'               => $first->ngay_dat,
+            'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
+            'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
+            'tong_tien_san_pham'     => $tong_tien_san_pham,
+            'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
+            'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+            'san_phams'              => $items->map(function ($item) {
+                return [
+                    'id_san_pham'       => $item->id_san_pham,
+                    'ten_san_pham'      => $item->ten_san_pham,
+                    'hinh_anh'          => $item->hinh_anh,
+                    'so_luong'          => $item->so_luong,
+                    'tinh_trang'        => $item->tinh_trang,
+                    'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
+                    'ten_nsx'           => $item->ten_nsx,
+                    'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                ];
+            })->values()
+        ];
+    })->values();
+
+    return response()->json([
+        'status' => true,
+        'data'   => $grouped,
+    ]);
     }
 }
