@@ -6,6 +6,7 @@ use App\Models\DaiLy;
 use App\Models\DanhMucSanPham;
 use App\Models\NhaSanXuat;
 use App\Models\SanPham;
+use App\Models\SanPhamNSX;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -176,6 +177,7 @@ class SanPhamController extends Controller
                     'san_phams.hinh_anh',
                     'san_phams.so_luong_ton_kho',
                     'san_phams.gia_ban',
+                    'san_phams.mo_ta',
                     'san_phams.don_vi_tinh',
                     'san_phams.tinh_trang',
                     'danh_muc_san_phams.ten_danh_muc', // Thêm tên danh mục
@@ -190,6 +192,62 @@ class SanPhamController extends Controller
         }
 
         return response()->json([], 401);
+    }
+    public function createSanPhamCuaNSX(Request $request)
+    {
+        $user = auth()->user();
+        $nhaSanXuat = NhaSanXuat::where('loai_tai_khoan', 'Nhà Sản Xuất')
+            ->where('id', $user->id)
+            ->first();
+        $sanPham = SanPham::create([
+            'ma_san_pham'         => strtoupper(uniqid('SP')), // Tạo mã sản phẩm tự động
+            'ten_san_pham'        =>  $request->ten_san_pham,
+            'mo_ta'               =>  $request->mo_ta,
+            'id_danh_muc'         =>  $request->id_danh_muc,
+            'hinh_anh'            =>  $request->hinh_anh,
+            'so_luong_ton_kho'    =>  $request->so_luong_ton_kho,
+            'gia_ban'             =>  $request->gia_ban,
+            'don_vi_tinh'         =>  $request->don_vi_tinh,
+            'tinh_trang'          =>  $request->tinh_trang
+        ]);
+
+        SanPhamNSX::create([
+            'id_san_pham'         => $sanPham->id,
+            'id_nha_san_xuat'     => $nhaSanXuat->id,
+            'ma_lo_hang'          => strtoupper(uniqid('LH')),
+            'ngay_san_xuat'       => now(),
+            'tinh_trang'          => 1,
+        ]);
+        return response()->json([
+            'status'    =>  true,
+            'message'   =>  'Đã tạo mới sản phẩm thành công!'
+        ]);
+    }
+
+    public function deleteSanPhamCuaNSX($id)
+    {
+        $user = auth()->user();
+
+        $sp_nsx = SanPhamNSX::where('id_san_pham', $id)
+            ->where('id_nha_san_xuat', $user->id)
+            ->first();
+
+        if (!$sp_nsx) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Không tìm thấy sản phẩm cần xóa!'
+            ], 404);
+        }
+        // Xoá bản ghi trong bảng trung gian
+        $sanPhamID = $sp_nsx->id_san_pham;
+        $sp_nsx->delete();
+
+        SanPham::where('id', $sanPhamID)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Xoá sản phẩm thành công!'
+        ]);
     }
 
     public function getDataByIDSanPham(Request $request)
@@ -245,6 +303,7 @@ class SanPhamController extends Controller
             'san_phams.id',
             'san_phams.ten_san_pham',
             'nha_san_xuats.ten_cong_ty',
+            'san_phams.mo_ta',
             'san_phams.hinh_anh',
             'san_pham_n_s_x_e_s.ma_lo_hang',
             'san_pham_n_s_x_e_s.ngay_san_xuat',
@@ -260,7 +319,7 @@ class SanPhamController extends Controller
             'san_pham' => $data,
         ]);
     }
-    public function updateSanPhamNSX(Request $request)
+    public function updateSanPhamCuaNSX(Request $request)
     {
         try {
             SanPham::where('id', $request->id)

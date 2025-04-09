@@ -130,10 +130,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/xoa-san-pham', [GioHangController::class, 'xoaSanPham']);
         Route::post('/dat-hang', [GioHangController::class, 'datHang']);
     });
-    Route::group(['prefix'  =>  '/san-pham-nha-san-xuat'], function () {
-        Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
-        Route::post('/update-san-pham-nha-san-xuat', [SanPhamController::class, 'updateSanPhamNSX']);
-    });
+
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::get('/lay-du-lieu', [DonHangController::class, 'getDataForAdmin']);
         Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHangAdmin']);
@@ -142,7 +139,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
     });
 });
 //user
-Route::group(['prefix'  =>  '/user'], function () {
+Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum' ], function () {
     Route::group(['prefix'  =>  '/gio-hang'], function () {
         Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
         Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
@@ -153,6 +150,10 @@ Route::group(['prefix'  =>  '/user'], function () {
     Route::group(['prefix'  =>  '/san-pham'], function () {
         Route::get('/get-data-by-user', [SanPhamController::class, 'getDataByUser']);
         Route::post('/lay-du-lieu-san-pham/data', [SanPhamController::class, 'getDataByIDSanPham']);
+        Route::post('/them-moi-san-pham-cua-nsx', [SanPhamController::class, 'createSanPhamCuaNSX']);
+        Route::post('/update-san-pham-cua-nsx', [SanPhamController::class, 'updateSanPhamCuaNSX']);
+        Route::delete('/xoa-san-pham-cua-nsx/{id}', [SanPhamController::class, 'deleteSanPhamCuaNSX']);
+        Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::group(['prefix'  =>  '/dai-ly'], function () {
