@@ -136,10 +136,11 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHangAdmin']);
         Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangAdmin']);
         Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietAdmin']);
+        Route::post('/tim-don-hang', [DonHangController::class, 'searchDonHangAdmin']);
     });
 });
 //user
-Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum' ], function () {
+Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function () {
     Route::group(['prefix'  =>  '/gio-hang'], function () {
         Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
         Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
@@ -165,12 +166,14 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum' ], function 
         Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
             Route::get('/lay-du-lieu-cho-nsx', [DonHangController::class, 'getDataForNSX']);
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangNSX']);
+            Route::post('/tim-don-hang-nsx', [DonHangController::class, 'searchDonHangNSX']);
         });
         //đơn vị vận chuyển
         Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
             Route::get('/lay-du-lieu-cho-dvvc', [DonHangController::class, 'getDataForDVVC']);
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangDVVC']);
             Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietForDVVC']);
+            Route::post('/tim-kiem-dvvc', [DonHangController::class, 'searchDonHangDVVC']);
         });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
