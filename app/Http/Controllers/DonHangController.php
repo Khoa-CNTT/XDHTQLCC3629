@@ -232,7 +232,7 @@ class DonHangController extends Controller
     }
 
     // nhà sản xuất
-    public function getDataForNSX(){
+    public function getDataChiTietForNSX(Request $request){
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -244,6 +244,7 @@ class DonHangController extends Controller
             $list_don_hang = LichSuDonHang::
                 where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
                 ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
+                ->where('lich_su_don_hangs.id_don_hang', '=', $request->id_don_hang)
                 ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
                 ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
                 ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
@@ -266,6 +267,95 @@ class DonHangController extends Controller
         }
     }
 
+    public function getDataForNSX(){
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+
+        if ($user instanceof NhaSanXuat) {
+            try {
+                $user_id = $user->id;
+
+                $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
+                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
+                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                    ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+                    ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+                    ->select(
+                        'lich_su_don_hangs.*',
+                        'san_phams.ten_san_pham',
+                        'san_phams.hinh_anh',
+                        'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                        'dai_lies.ten_cong_ty as ten_khach_hang',
+                        'don_hangs.ngay_dat',
+                        'dai_lies.id as user_id',
+                        'don_hangs.tinh_trang_thanh_toan',
+                        'don_hangs.tinh_trang as tinh_trang_don_hang',
+                        'lich_su_don_hangs.id as id_lich_su_don_hang'
+                    )
+                    ->get();
+
+                // Gộp lại theo đơn hàng
+                $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
+                    $first = $items->first();
+
+                    // Tổng tiền sản phẩm = ∑ (giá × số lượng)
+                    $tong_tien_san_pham = $items->sum(function ($item) {
+                        return $item->don_gia * $item->so_luong;
+                    });
+
+                    //Gom theo id_nha_san_xuat để tránh trùng cước
+                    $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
+                        return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
+                    });
+
+                    $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
+
+                    return [
+                        'id_don_hang'            => $id,
+                        'user_id'                => $first->user_id,
+                        'ten_khach_hang'         => $first->ten_khach_hang,
+                        'ngay_dat'               => $first->ngay_dat,
+                        'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
+                        'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
+                        'tong_tien_san_pham'     => $tong_tien_san_pham,
+                        'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
+                        'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                        'san_phams'              => $items->map(function ($item) {
+                            return [
+                                'id_san_pham'       => $item->id_san_pham,
+                                'ten_san_pham'      => $item->ten_san_pham,
+                                'hinh_anh'          => $item->hinh_anh,
+                                'so_luong'          => $item->so_luong,
+                                'tinh_trang'        => $item->tinh_trang,
+                                'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
+                                'ten_dvvc'          => $item->ten_dvvc,
+                                'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                            ];
+                        })->values()
+                    ];
+                })->values();
+
+                return response()->json([
+                    'status' => true,
+                    'data'   => $grouped,
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Lỗi khi lấy dữ liệu đơn hàng cho NSX: " . $e->getMessage());
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Đã xảy ra lỗi khi xử lý dữ liệu',
+                ]);
+            }
+        }
+    }
+
     public function xacNhanDonHangNSX(Request $request){
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -275,24 +365,38 @@ class DonHangController extends Controller
             ], 401);
         } elseif($user && $user instanceof NhaSanXuat) {
             try {
-                if ($request->tinh_trang == 1) {
-                    $tinh_trang_moi_nsx = 2;
+                DB::beginTransaction();
+
+                if ($request->tinh_trang_don_hang != 1) {
+                    return response()->json([
+                        'message' => 'Trạng thái không hợp lệ để xác nhận!',
+                        'status'  => false,
+                    ]);
                 }
-                LichSuDonHang::where('id', $request->id)->update([
-                    'tinh_trang'        =>  $tinh_trang_moi_nsx,
-                ]);
+                $tinh_trang_moi_nsx = 2;
+                // Cập nhật đơn hàng và toàn bộ sản phẩm
                 DonHang::where('id', $request->id_don_hang)->update([
-                    'tinh_trang'        =>  $tinh_trang_moi_nsx,
+                    'tinh_trang' => $tinh_trang_moi_nsx,
                 ]);
+                foreach ($request->san_phams as $sp) {
+                    if (isset($sp['id_lich_su_don_hang'])) {
+                        LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
+                            'tinh_trang' => $tinh_trang_moi_nsx,
+                        ]);
+                    }
+                }
+                DB::commit();
                 return response()->json([
-                    'status'            =>   true,
-                    'message'           =>   'Xác nhận thành công!',
+                    'status'  => true,
+                    'message' => 'Xác nhận thành công!',
                 ]);
-            } catch (Exception $e) {
-                Log::info("Lỗi", $e);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Lỗi xác nhận của nsx: ' . $e->getMessage());
+
                 return response()->json([
-                    'status'            =>   false,
-                    'message'           =>   'Có lỗi khi xác nhận',
+                    'status'  => false,
+                    'message' => 'Lỗi: ' . $e->getMessage(),
                 ]);
             }
         }
@@ -457,14 +561,12 @@ class DonHangController extends Controller
                 $tatCaKho = KhoTrungChuyen::all();
                 $khoPhuHop = null;
                 foreach ($tatCaKho as $khoItem) {
-                    $tinhTrongKho = $this->timTinhTuDiaChi($khoItem->dia_chi, $this->dsTinhThanhPho());
+                    $tinhTrongKho = $this->timTinhTuDiaChi($khoItem->tinh_thanh, $this->dsTinhThanhPho());
                     if ($tinhTrongKho && strtolower($tinhTrongKho) == strtolower($tinhShop)) {
                         $khoPhuHop = $khoItem;
                         break;
                     }
                 }
-
-                // Nếu không tìm được kho phù hợp, dùng random
                 if (!$khoPhuHop) {
                     $khoPhuHop = KhoTrungChuyen::inRandomOrder()->first();
                     Log::warning("Không tìm được kho đúng tỉnh [$tinhShop], dùng random: ID {$khoPhuHop->id}");
@@ -510,23 +612,17 @@ class DonHangController extends Controller
             'Tp.HN' => 'Hà Nội',
             'TP. HCM' => 'Hồ Chí Minh',
         ];
-
         $diaChiLower = Str::lower($diaChi);
-
-        // So sánh alias trước
         foreach ($alias as $vietTat => $dayDu) {
             if (Str::contains($diaChiLower, Str::lower($vietTat))) {
                 return $dayDu;
             }
         }
-
-        // So sánh với danh sách tỉnh
         foreach ($dsTinh as $tinh) {
             if (Str::contains($diaChiLower, Str::lower($tinh))) {
                 return $tinh;
             }
         }
-
         return null;
     }
 
@@ -618,27 +714,70 @@ class DonHangController extends Controller
         $user_id = $user->id;
         $key = "%" . $request->abc . "%";
 
-        $data =  LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
-                ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
-                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-                ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
-                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-                ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
-                ->where('ten_san_pham', 'like', $key)
-                ->select(
-                    'lich_su_don_hangs.*',
-                    'san_phams.ten_san_pham',
-                    'san_phams.hinh_anh',
-                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                    'dai_lies.ten_cong_ty as ten_khach_hang',
-                    'dai_lies.id as user_id',
-                    'don_hangs.ngay_dat',
-                    'don_hangs.tinh_trang_thanh_toan',
-                )
-                ->get();
+        $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
+        ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
+        ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+        ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+        ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+        ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+        ->where('dai_lies.ten_cong_ty', 'like', $key)
+        ->select(
+            'lich_su_don_hangs.*',
+            'san_phams.ten_san_pham',
+            'san_phams.hinh_anh',
+            'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+            'dai_lies.ten_cong_ty as ten_khach_hang',
+            'don_hangs.ngay_dat',
+            'dai_lies.id as user_id',
+            'don_hangs.tinh_trang_thanh_toan',
+            'don_hangs.tinh_trang as tinh_trang_don_hang',
+            'lich_su_don_hangs.id as id_lich_su_don_hang'
+        )
+        ->get();
+                // Gộp lại theo đơn hàng
+        $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
+            $first = $items->first();
+
+            // Tổng tiền sản phẩm = ∑ (giá × số lượng)
+            $tong_tien_san_pham = $items->sum(function ($item) {
+                return $item->don_gia * $item->so_luong;
+            });
+
+            //Gom theo id_nha_san_xuat để tránh trùng cước
+            $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
+                return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
+            });
+
+            $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
+
+            return [
+                'id_don_hang'            => $id,
+                'user_id'                => $first->user_id,
+                'ten_khach_hang'         => $first->ten_khach_hang,
+                'ngay_dat'               => $first->ngay_dat,
+                'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
+                'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
+                'tong_tien_san_pham'     => $tong_tien_san_pham,
+                'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
+                'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                'san_phams'              => $items->map(function ($item) {
+                    return [
+                        'id_san_pham'       => $item->id_san_pham,
+                        'ten_san_pham'      => $item->ten_san_pham,
+                        'hinh_anh'          => $item->hinh_anh,
+                        'so_luong'          => $item->so_luong,
+                        'tinh_trang'        => $item->tinh_trang,
+                        'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
+                        'ten_dvvc'          => $item->ten_dvvc,
+                        'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                    ];
+                })->values()
+            ];
+        })->values();
+
         return response()->json([
-            'status'    =>      true,
-            'data'      =>      $data,
+            'status' => true,
+            'data'   => $grouped,
         ]);
     }
 
@@ -679,41 +818,41 @@ class DonHangController extends Controller
                 return $item->don_gia * $item->so_luong;
             });
 
-        //Gom theo id_nha_san_xuat để tránh trùng cước
-        $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
-            return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
-        });
+            //Gom theo id_nha_san_xuat để tránh trùng cước
+            $cuoc_theo_nsx = $items->groupBy('id_nha_san_xuat')->map(function ($group) {
+                return $group->first()->cuoc_van_chuyen; // Chỉ lấy 1 dòng đại diện
+            });
 
-        $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
+            $tong_cuoc_van_chuyen = $cuoc_theo_nsx->sum(); // Tổng cước theo NSX
 
-        return [
-            'id_don_hang'            => $id,
-            'user_id'                => $first->user_id,
-            'ten_khach_hang'         => $first->ten_khach_hang,
-            'ngay_dat'               => $first->ngay_dat,
-            'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
-            'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
-            'tong_tien_san_pham'     => $tong_tien_san_pham,
-            'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
-            'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
-            'san_phams'              => $items->map(function ($item) {
-                return [
-                    'id_san_pham'       => $item->id_san_pham,
-                    'ten_san_pham'      => $item->ten_san_pham,
-                    'hinh_anh'          => $item->hinh_anh,
-                    'so_luong'          => $item->so_luong,
-                    'tinh_trang'        => $item->tinh_trang,
-                    'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
-                    'ten_nsx'           => $item->ten_nsx,
-                    'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
-                ];
-            })->values()
-        ];
-    })->values();
+            return [
+                'id_don_hang'            => $id,
+                'user_id'                => $first->user_id,
+                'ten_khach_hang'         => $first->ten_khach_hang,
+                'ngay_dat'               => $first->ngay_dat,
+                'tinh_trang_thanh_toan'  => $first->tinh_trang_thanh_toan,
+                'tinh_trang_don_hang'    => $first->tinh_trang_don_hang,
+                'tong_tien_san_pham'     => $tong_tien_san_pham,
+                'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
+                'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                'san_phams'              => $items->map(function ($item) {
+                    return [
+                        'id_san_pham'       => $item->id_san_pham,
+                        'ten_san_pham'      => $item->ten_san_pham,
+                        'hinh_anh'          => $item->hinh_anh,
+                        'so_luong'          => $item->so_luong,
+                        'tinh_trang'        => $item->tinh_trang,
+                        'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
+                        'ten_nsx'           => $item->ten_nsx,
+                        'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                    ];
+                })->values()
+            ];
+        })->values();
 
-    return response()->json([
-        'status' => true,
-        'data'   => $grouped,
-    ]);
-    }
+        return response()->json([
+            'status' => true,
+            'data'   => $grouped,
+        ]);
+        }
 }
