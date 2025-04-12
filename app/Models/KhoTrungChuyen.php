@@ -18,5 +18,6 @@ class KhoTrungChuyen extends Model
         "kinh_do",
         "loai_kho",
         "mo_ta",
+        "id_dvvc"
     ];
 }
