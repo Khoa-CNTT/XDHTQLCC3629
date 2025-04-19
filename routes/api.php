@@ -175,6 +175,7 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangDVVC']);
             Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietForDVVC']);
             Route::post('/tim-kiem-dvvc', [DonHangController::class, 'searchDonHangDVVC']);
+            Route::post('/goi-y-duong-di', [DonHangController::class, 'goiYDuongDi']);
         });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
