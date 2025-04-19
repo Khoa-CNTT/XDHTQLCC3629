@@ -21,13 +21,15 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'KCN Sài Đồng, Phường Phúc Đồng, Quận Long Biên',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Hải Phòng',
                 'tinh_thanh' => 'Hải Phòng',
-                'dia_chi' => 'Đường Bạch Đằng, Phường Hạ Lý, Quận Hồng Bàng',
+                'dia_chi' => 'Đường Lý Thường Kiệt, Quận Hồng Bàng',
                 'vi_do' => 20.8600,
                 'kinh_do' => 106.6822,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Quảng Ninh',
@@ -35,6 +37,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'P. Cao Xanh, TP. Hạ Long',
                 'vi_do' => 21.0064,
                 'kinh_do' => 107.2925,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Bắc Ninh',
@@ -42,6 +45,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'KCN Yên Phong, Huyện Yên Phong',
                 'vi_do' => 21.1860,
                 'kinh_do' => 106.0764,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Thanh Hóa',
@@ -49,6 +53,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Phường Đông Hương, TP. Thanh Hóa',
                 'vi_do' => 19.8079,
                 'kinh_do' => 105.7768,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Nghệ An',
@@ -56,6 +61,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => '75 Trường Chinh, Phường Lê Lợi, TP. Vinh',
                 'vi_do' => 18.6734,
                 'kinh_do' => 105.6929,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Hà Tĩnh',
@@ -63,6 +69,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Phường Thạch Linh, TP. Hà Tĩnh',
                 'vi_do' => 18.335,
                 'kinh_do' => 105.906,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Quảng Bình',
@@ -70,6 +77,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Đường Trần Quang Khải, TP. Đồng Hới',
                 'vi_do' => 17.4689,
                 'kinh_do' => 106.6223,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Huế',
@@ -77,13 +85,15 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Đường Nguyễn Tất Thành, Hương Thủy',
                 'vi_do' => 16.4637,
                 'kinh_do' => 107.5909,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Đà Nẵng',
                 'tinh_thanh' => 'Đà Nẵng',
-                'dia_chi' => 'Lô 39, KCN Đà Nẵng, Phường An Hải Bắc, Quận Sơn Trà',
+                'dia_chi' => 'Lô 39, KCN Hòa Cầm, Đà Nẵng',
                 'vi_do' => 16.0739,
                 'kinh_do' => 108.2240,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Quảng Ngãi',
@@ -91,6 +101,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'TP. Quảng Ngãi',
                 'vi_do' => 15.1201,
                 'kinh_do' => 108.7923,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Bình Định',
@@ -98,6 +109,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Xã Hoài Tân, Thị xã Hoài Nhơn',
                 'vi_do' => 14.4200,
                 'kinh_do' => 109.0000,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Phú Yên',
@@ -105,6 +117,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'TP. Tuy Hòa',
                 'vi_do' => 13.0892,
                 'kinh_do' => 109.3095,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Khánh Hòa',
@@ -112,6 +125,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'KCN Suối Dầu, Huyện Cam Lâm',
                 'vi_do' => 12.2388,
                 'kinh_do' => 109.1967,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Đắk Lắk',
@@ -119,6 +133,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'TP. Buôn Ma Thuột',
                 'vi_do' => 12.666,
                 'kinh_do' => 108.0378,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Lâm Đồng',
@@ -126,6 +141,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Phường 8, TP. Đà Lạt',
                 'vi_do' => 11.9404,
                 'kinh_do' => 108.4583,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho TP.HCM',
@@ -133,6 +149,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'Ấp 1, Xã Tân Thới Nhì, Huyện Hóc Môn',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Cần Thơ',
@@ -140,6 +157,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'QL1A, Phường Hưng Thạnh, Quận Cái Răng',
                 'vi_do' => 10.0159,
                 'kinh_do' => 105.7689,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho An Giang',
@@ -147,6 +165,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'TP. Long Xuyên',
                 'vi_do' => 10.385,
                 'kinh_do' => 105.435,
+                'id_dvvc' => 1,
             ],
             [
                 'ten_kho' => 'Kho Kiên Giang',
@@ -154,6 +173,7 @@ class KhoTrungChuyenSeeder extends Seeder
                 'dia_chi' => 'TP. Rạch Giá',
                 'vi_do' => 9.940,
                 'kinh_do' => 105.085,
+                'id_dvvc' => 1,
             ],
         ]);
     }

@@ -18,6 +18,8 @@ class DaiLy extends Authenticatable
         "password",
         "dia_chi",
         "so_dien_thoai",
-        "tinh_trang"
+        "tinh_trang",
+        "vi_do",
+        "kinh_do",
     ];
 }

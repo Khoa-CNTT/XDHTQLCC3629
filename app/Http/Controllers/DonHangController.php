@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Services\PathFindingService;
 
 class DonHangController extends Controller
 {
@@ -433,7 +434,9 @@ class DonHangController extends Controller
                         'dai_lies.id as user_id',
                         'don_hangs.tinh_trang_thanh_toan',
                         'don_hangs.tinh_trang as tinh_trang_don_hang',
-                        'lich_su_don_hangs.id as id_lich_su_don_hang'
+                        'lich_su_don_hangs.id as id_lich_su_don_hang',
+                        'lich_su_don_hangs.id_don_vi_van_chuyen as id_dvvc',
+                        'nha_san_xuats.id as id_nsx'
                     )
                     ->get();
 
@@ -463,6 +466,8 @@ class DonHangController extends Controller
                         'tong_tien_san_pham'     => $tong_tien_san_pham,
                         'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
                         'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                        'id_dvvc'                => $first->id_dvvc,
+                        'id_nsx'                => $first->id_nsx,
                         'san_phams'              => $items->map(function ($item) {
                             return [
                                 'id_san_pham'       => $item->id_san_pham,
@@ -683,6 +688,29 @@ class DonHangController extends Controller
         }
     }
 
+    protected $pathFindingService;
+    public function __construct(PathFindingService $pathFindingService)
+    {
+        $this->pathFindingService = $pathFindingService;
+    }
+    // Trả về tuyến đường ngắn nhất từ nhà sản xuất đến đại lý
+    public function goiYDuongDi(Request $request)
+    {
+        $request->validate([
+            'id_nha_san_xuat' => 'required|exists:nha_san_xuats,id',
+            'id_dai_ly' => 'required|exists:dai_lies,id',
+        ]);
+        $result = $this->pathFindingService->findShortestPath(
+            $request->id_nha_san_xuat,
+            $request->id_dai_ly
+        );
+        return response()->json([
+            'success' => true,
+            'tuyen_duong_id' => $result['path_ids'],
+            'tuyen_duong_ten' => $result['path_names'],
+            'tong_khoang_cach' => $result['distance'] . ' km',
+        ]);
+    }
     // search cho đơn hàng bên Admin
     public function searchDonHangAdmin(Request $request)
     {
