@@ -235,7 +235,7 @@ class PathFindingService
             } elseif (str_starts_with($pointId, 'kho_')) {
                 $khoId = (int) str_replace('kho_', '', $pointId);
                 $kho = $allKhos->firstWhere('id', $khoId);
-                $pathNames[] = 'Kho: ' . ($kho ? $kho->ten_kho : 'Không rõ');
+                $pathNames[] = ($kho ? $kho->ten_kho : 'Không rõ');
             }
         }
 
