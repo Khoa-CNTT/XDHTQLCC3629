@@ -247,6 +247,86 @@ class PathFindingService
         ];
     }
 
+    // public function findOptimizedPath(array $nhaSanXuatIds, $daiLyId)
+    // {
+    //     $daiLy = DaiLy::findOrFail($daiLyId);
+    //     $daiLyPoint = ['lat' => $daiLy->vi_do, 'lng' => $daiLy->kinh_do];
+    //     $allKhos = KhoTrungChuyen::all();
+
+    //     $nsxs = NhaSanXuat::whereIn('id', $nhaSanXuatIds)->get();
+    //     $nsxPoints = [];
+    //     foreach ($nsxs as $nsx) {
+    //         $nsxPoints['nsx_' . $nsx->id] = [
+    //             'lat' => $nsx->vi_do,
+    //             'lng' => $nsx->kinh_do,
+    //             'ten' => $nsx->ten_cong_ty,
+    //             'dia_chi' => $nsx->dia_chi
+    //         ];
+    //     }
+
+    //     // Xử lý các kho hợp lệ như cũ (ưu tiên gần đại lý)
+    //     $validKhos = $this->filterValidKhos($allKhos, $nsxPoints, $daiLyPoint);
+    //     if (empty($validKhos)) {
+    //         return ['error' => 'Không có kho phù hợp'];
+    //     }
+
+    //     $khoPoints = [];
+    //     foreach ($validKhos as $kho) {
+    //         $khoPoints['kho_' . $kho->id] = [
+    //             'lat' => $kho->vi_do,
+    //             'lng' => $kho->kinh_do,
+    //             'ten' => $kho->ten_kho
+    //         ];
+    //     }
+
+    //     // Sinh tất cả hoán vị NSX
+    //     $nsxPermutations = $this->getPermutations(array_keys($nsxPoints));
+
+    //     $minPath = null;
+    //     $minDistance = INF;
+
+    //     foreach ($nsxPermutations as $perm) {
+    //         // Chọn 1 → 2 kho (ưu tiên gần đại lý)
+    //         foreach ($this->getCombinations(array_keys($khoPoints), 1, 2) as $khoCombo) {
+    //             $path = array_merge($perm, $khoCombo, ['dl_' . $daiLy->id]);
+    //             $nodes = array_merge($nsxPoints, array_intersect_key($khoPoints, array_flip($khoCombo)));
+    //             $nodes['dl_' . $daiLy->id] = $daiLyPoint;
+
+    //             $totalDistance = 0;
+    //             for ($i = 0; $i < count($path) - 1; $i++) {
+    //                 $from = $nodes[$path[$i]];
+    //                 $to = $nodes[$path[$i + 1]];
+    //                 $totalDistance += $this->haversine($from['lat'], $from['lng'], $to['lat'], $to['lng']);
+    //             }
+
+    //             if ($totalDistance < $minDistance) {
+    //                 $minDistance = $totalDistance;
+    //                 $minPath = $path;
+    //             }
+    //         }
+    //     }
+
+    //     // Build tên path
+    //     $pathNames = [];
+    //     foreach ($minPath ?? [] as $id) {
+    //         if (str_starts_with($id, 'nsx_')) {
+    //             $nsx = $nsxs->firstWhere('id', (int) str_replace('nsx_', '', $id));
+    //             $pathNames[] = 'Nhà sản xuất: ' . $nsx->dia_chi;
+    //         } elseif (str_starts_with($id, 'kho_')) {
+    //             $kho = $allKhos->firstWhere('id', (int) str_replace('kho_', '', $id));
+    //             $pathNames[] = 'Kho: ' . $kho->ten_kho;
+    //         } elseif (str_starts_with($id, 'dl_')) {
+    //             $pathNames[] = 'Đại lý: ' . $daiLy->dia_chi;
+    //         }
+    //     }
+
+    //     return [
+    //         'path_ids' => $minPath,
+    //         'path_names' => $pathNames,
+    //         'distance' => round($minDistance, 2),
+    //     ];
+    // }
+
     private function getCombinations($array, $size)
     {
         $combinations = [];
@@ -265,4 +345,51 @@ class PathFindingService
             $this->combinationHelper($array, $size, $i + 1, array_merge($current, [$array[$i]]), $combinations);
         }
     }
+
+    // private function getPermutations($items)
+    // {
+    //     if (count($items) <= 1) {
+    //         return [$items];
+    //     }
+
+    //     $permutations = [];
+    //     foreach ($items as $index => $item) {
+    //         $remainingItems = $items;
+    //         unset($remainingItems[$index]);
+    //         $remainingItems = array_values($remainingItems);
+
+    //         foreach ($this->getPermutations($remainingItems) as $permutation) {
+    //             array_unshift($permutation, $item);
+    //             $permutations[] = $permutation;
+    //         }
+    //     }
+    //     return $permutations;
+    // }
+
+    // private function filterValidKhos($khos, $nsxStart, $daiLy, $maxDistanceToPath = 50, $nearDaiLyRadius = 100)
+    // {
+    //     $validKhos = [];
+
+    //     foreach ($khos as $kho) {
+    //         // Khoảng cách từ kho đến đoạn đường NSX → Đại lý
+    //         $distanceToPath = $this->distancePointToSegment(
+    //             $kho['lat'], $kho['lng'],
+    //             $nsxStart['lat'], $nsxStart['lng'],
+    //             $daiLy['lat'], $daiLy['lng']
+    //         );
+
+    //         // Khoảng cách từ kho đến đại lý
+    //         $distanceToDaiLy = $this->haversine(
+    //             $kho['lat'], $kho['lng'],
+    //             $daiLy['lat'], $daiLy['lng']
+    //         );
+
+    //         // Nếu gần tuyến đường hoặc gần đại lý thì chấp nhận
+    //         if ($distanceToPath <= $maxDistanceToPath || $distanceToDaiLy <= $nearDaiLyRadius) {
+    //             $validKhos[] = $kho;
+    //         }
+    //     }
+
+    //     return $validKhos;
+    // }
 }

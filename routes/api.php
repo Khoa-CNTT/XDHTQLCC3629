@@ -161,6 +161,7 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::get('/lay-du-lieu', [DonHangController::class, 'getData']);
             Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTiet']);
             Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHang']);
+            Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangDaiLy']);
         });
         //nhà sản xuất
         Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
