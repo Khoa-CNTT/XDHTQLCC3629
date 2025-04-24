@@ -357,7 +357,8 @@ class DonHangController extends Controller
                         'dai_lies.id as user_id',
                         'don_hangs.tinh_trang_thanh_toan',
                         'don_hangs.tinh_trang as tinh_trang_don_hang',
-                        'lich_su_don_hangs.id as id_lich_su_don_hang'
+                        'lich_su_don_hangs.id as id_lich_su_don_hang',
+                        'lich_su_don_hangs.tinh_trang as tinh_trang_chi_tiet_don_hang',
                     )
                     ->get();
 
@@ -387,16 +388,19 @@ class DonHangController extends Controller
                         'tong_tien_san_pham'     => $tong_tien_san_pham,
                         'tong_cuoc_van_chuyen'   => $tong_cuoc_van_chuyen,
                         'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
+                        'id_nha_san_xuat'        => $first->id_nha_san_xuat,
+                        'tinh_trang_chi_tiet_don_hang'        => $first->tinh_trang_chi_tiet_don_hang,
                         'san_phams'              => $items->map(function ($item) {
                             return [
-                                'id_san_pham'       => $item->id_san_pham,
-                                'ten_san_pham'      => $item->ten_san_pham,
-                                'hinh_anh'          => $item->hinh_anh,
-                                'so_luong'          => $item->so_luong,
-                                'tinh_trang'        => $item->tinh_trang,
-                                'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
-                                'ten_dvvc'          => $item->ten_dvvc,
-                                'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
+                                'id_san_pham'           => $item->id_san_pham,
+                                'ten_san_pham'          => $item->ten_san_pham,
+                                'hinh_anh'              => $item->hinh_anh,
+                                'so_luong'              => $item->so_luong,
+                                'cuoc_van_chuyen'       => $item->cuoc_van_chuyen,
+                                'ten_dvvc'              => $item->ten_dvvc,
+                                'id_lich_su_don_hang'   => $item->id_lich_su_don_hang,
+                                'id_nha_san_xuat'       => $item->id_nha_san_xuat,
+                                'tinh_trang_chi_tiet_don_hang'        => $item->tinh_trang_chi_tiet_don_hang
                             ];
                         })->values()
                     ];
@@ -418,47 +422,59 @@ class DonHangController extends Controller
 
     public function xacNhanDonHangNSX(Request $request){
         $user = Auth::guard('sanctum')->user();
-        if (!$user) {
+        if (!$user || !($user instanceof NhaSanXuat)) {
             return response()->json([
-                'message' => 'Bạn cần đăng nhập!',
+                'message' => 'Bạn cần đăng nhập với tư cách nhà sản xuất!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhaSanXuat) {
-            try {
-                DB::beginTransaction();
+        }
 
-                if ($request->tinh_trang_don_hang != 1) {
-                    return response()->json([
-                        'message' => 'Trạng thái không hợp lệ để xác nhận!',
-                        'status'  => false,
+        try {
+            DB::beginTransaction();
+
+            if ($request->tinh_trang_don_hang != 1) {
+                return response()->json([
+                    'message' => 'Trạng thái không hợp lệ để xác nhận!',
+                    'status'  => false,
+                ]);
+            }
+
+            $tinh_trang_moi_nsx = 2;
+
+            // Cập nhật các sản phẩm của nhà sản xuất hiện tại
+            foreach ($request->san_phams as $sp) {
+                if (isset($sp['id_lich_su_don_hang']) && $sp['id_nha_san_xuat'] == $user->id) {
+                    LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
+                        'tinh_trang' => $tinh_trang_moi_nsx,
                     ]);
                 }
-                $tinh_trang_moi_nsx = 2;
-                // Cập nhật đơn hàng và toàn bộ sản phẩm
+            }
+
+            // Kiểm tra toàn bộ sản phẩm trong đơn hàng đã xác nhận hết chưa
+            $chua_xac_nhan = LichSuDonHang::where('id_don_hang', $request->id_don_hang)
+                ->where('tinh_trang', '!=', $tinh_trang_moi_nsx)
+                ->exists();
+
+            if (!$chua_xac_nhan) {
                 DonHang::where('id', $request->id_don_hang)->update([
                     'tinh_trang' => $tinh_trang_moi_nsx,
                 ]);
-                foreach ($request->san_phams as $sp) {
-                    if (isset($sp['id_lich_su_don_hang'])) {
-                        LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
-                            'tinh_trang' => $tinh_trang_moi_nsx,
-                        ]);
-                    }
-                }
-                DB::commit();
-                return response()->json([
-                    'status'  => true,
-                    'message' => 'Xác nhận thành công!',
-                ]);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Lỗi xác nhận của nsx: ' . $e->getMessage());
-
-                return response()->json([
-                    'status'  => false,
-                    'message' => 'Lỗi: ' . $e->getMessage(),
-                ]);
             }
+
+            DB::commit();
+            return response()->json([
+                'status'  => true,
+                'message' => 'Xác nhận thành công!',
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi xác nhận của nsx: ' . $e->getMessage());
+
+            return response()->json([
+                'status'  => false,
+                'message' => 'Lỗi: ' . $e->getMessage(),
+            ]);
         }
     }
 
@@ -528,6 +544,7 @@ class DonHangController extends Controller
                         'tong_tien_don_hang'     => $tong_tien_san_pham + $tong_cuoc_van_chuyen,
                         'id_dvvc'                => $first->id_dvvc,
                         'id_nsx'                 => $first->id_nsx,
+                        'id_cac_nsx'             => $items->pluck('id_nsx')->unique()->values()->toArray(),
                         'dia_chi_dai_ly'         => $first->dia_chi_dai_ly,
                         'san_phams'              => $items->map(function ($item) {
                             return [
@@ -588,12 +605,12 @@ class DonHangController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($request->tinh_trang_don_hang != 2) {
-                return response()->json([
-                    'message' => 'Trạng thái không hợp lệ để xác nhận!',
-                    'status'  => false,
-                ]);
-            }
+            // if ($request->tinh_trang_don_hang != 2) {
+            //     return response()->json([
+            //         'message' => 'Trạng thái không hợp lệ để xác nhận!',
+            //         'status'  => false,
+            //     ]);
+            // }
             $tinh_trang_moi_dvvc = 5;
             // Cập nhật trạng thái đơn hàng và sản phẩm
             DonHang::where('id', $request->id_don_hang)->update([
@@ -615,9 +632,32 @@ class DonHangController extends Controller
                     'status'  => false,
                 ]);
             }
+            $request->validate([
+                'id_don_hang' => 'required|exists:don_hangs,id',
+                'danh_sach_nha_san_xuat' => 'required|array|min:1',
+                'danh_sach_nha_san_xuat.*' => 'exists:nha_san_xuats,id',
+                'id_dai_ly' => 'required|exists:dai_lys,id',
+            ]);
+
+            // Lấy thông tin đơn hàng và đại lý
             $donHang = DonHang::find($request->id_don_hang);
             $idDaiLy = $donHang->user_id;
             $nhomTheoNSX = $chiTietDonHang->groupBy('id_nha_san_xuat');
+
+            // Mảng các nhà sản xuất (NSX)
+            $danhSachNhaSanXuat = $request->danh_sach_nha_san_xuat;
+
+            // Gọi hàm tìm tuyến đường tối ưu với mảng các nhà sản xuất
+            $tuyen = $this->pathFindingService->findShortestPath($danhSachNhaSanXuat, $idDaiLy);
+
+            // Kiểm tra kết quả trả về có hợp lệ không
+            if (!isset($tuyen['path_ids']) || !is_array($tuyen['path_ids']) || empty($tuyen['path_ids'])) {
+                throw new \Exception("Không tìm thấy tuyến đường hợp lệ.");
+            }
+
+            $thuTu = 1;
+
+            // Lưu thông tin các nhà sản xuất và kho trung chuyển
             foreach ($nhomTheoNSX as $nsxId => $sanPhamTheoNSX) {
                 $nsx = NhaSanXuat::find($nsxId);
                 if (!$nsx) {
@@ -633,18 +673,13 @@ class DonHangController extends Controller
                     'id_dai_ly'            => $idDaiLy,
                     'thoi_gian_den'        => null,
                     'thoi_gian_di'         => null,
-                    'thu_tu'               => 1,
+                    'thu_tu'               => $thuTu,
                     'mo_ta'                => "Vị trí của nhà sản xuất",
                     'tinh_trang'           => 0,
                 ]);
+                $thuTu++;
 
-                // Gọi hàm tìm tuyến đường tối ưu
-                $tuyen = $this->pathFindingService->findShortestPath($nsxId, $idDaiLy);
-                if (!isset($tuyen['path_ids']) || !is_array($tuyen['path_ids'])) {
-                    throw new \Exception("Không tìm thấy tuyến đường hợp lệ cho nhà sản xuất $nsxId");
-                }
-                $thuTu = 2;
-                // Lưu thông tin các kho trung chuyển
+                // Lưu thông tin các kho trung chuyển từ kết quả tuyến đường
                 foreach ($tuyen['path_ids'] as $index => $diem) {
                     if (Str::startsWith($diem, 'kho_')) {
                         $idKho = (int) Str::after($diem, 'kho_');
@@ -675,12 +710,14 @@ class DonHangController extends Controller
                     'thoi_gian_den'        => null,
                     'thoi_gian_di'         => null,
                     'thu_tu'               => $thuTu,
-                    'mo_ta'                => "vị trí của đại lý", // Địa chỉ đại lý
+                    'mo_ta'                => "Vị trí của đại lý", // Địa chỉ đại lý
                     'tinh_trang'           => 0,
                 ]);
                 $thuTu++;
             }
+
             DB::commit();
+
             return response()->json([
                 'status'  => true,
                 'message' => 'Xác nhận thành công!',
@@ -742,21 +779,26 @@ class DonHangController extends Controller
     }
 
     protected $pathFindingService;
+
     public function __construct(PathFindingService $pathFindingService)
     {
         $this->pathFindingService = $pathFindingService;
     }
-    // Trả về tuyến đường ngắn nhất từ nhà sản xuất đến đại lý
+
+    // Gợi ý tuyến đường từ nhiều NSX đến đại lý
     public function goiYDuongDi(Request $request)
     {
         $request->validate([
-            'id_nha_san_xuat' => 'required|exists:nha_san_xuats,id',
+            'danh_sach_nha_san_xuat' => 'required|array|min:1',
+            'danh_sach_nha_san_xuat.*' => 'exists:nha_san_xuats,id',
             'id_dai_ly' => 'required|exists:dai_lies,id',
         ]);
+
         $result = $this->pathFindingService->findShortestPath(
-            $request->id_nha_san_xuat,
+            $request->danh_sach_nha_san_xuat,
             $request->id_dai_ly
         );
+
         return response()->json([
             'success' => true,
             'tuyen_duong_id' => $result['path_ids'],
@@ -764,26 +806,6 @@ class DonHangController extends Controller
             'tong_khoang_cach' => $result['distance'] . ' km',
         ]);
     }
-    // public function goiYDuongDi(Request $request)
-    // {
-    //     $request->validate([
-    //         'nsxIds' => 'required|array|min:1',
-    //         'nsxIds.*' => 'exists:nha_san_xuats,id',
-    //         'daiLyId' => 'required|exists:dai_lies,id',
-    //     ]);
-
-    //     $result = $this->pathFindingService->findOptimizedPath(
-    //         $request->nsxIds,
-    //         $request->daiLyId
-    //     );
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'tuyen_duong' => $result['path_names'],
-    //         'tuyen_duong_id' => $result['path_ids'],
-    //         'tong_km' => $result['distance'] . ' km',
-    //     ]);
-    // }
 
     // search cho đơn hàng bên Admin
     public function searchDonHangAdmin(Request $request)
