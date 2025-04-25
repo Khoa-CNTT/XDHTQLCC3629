@@ -605,12 +605,12 @@ class DonHangController extends Controller
         try {
             DB::beginTransaction();
 
-            // if ($request->tinh_trang_don_hang != 2) {
-            //     return response()->json([
-            //         'message' => 'Trạng thái không hợp lệ để xác nhận!',
-            //         'status'  => false,
-            //     ]);
-            // }
+            if ($request->input('id_don_hang.tinh_trang_don_hang') != 2) {
+                return response()->json([
+                    'message' => 'Trạng thái không hợp lệ để xác nhận!',
+                    'status'  => false,
+                ]);
+            }
             $tinh_trang_moi_dvvc = 5;
             // Cập nhật trạng thái đơn hàng và sản phẩm
             DonHang::where('id', $request->id_don_hang)->update([
@@ -640,12 +640,13 @@ class DonHangController extends Controller
             ]);
 
             // Lấy thông tin đơn hàng và đại lý
-            $donHang = DonHang::find($request->id_don_hang);
+            $donHang = DonHang::find($request->input('id_don_hang'));
             $idDaiLy = $donHang->user_id;
             $nhomTheoNSX = $chiTietDonHang->groupBy('id_nha_san_xuat');
 
             // Mảng các nhà sản xuất (NSX)
-            $danhSachNhaSanXuat = $request->danh_sach_nha_san_xuat;
+            $danhSachNhaSanXuat = $request->input('id_cac_nsx');
+            Log::info('Payload nhận được:', $request->all());
 
             // Gọi hàm tìm tuyến đường tối ưu với mảng các nhà sản xuất
             $tuyen = $this->pathFindingService->findShortestPath($danhSachNhaSanXuat, $idDaiLy);
@@ -788,22 +789,40 @@ class DonHangController extends Controller
     // Gợi ý tuyến đường từ nhiều NSX đến đại lý
     public function goiYDuongDi(Request $request)
     {
+        // Validate dữ liệu yêu cầu
         $request->validate([
             'danh_sach_nha_san_xuat' => 'required|array|min:1',
             'danh_sach_nha_san_xuat.*' => 'exists:nha_san_xuats,id',
             'id_dai_ly' => 'required|exists:dai_lies,id',
         ]);
+        // Lấy danh sách nhà sản xuất từ ID và ID đại lý
+        $nhaSanXuatIds = $request->danh_sach_nha_san_xuat;
+        $daiLyId = $request->id_dai_ly;
+        // Lấy tên nhà sản xuất từ ID
+        $nhaSanXuatNames = \App\Models\NhaSanXuat::whereIn('id', $nhaSanXuatIds)
+                                                ->pluck('ten_cong_ty', 'id')
+                                                ->toArray();
+        // Gọi hàm findShortestPathMultipleNSX để tính toán tất cả các tuyến đường cho các nhà sản xuất
+        $results = $this->pathFindingService->findShortestPathMultipleNSX($nhaSanXuatIds, $daiLyId);
 
-        $result = $this->pathFindingService->findShortestPath(
-            $request->danh_sach_nha_san_xuat,
-            $request->id_dai_ly
-        );
-
+        // Nếu không có tuyến đường hợp lệ, trả về thông báo lỗi
+        if (empty($results)) {
+            return response()->json([
+                'error' => 'Không có kế hoạch vận chuyển khả thi.'
+            ], 400);
+        }
+        // Tính tổng quãng đường
+        $totalDistance = array_sum(array_column($results, 'distance'));
+        // Thêm tên nhà sản xuất vào kết quả
+        foreach ($results as &$tuyen) {
+            // Lấy tên nhà sản xuất từ danh sách tên đã lấy ở trên
+            $tuyen['nha_san_xuat_name'] = $nhaSanXuatNames[$tuyen['nha_san_xuat_id']] ?? 'Tên không có sẵn';
+        }
+        // Trả về kết quả
         return response()->json([
             'success' => true,
-            'tuyen_duong_id' => $result['path_ids'],
-            'tuyen_duong_ten' => $result['path_names'],
-            'tong_khoang_cach' => $result['distance'] . ' km',
+            'data' => $results, // Trả về tất cả các tuyến đường
+            'total_distance' => round($totalDistance, 2) . ' km', // Tổng quãng đường
         ]);
     }
 

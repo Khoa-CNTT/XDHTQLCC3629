@@ -73,257 +73,197 @@ class PathFindingService
         return $this->haversine(rad2deg($closestLat), rad2deg($closestLng), $px, $py);
     }
 
-    // public function findShortestPath($nhaSanXuatId, $daiLyId)
-    // {
-    //     $nsx = NhaSanXuat::findOrFail($nhaSanXuatId);
-    //     $dl = DaiLy::findOrFail($daiLyId);
-    //     $allKhos = KhoTrungChuyen::all();
-
-    //     $startPoint = ['lat' => $nsx->vi_do, 'lng' => $nsx->kinh_do];
-    //     $endPoint = ['lat' => $dl->vi_do, 'lng' => $dl->kinh_do];
-
-    //     $isNorthBound = $startPoint['lat'] < $endPoint['lat'];
-    //     $cityRadius = 100;
-
-    //     $validKhos = collect();
-    //     $cityKhos = collect();
-
-    //     foreach ($allKhos as $kho) {
-    //         $lat = $kho->vi_do;
-    //         $lng = $kho->kinh_do;
-
-    //         // Luôn check cityKhos trước (ưu tiên)
-    //         $distanceToDl = $this->haversine($lat, $lng, $dl->vi_do, $dl->kinh_do);
-    //         if ($distanceToDl <= $cityRadius) {
-    //             $cityKhos->push($kho);
-    //             continue; // Đã là kho trong thành phố, khỏi check tiếp
-    //         }
-
-    //         // Các điều kiện lọc theo tuyến
-    //         $distanceToLine = $this->distancePointToSegment(
-    //             $lat, $lng,
-    //             $startPoint['lat'], $startPoint['lng'],
-    //             $endPoint['lat'], $endPoint['lng']
-    //         );
-
-    //         if ($distanceToLine > 150) continue;
-
-    //         if ($isNorthBound && ($lat < $startPoint['lat'] || $lat > $endPoint['lat'])) continue;
-    //         if (!$isNorthBound && ($lat > $startPoint['lat'] || $lat < $endPoint['lat'])) continue;
-
-    //         $validKhos->push($kho);
-    //     }
-
-    //     if ($validKhos->isEmpty() && $cityKhos->isEmpty()) {
-    //         $directDistance = $this->haversine(
-    //             $startPoint['lat'], $startPoint['lng'],
-    //             $endPoint['lat'], $endPoint['lng']
-    //         );
-
-    //         if ($directDistance <= 100) {
-    //             return [
-    //                 'path_ids' => ['nsx_' . $nsx->id, 'dl_' . $dl->id],
-    //                 'path_names' => [
-    //                     'Nhà sản xuất: ' . $nsx->ten_cong_ty,
-    //                     'Đại lý: ' . $dl->ten_cong_ty,
-    //                 ],
-    //                 'distance' => round($directDistance, 2),
-    //                 'debug_kho_count' => 0,
-    //             ];
-    //         } else {
-    //             return [
-    //                 'path_ids' => [],
-    //                 'path_names' => [],
-    //                 'distance' => 0,
-    //                 'debug_kho_count' => 0,
-    //                 'error' => 'Không có kho phù hợp cho tuyến đường dài (' . round($directDistance, 2) . ' km)'
-    //             ];
-    //         }
-    //     }
-
-    //     $khoPoints = [];
-    //     foreach ($validKhos as $kho) {
-    //         $khoPoints['kho_' . $kho->id] = [
-    //             'lat' => $kho->vi_do,
-    //             'lng' => $kho->kinh_do,
-    //             'ten' => $kho->ten_kho
-    //         ];
-    //     }
-
-    //     $cityKho = $cityKhos->sortBy(function ($kho) use ($dl) {
-    //         return $this->haversine($kho->vi_do, $kho->kinh_do, $dl->vi_do, $dl->kinh_do);
-    //     })->first();
-
-    //     $minPath = null;
-    //     $minDistance = INF;
-
-    //     $directDistance = $this->haversine(
-    //         $startPoint['lat'], $startPoint['lng'],
-    //         $endPoint['lat'], $endPoint['lng']
-    //     );
-
-    //     if ($directDistance <= 100) {
-    //         $minKho = 0;
-    //         $maxKho = 1;
-    //     } elseif ($directDistance <= 300) {
-    //         $minKho = 1;
-    //         $maxKho = 2;
-    //     } elseif ($directDistance <= 600) {
-    //         $minKho = 2;
-    //         $maxKho = 4;
-    //     } else {
-    //         $minKho = 4;
-    //         $maxKho = min(6, count($khoPoints));
-    //     }
-
-    //     for ($n = $minKho; $n <= $maxKho; $n++) {
-    //         $combinations = $this->getCombinations(array_keys($khoPoints), $n);
-    //         foreach ($combinations as $combo) {
-    //             // Sắp xếp theo khoảng cách từ NSX
-    //             usort($combo, function ($a, $b) use ($startPoint, $khoPoints) {
-    //                 $distA = $this->haversine($startPoint['lat'], $startPoint['lng'], $khoPoints[$a]['lat'], $khoPoints[$a]['lng']);
-    //                 $distB = $this->haversine($startPoint['lat'], $startPoint['lng'], $khoPoints[$b]['lat'], $khoPoints[$b]['lng']);
-    //                 return $distA <=> $distB;
-    //             });
-
-    //             // Thêm kho trong thành phố làm điểm cuối nếu có
-    //             // Ép cityKho luôn là chặng cuối trước khi tới đại lý
-    //             if ($cityKho) {
-    //                 $cityKhoId = 'kho_' . $cityKho->id;
-
-    //                 // Xóa cityKho khỏi combo nếu có
-    //                 $combo = array_filter($combo, fn($id) => $id !== $cityKhoId);
-
-    //                 // Thêm lại vào cuối
-    //                 $combo = array_values($combo); // đảm bảo re-index
-    //                 $combo[] = $cityKhoId;
-
-    //                 // Đảm bảo khoPoints có cityKho
-    //                 $khoPoints[$cityKhoId] = [
-    //                     'lat' => $cityKho->vi_do,
-    //                     'lng' => $cityKho->kinh_do,
-    //                     'ten' => $cityKho->ten_kho
-    //                 ];
-    //             }
-
-    //             $path = ['nsx_' . $nsx->id, ...$combo, 'dl_' . $dl->id];
-    //             $nodes = ['nsx_' . $nsx->id => $startPoint];
-    //             foreach ($combo as $k) $nodes[$k] = $khoPoints[$k];
-    //             $nodes['dl_' . $dl->id] = $endPoint;
-
-    //             $totalDistance = 0;
-    //             for ($i = 0; $i < count($path) - 1; $i++) {
-    //                 $totalDistance += $this->haversine(
-    //                     $nodes[$path[$i]]['lat'], $nodes[$path[$i]]['lng'],
-    //                     $nodes[$path[$i + 1]]['lat'], $nodes[$path[$i + 1]]['lng']
-    //                 );
-    //             }
-    //             if ($totalDistance < $minDistance) {
-    //                 $minDistance = $totalDistance;
-    //                 $minPath = $path;
-    //             }
-    //         }
-    //         if ($minPath) break;
-    //     }
-
-    //     $pathNames = [];
-    //     foreach ($minPath ?? [] as $pointId) {
-    //         if (str_starts_with($pointId, 'nsx_')) {
-    //             $pathNames[] = 'Nhà sản xuất: ' . $nsx->dia_chi;
-    //         } elseif (str_starts_with($pointId, 'dl_')) {
-    //             $pathNames[] = 'Đại lý: ' . $dl->dia_chi;
-    //         } elseif (str_starts_with($pointId, 'kho_')) {
-    //             $khoId = (int) str_replace('kho_', '', $pointId);
-    //             $kho = $allKhos->firstWhere('id', $khoId);
-    //             $pathNames[] = ($kho ? $kho->ten_kho : 'Không rõ');
-    //         }
-    //     }
-
-    //     return [
-    //         'path_ids' => $minPath ?? [],
-    //         'path_names' => $pathNames,
-    //         'distance' => round($minDistance, 2),
-    //         'debug_kho_count' => $validKhos->count() + $cityKhos->count(),
-    //     ];
-    // }
-    public function findShortestPath(array $danhSachNhaSanXuat, $daiLyId)
+    public function findShortestPath(array $nhaSanXuatIds, $daiLyId)
     {
-        $nhaSanXuatList = NhaSanXuat::whereIn('id', $danhSachNhaSanXuat)->get();
+        $nhaSanXuatList = NhaSanXuat::whereIn('id', $nhaSanXuatIds)->get();
         $dl = DaiLy::findOrFail($daiLyId);
         $allKhos = KhoTrungChuyen::all();
 
-        if ($nhaSanXuatList->isEmpty()) {
+        // Lấy danh sách tọa độ
+        $startPoints = $nhaSanXuatList->map(fn($nsx) => ['lat' => $nsx->vi_do, 'lng' => $nsx->kinh_do]);
+        $endPoint = ['lat' => $dl->vi_do, 'lng' => $dl->kinh_do];
+
+        $isNorthBound = $startPoints[0]['lat'] < $endPoint['lat'];
+        $cityRadius = 100;
+
+        $validKhos = collect();
+        $cityKhos = collect();
+
+        foreach ($allKhos as $kho) {
+            $lat = $kho->vi_do;
+            $lng = $kho->kinh_do;
+
+            $distanceToDl = $this->haversine($lat, $lng, $endPoint['lat'], $endPoint['lng']);
+            if ($distanceToDl <= $cityRadius) {
+                $cityKhos->push($kho);
+                continue;
+            }
+
+            // Check nếu nằm gần tuyến đường
+            $distanceToLine = $this->distancePointToSegment(
+                $lat, $lng,
+                $startPoints[0]['lat'], $startPoints[0]['lng'],
+                $endPoint['lat'], $endPoint['lng']
+            );
+
+            if ($distanceToLine > 150) continue;
+
+            if ($isNorthBound && ($lat < $startPoints[0]['lat'] || $lat > $endPoint['lat'])) continue;
+            if (!$isNorthBound && ($lat > $startPoints[0]['lat'] || $lat < $endPoint['lat'])) continue;
+
+            $validKhos->push($kho);
+        }
+
+        if ($validKhos->isEmpty() && $cityKhos->isEmpty()) {
             return [
                 'path_ids' => [],
                 'path_names' => [],
                 'distance' => 0,
                 'debug_kho_count' => 0,
-                'error' => 'Không tìm thấy nhà sản xuất.'
+                'error' => 'Không có kho phù hợp cho tuyến đường.'
             ];
         }
 
-        $points = [];
-        $pathIds = [];
-        $pathNames = [];
+        // Danh sách kho dùng để tính toán
+        $khoPoints = [];
+        foreach ($validKhos as $kho) {
+            $khoPoints['kho_' . $kho->id] = [
+                'lat' => $kho->vi_do,
+                'lng' => $kho->kinh_do,
+                'ten' => $kho->ten_kho
+            ];
+        }
 
+        // Ưu tiên thêm kho gần đại lý
+        $cityKho = $cityKhos->sortBy(fn($kho) => $this->haversine($kho->vi_do, $kho->kinh_do, $endPoint['lat'], $endPoint['lng']))->first();
+
+        // Quyết định số lượng kho trung chuyển cần thêm
+        $minDistanceNSXToDL = min(
+            $startPoints->map(fn($pt) => $this->haversine($pt['lat'], $pt['lng'], $endPoint['lat'], $endPoint['lng']))->toArray()
+        );
+
+        if ($minDistanceNSXToDL <= 100) {
+            $minKho = 0;
+            $maxKho = 1;
+        } elseif ($minDistanceNSXToDL <= 300) {
+            $minKho = 1;
+            $maxKho = 2;
+        } elseif ($minDistanceNSXToDL <= 600) {
+            $minKho = 2;
+            $maxKho = 4;
+        } else {
+            $minKho = 4;
+            $maxKho = min(6, count($khoPoints));
+        }
+
+        // Dữ liệu lưu trữ kết quả cho từng tuyến đường
+        $allResults = [];
+
+        // Tính toán đường đi cho từng NSX
         foreach ($nhaSanXuatList as $nsx) {
-            $pointId = 'nsx_' . $nsx->id;
-            $points[$pointId] = ['lat' => $nsx->vi_do, 'lng' => $nsx->kinh_do, 'ten' => $nsx->ten_cong_ty];
-            $pathIds[] = $pointId;
-            $pathNames[] = 'Nhà sản xuất: ' . $nsx->dia_chi;
+            $minPath = null;
+            $minDistance = INF;
+
+            // Duyệt các tổ hợp kho trung chuyển
+            for ($n = $minKho; $n <= $maxKho; $n++) {
+                $combinations = $this->getCombinations(array_keys($khoPoints), $n);
+
+                foreach ($combinations as $combo) {
+                    if ($cityKho) {
+                        $cityKhoId = 'kho_' . $cityKho->id;
+                        $combo = array_filter($combo, fn($id) => $id !== $cityKhoId);
+                        $combo = array_values($combo);
+                        $combo[] = $cityKhoId;
+                        $khoPoints[$cityKhoId] = [
+                            'lat' => $cityKho->vi_do,
+                            'lng' => $cityKho->kinh_do,
+                            'ten' => $cityKho->ten_kho
+                        ];
+                    }
+
+                    // Sắp xếp NSX bằng Greedy gần nhất
+                    $remainingNSX = [$nsx];  // Chỉ lấy một NSX tại một thời điểm
+                    $orderedNSX = [];
+
+                    $currentLat = $combo ? $khoPoints[$combo[0]]['lat'] : $endPoint['lat'];
+                    $currentLng = $combo ? $khoPoints[$combo[0]]['lng'] : $endPoint['lng'];
+
+                    while (!empty($remainingNSX)) {
+                        usort($remainingNSX, fn($a, $b) => $this->haversine($currentLat, $currentLng, $a['vi_do'], $a['kinh_do']) <=> $this->haversine($currentLat, $currentLng, $b['vi_do'], $b['kinh_do']));
+                        $next = array_shift($remainingNSX);
+                        $orderedNSX[] = $next;
+                        $currentLat = $next['vi_do'];
+                        $currentLng = $next['kinh_do'];
+                    }
+
+                    // Tạo path
+                    $path = [];
+                    $nodes = [];
+
+                    foreach ($orderedNSX as $nsx) {
+                        $key = 'nsx_' . $nsx['id'];
+                        $path[] = $key;
+                        $nodes[$key] = ['lat' => $nsx['vi_do'], 'lng' => $nsx['kinh_do']];
+                    }
+
+                    foreach ($combo as $k) {
+                        $path[] = $k;
+                        $nodes[$k] = $khoPoints[$k];
+                    }
+
+                    $path[] = 'dl_' . $dl->id;
+                    $nodes['dl_' . $dl->id] = $endPoint;
+
+                    // Tính tổng quãng đường
+                    $totalDistance = 0;
+                    for ($i = 0; $i < count($path) - 1; $i++) {
+                        $totalDistance += $this->haversine(
+                            $nodes[$path[$i]]['lat'], $nodes[$path[$i]]['lng'],
+                            $nodes[$path[$i + 1]]['lat'], $nodes[$path[$i + 1]]['lng']
+                        );
+                    }
+
+                    if ($totalDistance < $minDistance) {
+                        $minDistance = $totalDistance;
+                        $minPath = $path;
+                    }
+                }
+
+                if ($minPath) break;
+            }
+
+            $pathNames = [];
+            foreach ($minPath ?? [] as $pointId) {
+                if (str_starts_with($pointId, 'nsx_')) {
+                    $id = (int) str_replace('nsx_', '', $pointId);
+                    $nsx = $nhaSanXuatList->firstWhere('id', $id);
+                    $pathNames[] = 'Nhà sản xuất: ' . $nsx->dia_chi;
+                } elseif (str_starts_with($pointId, 'dl_')) {
+                    $pathNames[] = 'Đại lý: ' . $dl->dia_chi;
+                } elseif (str_starts_with($pointId, 'kho_')) {
+                    $khoId = (int) str_replace('kho_', '', $pointId);
+                    $kho = $allKhos->firstWhere('id', $khoId);
+                    $pathNames[] = $kho ? $kho->ten_kho : 'Kho không xác định';
+                }
+            }
+
+            // Lưu kết quả của mỗi nhà sản xuất
+            $allResults[] = [
+                'path_ids' => $minPath,
+                'path_names' => $pathNames,
+                'distance' => round($minDistance, 2),
+            ];
         }
 
-        $endPoint = ['lat' => $dl->vi_do, 'lng' => $dl->kinh_do];
-        $points['dl_' . $dl->id] = $endPoint;
-
-        // Điểm đầu là NSX đầu tiên, điểm cuối là đại lý
-        $startPoint = ['lat' => $nhaSanXuatList[0]->vi_do, 'lng' => $nhaSanXuatList[0]->kinh_do];
-        $lastPoint = $endPoint;
-
-        // Lọc kho hợp lệ
-        $validKhos = $allKhos->filter(function ($kho) use ($startPoint, $lastPoint) {
-            $distanceToLine = $this->distancePointToSegment(
-                $kho->vi_do, $kho->kinh_do,
-                $startPoint['lat'], $startPoint['lng'],
-                $lastPoint['lat'], $lastPoint['lng']
-            );
-            return $distanceToLine <= 150;
-        });
-
-        // Ưu tiên kho gần đại lý (trong bán kính 100km)
-        $cityKho = $validKhos->sortBy(function ($kho) use ($dl) {
-            return $this->haversine($kho->vi_do, $kho->kinh_do, $dl->vi_do, $dl->kinh_do);
-        })->first();
-
-        if ($cityKho) {
-            $khoId = 'kho_' . $cityKho->id;
-            $points[$khoId] = ['lat' => $cityKho->vi_do, 'lng' => $cityKho->kinh_do, 'ten' => $cityKho->ten_kho];
-            $pathIds[] = $khoId;
-            $pathNames[] = $cityKho->ten_kho;
-        }
-
-        // Thêm đại lý vào cuối
-        $pathIds[] = 'dl_' . $dl->id;
-        $pathNames[] = 'Đại lý: ' . $dl->dia_chi;
-
-        // Tính tổng quãng đường
-        $totalDistance = 0;
-        for ($i = 0; $i < count($pathIds) - 1; $i++) {
-            $a = $points[$pathIds[$i]];
-            $b = $points[$pathIds[$i + 1]];
-            $totalDistance += $this->haversine($a['lat'], $a['lng'], $b['lat'], $b['lng']);
-        }
-
-        return [
-            'path_ids' => $pathIds,
-            'path_names' => $pathNames,
-            'distance' => round($totalDistance, 2),
-            'debug_kho_count' => $validKhos->count(),
-        ];
+        return $allResults;
     }
 
     private function getCombinations($array, $size)
     {
+        if (empty($array) || $size === 0 || $size > count($array)) {
+            return [[]]; // fallback an toàn
+        }
+
         $combinations = [];
         $this->combinationHelper($array, $size, 0, [], $combinations);
         return $combinations;
@@ -339,5 +279,23 @@ class PathFindingService
         for ($i = $start; $i < count($array); $i++) {
             $this->combinationHelper($array, $size, $i + 1, array_merge($current, [$array[$i]]), $combinations);
         }
+    }
+
+    public function findShortestPathMultipleNSX(array $nhaSanXuatIds, $daiLyId)
+    {
+        $results = [];
+        foreach ($nhaSanXuatIds as $nsxId) {
+            $result = $this->findShortestPath([$nsxId], $daiLyId);
+            // Lấy tuyến đường đầu tiên (nếu có)
+            if (!empty($result) && isset($result[0]['path_ids'])) {
+                $results[] = [
+                    'nha_san_xuat_id' => $nsxId,
+                    'path_ids' => $result[0]['path_ids'],
+                    'distance' => $result[0]['distance'],
+                    'path_names' => $result[0]['path_names'] ?? [],
+                ];
+            }
+        }
+        return $results;
     }
 }
