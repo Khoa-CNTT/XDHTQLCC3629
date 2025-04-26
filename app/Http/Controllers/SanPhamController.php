@@ -144,6 +144,7 @@ class SanPhamController extends Controller
                 ->where('san_phams.tinh_trang', '1')
                 ->select(
                     'san_phams.id',
+                    'nha_san_xuats.id as id_nha_san_xuat',
                     'san_phams.ten_san_pham',
                     'nha_san_xuats.ten_cong_ty',
                     'san_phams.hinh_anh',

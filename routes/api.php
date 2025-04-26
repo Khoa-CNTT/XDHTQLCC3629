@@ -169,6 +169,7 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangNSX']);
             Route::post('/tim-don-hang-nsx', [DonHangController::class, 'searchDonHangNSX']);
             Route::get('/lay-du-lieu-cho-nsx', [DonHangController::class, 'getDataForNSX']);
+            Route::get('/lay-du-lieu-nsx-cho-trang-chu', [DonHangController::class, 'getDataNSXchoTrangChu']);
         });
         //đơn vị vận chuyển
         Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {
