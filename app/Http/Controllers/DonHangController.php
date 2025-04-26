@@ -45,6 +45,15 @@ class DonHangController extends Controller
             ]);
         }
     }
+    public function getDataNSXchoTrangChu()
+    {
+        $data = NhaSanXuat::get();
+
+        return response()->json([
+            'status'    =>  true,
+            'nha_san_xuat_for_homepage' => $data
+        ]);
+    }
 
     public function getDataChiTiet(Request $request){
         $user = Auth::guard('sanctum')->user();
