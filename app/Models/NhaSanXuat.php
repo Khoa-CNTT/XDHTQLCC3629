@@ -22,6 +22,7 @@ class NhaSanXuat extends Authenticatable
         "ngay_cap_nhat",
         "tinh_trang",
         "password",
+        "loai_tai_khoan",
         "vi_do",
         "kinh_do",
     ];

@@ -155,6 +155,8 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
         Route::post('/update-san-pham-cua-nsx', [SanPhamController::class, 'updateSanPhamCuaNSX']);
         Route::delete('/xoa-san-pham-cua-nsx/{id}', [SanPhamController::class, 'deleteSanPhamCuaNSX']);
         Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
+        Route::post('/doi-tinh-trang-san-pham-cua-nsx', [SanPhamController::class, 'doiTinhTrangSanPhamCuaNSX']);
+
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::group(['prefix'  =>  '/dai-ly'], function () {

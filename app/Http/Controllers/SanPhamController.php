@@ -76,7 +76,6 @@ class SanPhamController extends Controller
         $key = "%" . $request->abc . "%";
 
         $data   = SanPham::where('ten_san_pham', 'like', $key)
-            ->where('ten_cong_ty', 'like', $key)
             ->get();
 
         return response()->json([
@@ -105,18 +104,26 @@ class SanPhamController extends Controller
     public function doiTinhTrangSanPham(Request $request)
     {
         try {
-            if ($request->tinh_trang == 1) {
-                $tinh_trang_moi = 0;
+            if ($request->tinh_trang == 1 || $request->tinh_trang == 2) {
+                if ($request->tinh_trang == 1) {
+                    $tinh_trang_moi = 2;
+                }
+                else {
+                    $tinh_trang_moi = 1;
+                }
+                SanPham::where('id', $request->id)->update([
+                    'tinh_trang'    =>  $tinh_trang_moi
+                ]);
+                return response()->json([
+                    'status'            =>   true,
+                    'message'           =>   'Đã đổi trạng thái duyệt thành công',
+                ]);
             } else {
-                $tinh_trang_moi = 1;
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không thể thay đổi sản phẩm đã dừng bán',
+                ]);
             }
-            SanPham::where('id', $request->id)->update([
-                'tinh_trang'    =>  $tinh_trang_moi
-            ]);
-            return response()->json([
-                'status'            =>   true,
-                'message'           =>   'Đã đổi trạng thái thành công',
-            ]);
         } catch (Exception $e) {
             Log::info("Lỗi", $e);
             return response()->json([
@@ -173,6 +180,7 @@ class SanPhamController extends Controller
                 ->where('nha_san_xuats.id', $id_nha_san_xuat)
                 ->select(
                     'san_phams.id',
+                    'san_phams.ma_san_pham',
                     'san_phams.ten_san_pham',
                     'nha_san_xuats.ten_cong_ty',
                     'san_phams.hinh_anh',
@@ -209,7 +217,7 @@ class SanPhamController extends Controller
             'so_luong_ton_kho'    =>  $request->so_luong_ton_kho,
             'gia_ban'             =>  $request->gia_ban,
             'don_vi_tinh'         =>  $request->don_vi_tinh,
-            'tinh_trang'          =>  $request->tinh_trang
+            'tinh_trang'          =>  2
         ]);
 
         SanPhamNSX::create([
@@ -280,25 +288,25 @@ class SanPhamController extends Controller
         $key = "%" . $request->abc . "%";
 
         $data   = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', '=', 'san_pham_n_s_x_e_s.id_san_pham')
-        ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
-        ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
-        //->where('nha_san_xuats.id', $id_nha_san_xuat)
-        ->where('nha_san_xuats.id', $user->id)
-        ->where('ten_san_pham', 'like', $key)
-        ->select(
-            'san_phams.id',
-            'san_phams.ten_san_pham',
-            'nha_san_xuats.ten_cong_ty',
-            'san_phams.hinh_anh',
-            'san_phams.mo_ta',
-            'san_phams.so_luong_ton_kho',
-            'san_phams.gia_ban',
-            'san_phams.don_vi_tinh',
-            'san_pham_n_s_x_e_s.ma_lo_hang',
-            'san_pham_n_s_x_e_s.ngay_san_xuat',
-            'san_phams.tinh_trang',
-            'danh_muc_san_phams.ten_danh_muc'
-        )
+            ->join('nha_san_xuats', 'nha_san_xuats.id', '=', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
+            ->join('danh_muc_san_phams', 'san_phams.id_danh_muc', '=', 'danh_muc_san_phams.id') // Tham gia bảng danh mục
+            //->where('nha_san_xuats.id', $id_nha_san_xuat)
+            ->where('nha_san_xuats.id', $user->id)
+            ->where('ten_san_pham', 'like', $key)
+            ->select(
+                'san_phams.id',
+                'san_phams.ten_san_pham',
+                'nha_san_xuats.ten_cong_ty',
+                'san_phams.hinh_anh',
+                'san_phams.mo_ta',
+                'san_phams.so_luong_ton_kho',
+                'san_phams.gia_ban',
+                'san_phams.don_vi_tinh',
+                'san_pham_n_s_x_e_s.ma_lo_hang',
+                'san_pham_n_s_x_e_s.ngay_san_xuat',
+                'san_phams.tinh_trang',
+                'danh_muc_san_phams.ten_danh_muc'
+            )
             ->get();
 
         return response()->json([
@@ -378,6 +386,34 @@ class SanPhamController extends Controller
             ]);
         }
     }
-
-
+    public function doiTinhTrangSanPhamCuaNSX(Request $request)
+    {
+        try {
+            if ($request->tinh_trang == 1 || $request->tinh_trang == 0) {
+                if ($request->tinh_trang == 1) {
+                    $tinh_trang_moi = 0;
+                } else {
+                    $tinh_trang_moi = 1;
+                }
+                SanPham::where('id', $request->id)->update([
+                    'tinh_trang' => $tinh_trang_moi
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Đã đổi trạng thái thành công',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sản phẩm đang chờ được duyệt từ admin',
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error("Lỗi đổi trạng thái sản phẩm", ['error' => $e]);
+            return response()->json([
+                'status' => false,
+                'message' => 'Có lỗi khi đổi trạng thái',
+            ]);
+        }
+    }
 }
