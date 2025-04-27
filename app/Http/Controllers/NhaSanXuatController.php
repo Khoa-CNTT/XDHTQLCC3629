@@ -57,8 +57,9 @@ class NhaSanXuatController extends Controller
             'dia_chi'       =>  $request->dia_chi,
             'so_dien_thoai' =>  $request->so_dien_thoai,
             'email'         =>  $request->email,
-            'password'      =>  $request->password,
-            'tinh_trang'    =>  $request->tinh_trang
+            'password'      =>  bcrypt($request->password),
+            'tinh_trang'    =>  $request->tinh_trang,
+            'loai_tai_khoan'    => 'Nhà Sản Xuất'
         ]);
         return response()->json([
             'status'    =>  true,
