@@ -284,16 +284,21 @@ class PathFindingService
     public function findShortestPathMultipleNSX(array $nhaSanXuatIds, $daiLyId)
     {
         $results = [];
+        $tuyenSo = 1;
         foreach ($nhaSanXuatIds as $nsxId) {
             $result = $this->findShortestPath([$nsxId], $daiLyId);
             // Lấy tuyến đường đầu tiên (nếu có)
             if (!empty($result) && isset($result[0]['path_ids'])) {
+                $idDonHang = $result[0]['id_don_hang'] ?? null;
                 $results[] = [
                     'nha_san_xuat_id' => $nsxId,
                     'path_ids' => $result[0]['path_ids'],
                     'distance' => $result[0]['distance'],
                     'path_names' => $result[0]['path_names'] ?? [],
+                    'tuyen_so' => $tuyenSo,
+                    'id_don_hang' => $idDonHang
                 ];
+                $tuyenSo++;
             }
         }
         return $results;

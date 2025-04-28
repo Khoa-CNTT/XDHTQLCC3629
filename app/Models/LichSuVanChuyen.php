@@ -19,6 +19,7 @@ class LichSuVanChuyen extends Model
         "thu_tu",
         "mo_ta",
         "tinh_trang",
-        "id_dai_ly"
+        "id_dai_ly",
+        "tuyen_so",
     ];
 }
