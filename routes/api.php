@@ -156,7 +156,14 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
         Route::delete('/xoa-san-pham-cua-nsx/{id}', [SanPhamController::class, 'deleteSanPhamCuaNSX']);
         Route::post('/tim-san-pham-nha-san-xuat', [SanPhamController::class, 'searchSanPhamNSX']);
         Route::post('/doi-tinh-trang-san-pham-cua-nsx', [SanPhamController::class, 'doiTinhTrangSanPhamCuaNSX']);
-
+    });
+    Route::group(['prefix'  =>  '/nguyen-lieu'], function () {
+        Route::get('/get-data-nglieu-by-user', [NguyenLieuController::class, 'getDataNgLieuByUser']);
+        Route::post('/doi-tinh-trang', [NguyenLieuController::class, 'changeTrangthai']);
+        Route::post('/them-moi-nguyen-lieu', [NguyenLieuController::class, 'createNguyenLieu']);
+        Route::post('/cap-nhat-nguyen-lieu', [NguyenLieuController::class, 'updateNguyenLieu']);
+        Route::delete('/xoa-nguyen-lieu/{id}', [NguyenLieuController::class, 'deleteNguyenLieu']);
+        Route::post('/tim-nguyen-lieu', [NguyenLieuController::class, 'searchNguyenLieu']);
     });
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::group(['prefix'  =>  '/dai-ly'], function () {
