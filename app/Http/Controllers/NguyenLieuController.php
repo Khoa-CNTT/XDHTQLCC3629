@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\NguyenLieu;
+use App\Models\NhaSanXuat;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class NguyenLieuController extends Controller
@@ -43,12 +45,18 @@ class NguyenLieuController extends Controller
     }
     public function createNguyenLieu(Request $request)
     {
-        $data   =   $request->all();
+        $user = auth()->user();
+        $nhaSanXuat = NhaSanXuat::where('loai_tai_khoan', 'Nhà Sản Xuất')
+            ->where('id', $user->id)
+            ->first();
         NguyenLieu::create([
+            'id_nha_san_xuat'       =>  $nhaSanXuat->id,
             'ma_nguyen_lieu'        =>  $request->ma_nguyen_lieu,
             'ten_nguyen_lieu'       =>  $request->ten_nguyen_lieu,
-            'ma_lo_hang'            =>  $request->ma_lo_hang,
-            'ma_nha_cung_cap'       =>  $request->ma_nha_cung_cap,
+            'so_luong'              =>  $request->so_luong,
+            'don_vi_tinh'           =>  $request->don_vi_tinh,
+            'ngay_san_xuat'         =>  $request->ngay_san_xuat,
+            'han_su_dung'           =>  $request->han_su_dung,
             'tinh_trang'            =>  $request->tinh_trang
         ]);
         return response()->json([
@@ -63,9 +71,10 @@ class NguyenLieuController extends Controller
                 ->update([
                     'ma_nguyen_lieu'        =>  $request->ma_nguyen_lieu,
                     'ten_nguyen_lieu'       =>  $request->ten_nguyen_lieu,
-                    'ma_lo_hang'            =>  $request->ma_lo_hang,
-                    'ma_nha_cung_cap'       =>  $request->ma_nha_cung_cap,
-                    'tinh_trang'            =>  $request->tinh_trang
+                    'so_luong'              =>  $request->so_luong,
+                    'don_vi_tinh'           =>  $request->don_vi_tinh,
+                    'ngay_san_xuat'         =>  $request->ngay_san_xuat,
+                    'han_su_dung'           =>  $request->han_su_dung,
                 ]);
             return response()->json([
                 'status'            =>   true,
@@ -97,14 +106,61 @@ class NguyenLieuController extends Controller
     }
     public function searchNguyenLieu(Request $request)
     {
+        $user = Auth::guard('sanctum')->user();
         $key = "%" . $request->abc . "%";
 
-        $data   = NguyenLieu::where('ten_nguyen_lieu', 'like', $key)
+        $data = NguyenLieu::join('nha_san_xuats', 'nha_san_xuats.id', '=', 'nguyen_lieus.id_nha_san_xuat')
+            ->where('nha_san_xuats.id', $user->id)
+            ->where('ten_nguyen_lieu', 'like', $key)
+            ->select(
+                'nguyen_lieus.id',
+                'nguyen_lieus.id_nha_san_xuat',
+                'nguyen_lieus.ma_nguyen_lieu',
+                'nguyen_lieus.ten_nguyen_lieu',
+                'nguyen_lieus.so_luong',
+                'nguyen_lieus.don_vi_tinh',
+                'nguyen_lieus.ngay_san_xuat',
+                'nguyen_lieus.han_su_dung',
+                'nguyen_lieus.tinh_trang',
+            )
             ->get();
-
         return response()->json([
             'status'    =>  true,
             'nguyen_lieu'  =>  $data,
         ]);
+    }
+    public function getDataNgLieuByUser()
+    {
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+        // Dữ liệu cho NhaSanXuat
+        if ($user instanceof NhaSanXuat) {
+            $id_nha_san_xuat = $user->id;
+
+            $list_nguyen_lieu = NguyenLieu::join('nha_san_xuats', 'nha_san_xuats.id', '=', 'nguyen_lieus.id_nha_san_xuat')
+                ->where('nha_san_xuats.id', $id_nha_san_xuat)
+                ->select(
+                    'nguyen_lieus.id',
+                    'nguyen_lieus.id_nha_san_xuat',
+                    'nguyen_lieus.ma_nguyen_lieu',
+                    'nguyen_lieus.ten_nguyen_lieu',
+                    'nguyen_lieus.so_luong',
+                    'nguyen_lieus.don_vi_tinh',
+                    'nguyen_lieus.ngay_san_xuat',
+                    'nguyen_lieus.han_su_dung',
+                    'nguyen_lieus.tinh_trang',
+                )
+                ->get();
+            return response()->json([
+                'status' => true,
+                'nguyen_lieu' => $list_nguyen_lieu,
+            ]);
+        }
+        return response()->json([], 401);
     }
 }
