@@ -15,9 +15,9 @@ Dự án này nhằm xây dựng một hệ thống quản lý chuỗi cung ứn
 
 -   **💻 Frontend**: Vue.js
 -   **🖥 Backend**: Laravel
--   **⛓ Blockchain**: Smart Contract trên Ethereum
+-   **⛓ Blockchain**: Smart Contract trên TronBox
 -   **🗄 Cơ sở dữ liệu**: MySQL
--   **📋 Quản lý dự án**: Jira
+-   **📋 Quản lý dự án**: Jira, Trello
 
 ## 🔧 Chức Năng Chính
 
@@ -66,6 +66,7 @@ Dự án này nhằm xây dựng một hệ thống quản lý chuỗi cung ứn
 
 -   🔗 Frontend: [GitHub Repo Frontend](https://github.com/MaiXuanTung/XDHTQLCC3629-FE)
 -   🔗 Backend: [GitHub Repo Backend](https://github.com/Khoa-CNTT/XDHTQLCC3629)
+-   🔗 BlockChain: [GitHub Repo BlockChain](https://github.com/MaiXuanTung/XDHTQLCC3629-BlockChain)
 
 ```sh
 # Clone repository
@@ -73,6 +74,8 @@ git clone git@github.com:Khoa-CNTT/XDHTQLCC3629.git
 cd XDHTQLCC3629
 git clone git@github.com:MaiXuanTung/XDHTQLCC3629-FE.git
 cd XDHTQLCC3629-FE
+git clone git@github.com:MaiXuanTung/XDHTQLCC3629-BlockChain.git
+cd XDHTQLCC3629-BlockChain
 # Cài đặt backend
 composer install
 cp .env.example .env
@@ -82,6 +85,11 @@ php artisan key:generate
 cd frontend
 npm install
 npm run dev
+
+# Cài đặt blockchain
+cd blockchain
+npm run download
+npm run compile
 ```
 
 ### 3️⃣ Khởi Chạy Dự Án
@@ -93,9 +101,11 @@ php artisan serve
 # Chạy frontend
 cd frontend
 npm run dev
+
+# Chạy blockchain
+npm run server
 ```
 
 ## 📞 Liên Hệ
 
 -   📧 Email: maitung801@gmail.com
--   🐙 GitHub: [https://github.com/Khoa-CNTT/XDHTQLCC3629]
