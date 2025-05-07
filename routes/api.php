@@ -13,6 +13,7 @@ use App\Http\Controllers\NhaSanXuatController;
 use App\Http\Controllers\PhuongTienController;
 use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\SanPhamNSXController;
+use App\Http\Controllers\TestController;
 use App\Models\DanhMucSanPham;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,9 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/check-nguoi-dung', [NhanVienController::class, 'checkNguoiDung']);
+
+Route::get('/test', [TestController::class, 'mint']);
+
 //auth user
 Route::group(['prefix'  =>  '/auth'], function () {
     Route::post('/login', [NhanVienController::class, 'login']);
