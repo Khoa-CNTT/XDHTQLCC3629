@@ -945,6 +945,63 @@ class DonHangController extends Controller
         }
     }
 
+    // public function xacNhanDen(Request $request)
+    // {
+    //     $user = Auth::guard('sanctum')->user();
+    //     if (!$user || !$user instanceof DonViVanChuyen) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Không xác thực'
+    //         ], 401);
+    //     }
+    //     $lichTrinh = LichSuVanChuyen::find($request->id);
+    //     if (!$lichTrinh) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Không tìm thấy lịch trình'
+    //         ], 404);
+    //     }
+    //     if ($lichTrinh->thoi_gian_den) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Đã xác nhận đến rồi'
+    //         ], 400);
+    //     }
+    //     $lichTrinh->thoi_gian_den = Carbon::now('Asia/Ho_Chi_Minh');
+    //     $lichTrinh->tinh_trang = 1; // Đã đến
+    //     $lichTrinh->save();
+    //     $isDiemCuoi = !$lichTrinh->id_kho_hang && Str::contains($lichTrinh->mo_ta, 'Vị trí đại lý');
+    //     // Nếu là chặng cuối (chứa địa chỉ đại lý, không phải kho trung chuyển)
+    //     if ($isDiemCuoi) {
+    //         // Lấy tất cả các chặng có mo_ta chứa "Vị trí đại lý" của cùng đơn hàng
+    //         $diemCuoiList = LichSuVanChuyen::where('id_don_hang', $lichTrinh->id_don_hang)
+    //             ->whereNull('id_kho_hang')
+    //             ->where('mo_ta', 'like', '%Vị trí đại lý%')
+    //             ->get();
+
+    //         if ($diemCuoiList->isNotEmpty()) {
+    //             $tatCaDaDen = $diemCuoiList->every(function ($item) {
+    //                 return !empty($item->thoi_gian_den);
+    //             });
+
+    //             if ($tatCaDaDen) {
+    //                 $donHang = DonHang::find($lichTrinh->id_don_hang);
+    //                 if ($donHang) {
+    //                     $donHang->tinh_trang = 6;
+    //                     $donHang->save();
+
+    //                     LichSuDonHang::where('id_don_hang', $donHang->id)
+    //                         ->update(['tinh_trang' => 6]);
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return response()->json([
+    //         'status' => true,
+    //         'message' => 'Đã xác nhận đã đến'
+    //     ]);
+    // }
+
     public function xacNhanDen(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
@@ -954,6 +1011,7 @@ class DonHangController extends Controller
                 'message' => 'Không xác thực'
             ], 401);
         }
+
         $lichTrinh = LichSuVanChuyen::find($request->id);
         if (!$lichTrinh) {
             return response()->json([
@@ -961,27 +1019,57 @@ class DonHangController extends Controller
                 'message' => 'Không tìm thấy lịch trình'
             ], 404);
         }
+
         if ($lichTrinh->thoi_gian_den) {
             return response()->json([
                 'status' => false,
                 'message' => 'Đã xác nhận đến rồi'
             ], 400);
         }
+
+        // Cập nhật thời gian đến
         $lichTrinh->thoi_gian_den = Carbon::now('Asia/Ho_Chi_Minh');
         $lichTrinh->tinh_trang = 1; // Đã đến
         $lichTrinh->save();
-        // Nếu là chặng cuối (chứa địa chỉ đại lý, không phải kho trung chuyển)
-        if (!$lichTrinh->thoi_gian_di && !$lichTrinh->ten_kho) {
-            // Tìm đơn hàng tương ứng
-            $donHang = DonHang::find($lichTrinh->id_don_hang);
-            if ($donHang) {
-                $donHang->tinh_trang = 6; // Đã giao – chờ đại lý xác nhận
-                $donHang->save();
 
-                LichSuDonHang::where('id_don_hang', $donHang->id)
-                ->update(['tinh_trang' => 6]); // Đã giao – chờ đại lý xác nhận
+        // Kiểm tra nếu là điểm cuối (không có kho và mô tả chứa "Vị trí đại lý")
+        $isDiemCuoi = !$lichTrinh->id_kho_hang && Str::contains($lichTrinh->mo_ta, 'Vị trí đại lý');
+
+        if ($isDiemCuoi) {
+            // Lấy tất cả các chặng "điểm cuối" của đơn hàng
+            $diemCuoiList = LichSuVanChuyen::where('id_don_hang', $lichTrinh->id_don_hang)
+                ->whereNull('id_kho_hang')
+                ->where('mo_ta', 'like', '%Vị trí đại lý%')
+                ->get();
+
+            // Kiểm tra xem tất cả điểm cuối đã đến chưa
+            $tatCaDiemCuoiDaDen = $diemCuoiList->every(function ($item) {
+                return !empty($item->thoi_gian_den);
+            });
+
+            // Nếu tất cả điểm cuối đã đến
+            if ($tatCaDiemCuoiDaDen) {
+                // Cập nhật trạng thái từng chi tiết đơn hàng liên quan
+                LichSuDonHang::where('id_don_hang', $lichTrinh->id_don_hang)
+                    ->where('tinh_trang', '<>', 6)
+                    ->update(['tinh_trang' => 6]);
+
+                // Kiểm tra xem tất cả chi tiết đơn hàng đã giao xong chưa
+                $tatCaChiTietDaGiao = LichSuDonHang::where('id_don_hang', $lichTrinh->id_don_hang)
+                    ->where('tinh_trang', '<>', 6)
+                    ->count() === 0;
+
+                // Nếu tất cả đã giao thì cập nhật đơn hàng
+                if ($tatCaChiTietDaGiao) {
+                    $donHang = DonHang::find($lichTrinh->id_don_hang);
+                    if ($donHang) {
+                        $donHang->tinh_trang = 6; // Đã giao – chờ đại lý xác nhận
+                        $donHang->save();
+                    }
+                }
             }
         }
+
         return response()->json([
             'status' => true,
             'message' => 'Đã xác nhận đã đến'
