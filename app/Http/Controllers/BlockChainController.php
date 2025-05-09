@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LichSuVanChuyen;
 use App\Services\PinataService;
 use Illuminate\Http\Request;
 
-class TestController extends Controller
+class BlockChainController extends Controller
 {
     protected $pinataService;
 
@@ -41,7 +42,6 @@ class TestController extends Controller
             }
             // Tùy ý lấy thông tin từ phần tử đầu để hiển thị trên NFT
             $first = $routes[0];
-            // $last = end($routes);
             // Tạo metadata từ toàn bộ tuyến
             $attributes = [];
             foreach ($routes as $index => $route) {
@@ -78,11 +78,39 @@ class TestController extends Controller
             // Gọi API mint
             $txHash = $this->mintNFTtoApi($address, $metadataUri);
 
+            // $data = $request->input('routes');
+
+            // Kiểm tra xem mảng có phần tử nào không
+            if (empty($routes) || !isset($routes[0])) {
+                return response()->json([
+                    'error' => 'Không có dữ liệu hợp lệ'
+                ], 400);
+            }
+
+            $firstItem = $routes[0];
+
+            $idDonHang = $firstItem['id_don_hang'] ?? null;
+            $tuyenSo   = $firstItem['tuyen_so'] ?? null;
+
+            LichSuVanChuyen::updateOrCreate(
+                [
+                    'id_don_hang' => $idDonHang,
+                    'tuyen_so' => $tuyenSo
+                ],
+                [
+                    'transaction_hash' => $txHash['transactionHash'],
+                    'metadata_uri' => $metadataUri,
+                    'token_id' => $txHash['tokenId']
+                ]
+            );
+
             return response()->json([
                 'success' => true,
                 'transaction_hash' => $txHash['transactionHash'],
                 'metadata_uri' => $metadataUri,
-                'tokenId' => $txHash['tokenId']
+                'tokenId' => $txHash['tokenId'],
+                'id_don_hang' => $idDonHang,
+                'tuyen_so' => $tuyenSo,
             ]);
         } catch (\Exception $e) {
             return response()->json([

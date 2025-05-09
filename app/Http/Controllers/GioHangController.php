@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\DaiLy;
 use App\Models\DonHang;
+use App\Models\DonViVanChuyen;
 use App\Models\GioHang;
 use App\Models\LichSuDonHang;
+use App\Models\NhaSanXuat;
 use App\Models\SanPham;
+use App\Services\PinataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -138,13 +141,28 @@ class GioHangController extends Controller
         ]);
     }
 
+    public function mintNFTtoApi($address, $metadataUri)
+    {
+        $client = new \GuzzleHttp\Client();
+        $res    = $client->post("http://localhost:3000/api/mint-nft", [
+            'json' => [
+                'recipient' => $address,
+                'tokenURI'  => $metadataUri
+            ]
+        ]);
+
+        $data = json_decode($res->getBody(), true);
+        return $data;
+    }
+
     public function datHang(Request $request)
     {
         DB::beginTransaction();
         try {
+            $maDonHang = Str::uuid();
             // Tạo đơn hàng mới
             $donHang = DonHang::create([
-                'ma_don_hang'           => Str::uuid(),
+                'ma_don_hang'           => $maDonHang,
                 'user_id'               => $request->user_id,
                 'id_nguoi_duyet'        => null,
                 'ngay_dat'              => now(),
@@ -227,10 +245,86 @@ class GioHangController extends Controller
                     ->where('id_san_pham', $sp['id_san_pham'])
                     ->delete();
             }
+
+            // Sao chép dữ liệu từ request ra biến riêng để xử lý
+            $sanPhams = $request->san_pham;
+            foreach ($sanPhams as &$sanPham) {
+                $nsx = NhaSanXuat::find($sanPham['id_nha_san_xuat']);
+                $sanPham['ten_nha_san_xuat']    = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
+                $sanPham['dia_chi']             = $nsx ? $nsx->dia_chi : 'Không rõ';
+                $sanPham['email']               = $nsx ? $nsx->email : 'Không rõ';
+                $sanPham['so_dien_thoai']       = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
+
+                $sp = SanPham::find($sanPham['id_san_pham']);
+                $sanPham['ten_san_pham']    = $sp ? $sp->ten_san_pham : 'Không rõ';
+                $sanPham['hinh_anh']        = $sp ? $sp->hinh_anh : 'Không rõ';
+                $sanPham['mo_ta']           = $sp ? $sp->mo_ta : 'Không rõ';
+                $sanPham['don_gia']         = $sp ? $sp->gia_ban : 'Không rõ';
+                $sanPham['don_vi_tinh']     = $sp ? $sp->don_vi_tinh : 'Không rõ';
+
+                unset($sanPham['id_nha_san_xuat'], $sanPham['id_san_pham']);
+            }
+
+            $donViVanChuyens = $request->don_vi_van_chuyen;
+            foreach ($donViVanChuyens as &$don_vi_van_chuyen) {
+                $nsx = NhaSanXuat::find($don_vi_van_chuyen['id_nha_san_xuat']);
+                $don_vi_van_chuyen['ten_nha_san_xuat']  = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
+                $don_vi_van_chuyen['dia_chi_nsx']           = $nsx ? $nsx->dia_chi : 'Không rõ';
+                $don_vi_van_chuyen['email_nsx']             = $nsx ? $nsx->email : 'Không rõ';
+                $don_vi_van_chuyen['so_dien_thoai_nsx']     = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
+
+                $dvvchuyen = DonViVanChuyen::find($don_vi_van_chuyen['id_don_vi_van_chuyen']);
+                $don_vi_van_chuyen['ten_dvvc']          = $dvvchuyen ? $dvvchuyen->ten_cong_ty : 'Không rõ';
+                $don_vi_van_chuyen['dia_chi_dvvc']           = $dvvchuyen ? $dvvchuyen->dia_chi : 'Không rõ';
+                $don_vi_van_chuyen['email_dvvc']             = $dvvchuyen ? $dvvchuyen->email : 'Không rõ';
+                $don_vi_van_chuyen['so_dien_thoai_dvvc']     = $dvvchuyen ? $dvvchuyen->so_dien_thoai : 'Không rõ';
+                $don_vi_van_chuyen['cuoc_van_chuyen']   = $dvvchuyen ? $dvvchuyen->cuoc_van_chuyen : 'Không rõ';
+
+                unset($don_vi_van_chuyen['id_nha_san_xuat'], $don_vi_van_chuyen['id_don_vi_van_chuyen']);
+            }
+
+            // 🔐 Mint dữ liệu lên blockchain
+            $metadata = [
+                'name' => 'Đơn hàng #' . $maDonHang,
+                'description' => 'Thông tin đơn hàng',
+                'attributes' => [
+                    ['trait_type' => 'Người nhận', 'value' => $request->ten_nguoi_nhan],
+                    ['trait_type' => 'Số điện thoại', 'value' => $request->so_dien_thoai],
+                    ['trait_type' => 'Tổng tiền', 'value' => $request->tong_tien],
+                    ['trait_type' => 'Cước vận chuyển', 'value' => $request->cuoc_van_chuyen],
+                    ['trait_type' => 'Mã đơn hàng', 'value' => $maDonHang],
+                    [
+                        'trait_type' => 'Sản phẩm',
+                        'value' => $sanPhams // đã thêm tên nhà sản xuất & tên sản phẩm
+                    ],
+                    [
+                        'trait_type' => 'Thông tin ĐVVC chịu trách nhiệm vận chuyển hàng từ NSX',
+                        'value' => $donViVanChuyens
+                    ]
+                ]
+            ];
+
+            $pinataService = new PinataService(); // Đảm bảo đã use đúng namespace
+            $metadataUri = $pinataService->uploadMetadata($metadata);
+
+            $address = $request->input('wallet_address', 'TDyWikx2s9DpdLVi5jc1MLYrwiyihzcDRj');
+
+            $txHash = $this->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
+
+            // Lưu vào đơn hàng
+            $donHang->transaction_hash = $txHash['transactionHash'];
+            $donHang->metadata_uri = $metadataUri;
+            $donHang->token_id = $txHash['tokenId'];
+            $donHang->save();
+
             DB::commit();
+
             return response()->json([
                 'success' => true,
-                'message' => 'Đặt hàng thành công!'
+                'message' => 'Đặt hàng thành công!',
+                'transaction_hash' => $txHash['transactionHash'],
+                'metadata_uri' => $metadataUri,
+                'token_id' => $txHash['tokenId']
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlockChainController;
 use App\Http\Controllers\ChiTietSanPhamController;
 use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
@@ -13,18 +14,9 @@ use App\Http\Controllers\NhaSanXuatController;
 use App\Http\Controllers\PhuongTienController;
 use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\SanPhamNSXController;
-use App\Http\Controllers\TestController;
-use App\Models\DanhMucSanPham;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 Route::get('/check-nguoi-dung', [NhanVienController::class, 'checkNguoiDung']);
-
-Route::get('/test', [TestController::class, 'mint']);
 
 //auth user
 Route::group(['prefix'  =>  '/auth'], function () {
@@ -194,6 +186,7 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::post('/lay-lich-trinh-don-hang', [DonHangController::class, 'getLichTrinh']);
             Route::post('/xac-nhan-da-den', [DonHangController::class, 'xacNhanDen']);
             Route::post('/xac-nhan-da-di', [DonHangController::class, 'xacNhanDi']);
+            Route::post('/dvvc-mint', [BlockChainController::class, 'mint']);
         });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {

@@ -21,5 +21,8 @@ class LichSuVanChuyen extends Model
         "tinh_trang",
         "id_dai_ly",
         "tuyen_so",
+        "transaction_hash",
+        "metadata_uri",
+        "token_id",
     ];
 }
