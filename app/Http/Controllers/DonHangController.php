@@ -21,6 +21,7 @@ use App\Services\PathFindingService;
 
 class DonHangController extends Controller
 {
+    //đại lý
     public function getData(){
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -45,6 +46,7 @@ class DonHangController extends Controller
             ]);
         }
     }
+
     public function getDataNSXchoTrangChu()
     {
         $data = NhaSanXuat::get();
@@ -119,64 +121,6 @@ class DonHangController extends Controller
         }
     }
 
-    // public function xacNhanDonHangDaiLy(Request $request){
-    //     $user = Auth::guard('sanctum')->user();
-    //     if (!$user) {
-    //         return response()->json([
-    //             'message' => 'Bạn cần đăng nhập!',
-    //             'status'  => false,
-    //         ], 401);
-    //     } elseif($user instanceof DaiLy) {
-    //         try {
-    //             DB::beginTransaction();
-
-    //             if ($request->tinh_trang != 6) {
-    //                 return response()->json([
-    //                     'message' => 'Trạng thái không hợp lệ để xác nhận!',
-    //                     'status'  => false,
-    //                 ]);
-    //             }
-    //             $tinh_trang_moi = 3;
-    //             // Cập nhật đơn hàng
-    //             DonHang::where('id', $request->id)->update([
-    //                 'tinh_trang' => $tinh_trang_moi,
-    //             ]);
-    //             // Cập nhật chi tiết đơn hàng
-    //             if (is_array($request->san_phams)) {
-    //                 foreach ($request->san_phams as $sp) {
-    //                     if (isset($sp['id_lich_su_don_hang'])) {
-    //                         LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
-    //                             'tinh_trang' => $tinh_trang_moi,
-    //                         ]);
-    //                     }
-    //                 }
-    //             }
-    //             // Cập nhật tình trạng chặng cuối của lịch sử vận chuyển
-    //             $changCuoi = LichSuVanChuyen::where('id_don_hang', $request->id)
-    //                 ->whereNull('id_kho_hang')
-    //                 ->whereNull('thoi_gian_di')
-    //                 ->orderByDesc('thu_tu') //lấy cái số thứ tự cuối cùng của id đơn hàng
-    //                 ->first();
-    //             if ($changCuoi) {
-    //                 $changCuoi->tinh_trang = 2;
-    //                 $changCuoi->thoi_gian_di = Carbon::now('Asia/Ho_Chi_Minh');
-    //                 $changCuoi->save();
-    //             }
-    //             DB::commit();
-    //             return response()->json([
-    //                 'status'  => true,
-    //                 'message' => 'Xác nhận thành công!',
-    //             ]);
-    //         } catch (\Exception $e) {
-    //             DB::rollBack();
-    //             Log::error('Lỗi xác nhận của đại lý: ' . $e->getMessage());
-    //             return response()->json([
-    //                 'status'  => false,
-    //                 'message' => 'Lỗi: ' . $e->getMessage(),
-    //             ]);
-    //         }
-    //     }
-    // }
     public function xacNhanDonHangDaiLy(Request $request) {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -635,7 +579,6 @@ class DonHangController extends Controller
                                 'cuoc_van_chuyen'   => $item->cuoc_van_chuyen,
                                 'ten_nsx'           => $item->ten_nsx,
                                 'id_lich_su_don_hang'    => $item->id_lich_su_don_hang,
-                                'id_nsx_test'=>$item->id_nha_san_xuat
                             ];
                         })->values()
                     ];
@@ -929,6 +872,9 @@ class DonHangController extends Controller
                     'kho_trung_chuyens.dia_chi as dia_chi_kho',
                     'nha_san_xuats.dia_chi as dia_chi_nsx',
                     'dai_lies.dia_chi as dia_chi_dai_ly',
+                    'lich_su_van_chuyens.transaction_hash',
+                    'lich_su_van_chuyens.metadata_uri',
+                    'lich_su_van_chuyens.token_id',
                 )
                 ->get();
                 return response()->json([
@@ -944,63 +890,6 @@ class DonHangController extends Controller
             }
         }
     }
-
-    // public function xacNhanDen(Request $request)
-    // {
-    //     $user = Auth::guard('sanctum')->user();
-    //     if (!$user || !$user instanceof DonViVanChuyen) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Không xác thực'
-    //         ], 401);
-    //     }
-    //     $lichTrinh = LichSuVanChuyen::find($request->id);
-    //     if (!$lichTrinh) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Không tìm thấy lịch trình'
-    //         ], 404);
-    //     }
-    //     if ($lichTrinh->thoi_gian_den) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Đã xác nhận đến rồi'
-    //         ], 400);
-    //     }
-    //     $lichTrinh->thoi_gian_den = Carbon::now('Asia/Ho_Chi_Minh');
-    //     $lichTrinh->tinh_trang = 1; // Đã đến
-    //     $lichTrinh->save();
-    //     $isDiemCuoi = !$lichTrinh->id_kho_hang && Str::contains($lichTrinh->mo_ta, 'Vị trí đại lý');
-    //     // Nếu là chặng cuối (chứa địa chỉ đại lý, không phải kho trung chuyển)
-    //     if ($isDiemCuoi) {
-    //         // Lấy tất cả các chặng có mo_ta chứa "Vị trí đại lý" của cùng đơn hàng
-    //         $diemCuoiList = LichSuVanChuyen::where('id_don_hang', $lichTrinh->id_don_hang)
-    //             ->whereNull('id_kho_hang')
-    //             ->where('mo_ta', 'like', '%Vị trí đại lý%')
-    //             ->get();
-
-    //         if ($diemCuoiList->isNotEmpty()) {
-    //             $tatCaDaDen = $diemCuoiList->every(function ($item) {
-    //                 return !empty($item->thoi_gian_den);
-    //             });
-
-    //             if ($tatCaDaDen) {
-    //                 $donHang = DonHang::find($lichTrinh->id_don_hang);
-    //                 if ($donHang) {
-    //                     $donHang->tinh_trang = 6;
-    //                     $donHang->save();
-
-    //                     LichSuDonHang::where('id_don_hang', $donHang->id)
-    //                         ->update(['tinh_trang' => 6]);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Đã xác nhận đã đến'
-    //     ]);
-    // }
 
     public function xacNhanDen(Request $request)
     {

@@ -20,7 +20,10 @@ class DonHang extends Model
         "tong_tien",
         "tinh_trang",
         "tinh_trang_thanh_toan",
-        "cuoc_van_chuyen"
+        "cuoc_van_chuyen",
+        "transaction_hash",
+        "metadata_uri",
+        "token_id",
     ];
 
     protected static function boot()
