@@ -102,6 +102,7 @@ class NhanVienController extends Controller
             'so_dien_thoai'     =>      $user->so_dien_thoai,
             'dia_chi'           =>      $user->dia_chi,
             'user_id'           =>      $user->id,
+            'dia_chi_vi'        =>      $user->dia_chi_vi
         ], 200);
     }
 

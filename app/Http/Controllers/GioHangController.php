@@ -270,17 +270,17 @@ class GioHangController extends Controller
             $donViVanChuyens = $request->don_vi_van_chuyen;
             foreach ($donViVanChuyens as &$don_vi_van_chuyen) {
                 $nsx = NhaSanXuat::find($don_vi_van_chuyen['id_nha_san_xuat']);
-                $don_vi_van_chuyen['ten_nha_san_xuat']  = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
-                $don_vi_van_chuyen['dia_chi_nsx']           = $nsx ? $nsx->dia_chi : 'Không rõ';
-                $don_vi_van_chuyen['email_nsx']             = $nsx ? $nsx->email : 'Không rõ';
-                $don_vi_van_chuyen['so_dien_thoai_nsx']     = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
+                $don_vi_van_chuyen['ten_nha_san_xuat'] = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
+                $don_vi_van_chuyen['dia_chi_nsx'] = $nsx ? $nsx->dia_chi : 'Không rõ';
+                $don_vi_van_chuyen['email_nsx'] = $nsx ? $nsx->email : 'Không rõ';
+                $don_vi_van_chuyen['so_dien_thoai_nsx'] = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
 
                 $dvvchuyen = DonViVanChuyen::find($don_vi_van_chuyen['id_don_vi_van_chuyen']);
-                $don_vi_van_chuyen['ten_dvvc']          = $dvvchuyen ? $dvvchuyen->ten_cong_ty : 'Không rõ';
-                $don_vi_van_chuyen['dia_chi_dvvc']           = $dvvchuyen ? $dvvchuyen->dia_chi : 'Không rõ';
-                $don_vi_van_chuyen['email_dvvc']             = $dvvchuyen ? $dvvchuyen->email : 'Không rõ';
-                $don_vi_van_chuyen['so_dien_thoai_dvvc']     = $dvvchuyen ? $dvvchuyen->so_dien_thoai : 'Không rõ';
-                $don_vi_van_chuyen['cuoc_van_chuyen']   = $dvvchuyen ? $dvvchuyen->cuoc_van_chuyen : 'Không rõ';
+                $don_vi_van_chuyen['ten_dvvc'] = $dvvchuyen ? $dvvchuyen->ten_cong_ty : 'Không rõ';
+                $don_vi_van_chuyen['dia_chi_dvvc'] = $dvvchuyen ? $dvvchuyen->dia_chi : 'Không rõ';
+                $don_vi_van_chuyen['email_dvvc'] = $dvvchuyen ? $dvvchuyen->email : 'Không rõ';
+                $don_vi_van_chuyen['so_dien_thoai_dvvc']= $dvvchuyen ? $dvvchuyen->so_dien_thoai : 'Không rõ';
+                $don_vi_van_chuyen['cuoc_van_chuyen'] = $dvvchuyen ? $dvvchuyen->cuoc_van_chuyen : 'Không rõ';
 
                 unset($don_vi_van_chuyen['id_nha_san_xuat'], $don_vi_van_chuyen['id_don_vi_van_chuyen']);
             }
@@ -290,6 +290,9 @@ class GioHangController extends Controller
                 $dvvchuyen = DonViVanChuyen::find($chi_tiet_cuoc_vc['id_don_vi_van_chuyen']);
                 $chi_tiet_cuoc_vc['ten_dvvc'] = $dvvchuyen ? $dvvchuyen->ten_cong_ty : 'Không rõ';
                 $chi_tiet_cuoc_vc['cuoc_van_chuyen'] = $dvvchuyen ? $dvvchuyen->cuoc_van_chuyen : 'Không rõ';
+
+                $nsx = NhaSanXuat::find($chi_tiet_cuoc_vc['id_nha_san_xuat']);
+                $chi_tiet_cuoc_vc['ten_nha_san_xuat'] = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
 
                 unset($chi_tiet_cuoc_vc['id_nha_san_xuat'], $chi_tiet_cuoc_vc['id_don_vi_van_chuyen']);
             }
@@ -324,7 +327,9 @@ class GioHangController extends Controller
             $pinataService = new PinataService(); // Đảm bảo đã use đúng namespace
             $metadataUri = $pinataService->uploadMetadata($metadata);
 
-            $address = $request->input('wallet_address', 'TDyWikx2s9DpdLVi5jc1MLYrwiyihzcDRj');
+            $to_address = $request->dia_chi_vi;
+
+            $address = $request->input('wallet_address', $to_address);
 
             $txHash = $this->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
 

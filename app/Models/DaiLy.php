@@ -21,5 +21,6 @@ class DaiLy extends Authenticatable
         "tinh_trang",
         "vi_do",
         "kinh_do",
+        "dia_chi_vi",
     ];
 }

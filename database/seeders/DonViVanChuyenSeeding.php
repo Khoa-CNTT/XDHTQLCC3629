@@ -25,7 +25,8 @@ class DonViVanChuyenSeeding extends Seeder
                 'so_dien_thoai' => '0912345678',
                 'dia_chi' => '567 Đường Hai Bà Trưng',
                 'cuoc_van_chuyen' => '40000',
-                'loai_tai_khoan' => 'Đơn vị vận chuyển'
+                'loai_tai_khoan' => 'Đơn vị vận chuyển',
+                'dia_chi_vi' => 'TUtmUFRyUP93fJPR4QPQTo2VU2MfzRWF5f'
             ],
             [
                 'ten_cong_ty' => 'Công ty Giao Hàng Tiết Kiệm',
@@ -34,7 +35,8 @@ class DonViVanChuyenSeeding extends Seeder
                 'so_dien_thoai' => '0922233445',
                 'dia_chi' => '789 Đường Nguyễn Huệ',
                 'cuoc_van_chuyen' => '25000',
-                'loai_tai_khoan' => 'Đơn vị vận chuyển'
+                'loai_tai_khoan' => 'Đơn vị vận chuyển',
+                'dia_chi_vi' => 'TE17bVCPVuCtTtDVt5S4ezRvgfEBW7Lk3b'
             ],
             [
                 'ten_cong_ty' => 'Công ty Chuyển Phát Nhanh VN',
@@ -43,7 +45,8 @@ class DonViVanChuyenSeeding extends Seeder
                 'so_dien_thoai' => '0933456789',
                 'dia_chi' => '456 Đường Trần Hưng Đạo',
                 'cuoc_van_chuyen' => '35000',
-                'loai_tai_khoan' => 'Đơn vị vận chuyển'
+                'loai_tai_khoan' => 'Đơn vị vận chuyển',
+                'dia_chi_vi' => ''
             ],
             [
                 'ten_cong_ty' => 'Công ty Vận Tải ABC',
@@ -52,7 +55,8 @@ class DonViVanChuyenSeeding extends Seeder
                 'so_dien_thoai' => '0901234567',
                 'dia_chi' => '123 Đường Lê Lợi',
                 'cuoc_van_chuyen' => '30000',
-                'loai_tai_khoan' => 'Đơn vị vận chuyển'
+                'loai_tai_khoan' => 'Đơn vị vận chuyển',
+                'dia_chi_vi' => ''
             ],
         ]);
     }

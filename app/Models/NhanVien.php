@@ -17,6 +17,7 @@ class NhanVien extends Authenticatable
         "email",
         "password",
         "id_chuc_vu",
-        "tinh_trang"
+        "tinh_trang",
+        "dia_chi_vi",
     ];
 }
