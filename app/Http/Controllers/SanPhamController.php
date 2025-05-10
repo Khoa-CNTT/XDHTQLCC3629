@@ -101,8 +101,7 @@ class SanPhamController extends Controller
         }
     }
 
-    public function doiTinhTrangSanPham(Request $request)
-    {
+    public function doiTinhTrangSanPham(Request $request) {
         try {
             if ($request->tinh_trang == 1 || $request->tinh_trang == 2) {
                 if ($request->tinh_trang == 1) {
@@ -134,8 +133,7 @@ class SanPhamController extends Controller
     }
 
     //get data theo id nhà sản xuất
-    public function getDataByUser()
-    {
+    public function getDataByUser() {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -149,6 +147,7 @@ class SanPhamController extends Controller
             $list_san_pham = SanPham::join('san_pham_n_s_x_e_s', 'san_phams.id', 'san_pham_n_s_x_e_s.id_san_pham')
                 ->join('nha_san_xuats', 'nha_san_xuats.id', 'san_pham_n_s_x_e_s.id_nha_san_xuat')
                 ->where('san_phams.tinh_trang', '1')
+                ->where('san_phams.so_luong_ton_kho', '>', 0)
                 ->select(
                     'san_phams.id',
                     'nha_san_xuats.id as id_nha_san_xuat',
@@ -202,8 +201,8 @@ class SanPhamController extends Controller
 
         return response()->json([], 401);
     }
-    public function createSanPhamCuaNSX(Request $request)
-    {
+
+    public function createSanPhamCuaNSX(Request $request) {
         $user = auth()->user();
         $nhaSanXuat = NhaSanXuat::where('loai_tai_khoan', 'Nhà Sản Xuất')
             ->where('id', $user->id)
