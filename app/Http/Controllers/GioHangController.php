@@ -159,14 +159,16 @@ class GioHangController extends Controller
     {
         DB::beginTransaction();
         try {
-            $maDonHang = Str::uuid();
+            $ma_don_hang = Str::uuid();
+            $ngay_dat = now();
+            $ngay_giao = now()->addDays(4);
             // Tạo đơn hàng mới
             $donHang = DonHang::create([
-                'ma_don_hang'           => $maDonHang,
+                'ma_don_hang'           => $ma_don_hang,
                 'user_id'               => $request->user_id,
                 'id_nguoi_duyet'        => null,
-                'ngay_dat'              => now(),
-                'ngay_giao'             => now()->addDays(4),
+                'ngay_dat'              => $ngay_dat,
+                'ngay_giao'             => $ngay_giao,
                 'tong_tien'             => $request->tong_tien,
                 'cuoc_van_chuyen'       => $request->cuoc_van_chuyen ?? 0,
                 'tinh_trang'            => 0,
@@ -283,19 +285,34 @@ class GioHangController extends Controller
                 unset($don_vi_van_chuyen['id_nha_san_xuat'], $don_vi_van_chuyen['id_don_vi_van_chuyen']);
             }
 
+            $cuocVCthanhphans = $request->chi_tiet_cuoc_vc;
+            foreach ($cuocVCthanhphans as &$chi_tiet_cuoc_vc) {
+                $dvvchuyen = DonViVanChuyen::find($chi_tiet_cuoc_vc['id_don_vi_van_chuyen']);
+                $chi_tiet_cuoc_vc['ten_dvvc'] = $dvvchuyen ? $dvvchuyen->ten_cong_ty : 'Không rõ';
+                $chi_tiet_cuoc_vc['cuoc_van_chuyen'] = $dvvchuyen ? $dvvchuyen->cuoc_van_chuyen : 'Không rõ';
+
+                unset($chi_tiet_cuoc_vc['id_nha_san_xuat'], $chi_tiet_cuoc_vc['id_don_vi_van_chuyen']);
+            }
+
             // 🔐 Mint dữ liệu lên blockchain
             $metadata = [
-                'name' => 'Đơn hàng #' . $maDonHang,
+                'name' => 'Đơn hàng #' . $ma_don_hang,
                 'description' => 'Thông tin đơn hàng',
                 'attributes' => [
                     ['trait_type' => 'Người nhận', 'value' => $request->ten_nguoi_nhan],
+                    ['trait_type' => 'Ngày đặt', 'value' => $ngay_dat],
+                    ['trait_type' => 'Ngày giao (dự kiến)', 'value' => $ngay_giao],
                     ['trait_type' => 'Số điện thoại', 'value' => $request->so_dien_thoai],
                     ['trait_type' => 'Tổng tiền', 'value' => $request->tong_tien],
-                    ['trait_type' => 'Cước vận chuyển', 'value' => $request->cuoc_van_chuyen],
-                    ['trait_type' => 'Mã đơn hàng', 'value' => $maDonHang],
+                    ['trait_type' => 'Tổng cước vận chuyển', 'value' => $request->cuoc_van_chuyen],
+                    [
+                        'trait_type' => 'Cước vận chuyển thành phần',
+                        'value' => $cuocVCthanhphans
+                    ],
+                    ['trait_type' => 'Mã đơn hàng', 'value' => $ma_don_hang],
                     [
                         'trait_type' => 'Sản phẩm',
-                        'value' => $sanPhams // đã thêm tên nhà sản xuất & tên sản phẩm
+                        'value' => $sanPhams
                     ],
                     [
                         'trait_type' => 'Thông tin ĐVVC chịu trách nhiệm vận chuyển hàng từ NSX',

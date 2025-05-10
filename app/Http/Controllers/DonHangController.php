@@ -38,8 +38,9 @@ class DonHangController extends Controller
                     'don_hangs.tong_tien',
                     'don_hangs.tinh_trang',
                     'don_hangs.tinh_trang_thanh_toan',
-                    'don_hangs.id')
-            ->get();
+                    'don_hangs.id',
+                    'don_hangs.ma_don_hang',
+            )->get();
             return response()->json([
                 'status'    =>      true,
                 'data'      =>      $list_don_hang,
@@ -189,6 +190,80 @@ class DonHangController extends Controller
                     'message' => 'Lỗi: ' . $e->getMessage(),
                 ]);
             }
+        }
+    }
+
+    public function getDataOrderOnBlockChain(Request $request){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        } elseif($user && $user instanceof DaiLy) {
+            $user_id = $user->id;
+            $list_info_blockchain_don_hang = DonHang::
+            where('don_hangs.user_id', $user_id)
+            ->where('don_hangs.id', $request->id_don_hang)
+            ->select(
+                'don_hangs.transaction_hash',
+                'don_hangs.metadata_uri',
+                'don_hangs.token_id',
+                'don_hangs.ma_don_hang',
+            )
+            ->get();
+            return response()->json([
+                'status'    =>      true,
+                'data'      =>      $list_info_blockchain_don_hang,
+            ]);
+        }
+    }
+
+    public function getDataHistoryTransport(Request $request){
+        $user = Auth::guard('sanctum')->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        }
+
+        if ($user instanceof DaiLy) {
+            $user_id = $user->id;
+
+            // Lấy toàn bộ bản ghi ứng với đơn hàng và đại lý
+            $records = LichSuVanChuyen::
+                        join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
+                        ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
+                        ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
+                        ->orderBy('lich_su_van_chuyens.tuyen_so')
+                        ->orderBy('lich_su_van_chuyens.id')
+                        ->select(
+                            'lich_su_van_chuyens.transaction_hash',
+                            'lich_su_van_chuyens.metadata_uri',
+                            'lich_su_van_chuyens.token_id',
+                            'lich_su_van_chuyens.tuyen_so',
+                            'don_hangs.ma_don_hang'
+                        )
+                        ->get();
+
+            // Group theo `tuyen_so` và lấy hàng đầu tiên mỗi nhóm
+            $filtered = $records->groupBy('tuyen_so')->map(function ($group) {
+                $first = $group->first();
+                return [
+                    'tuyen_so'        => $first->tuyen_so,
+                    'transaction_hash'=> $first->transaction_hash,
+                    'metadata_uri'    => $first->metadata_uri,
+                    'token_id'        => $first->token_id,
+                    'ma_don_hang'     => $first->ma_don_hang
+                ];
+            })->values();
+
+            return response()->json([
+                'status' => true,
+                'data'   => $filtered,
+            ]);
         }
     }
 

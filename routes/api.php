@@ -167,6 +167,8 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTiet']);
             Route::post('/huy-don-hang', [DonHangController::class, 'huyDonHang']);
             Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangDaiLy']);
+            Route::post('/lay-thong-tin-don-hang-blockchain', [DonHangController::class, 'getDataOrderOnBlockChain']);
+            Route::post('/lay-lich-su-van-chuyen-blockchain', [DonHangController::class, 'getDataHistoryTransport']);
         });
         //nhà sản xuất
         Route::group(['prefix'  =>  '/nha-san-xuat'], function () {
