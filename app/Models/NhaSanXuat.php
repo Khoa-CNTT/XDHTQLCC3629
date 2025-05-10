@@ -25,5 +25,6 @@ class NhaSanXuat extends Authenticatable
         "loai_tai_khoan",
         "vi_do",
         "kinh_do",
+        "dia_chi_vi",
     ];
 }

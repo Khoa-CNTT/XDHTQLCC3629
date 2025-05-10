@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LichSuVanChuyen;
 use App\Services\PinataService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BlockChainController extends Controller
 {
@@ -32,6 +33,8 @@ class BlockChainController extends Controller
     public function mint(Request $request)
     {
         try {
+            $ngay_giao = now()->addDays(4);
+            $ma_van_don = Str::uuid();
             $routes = $request->input('routes'); // lấy mảng hành trình
 
             if (!is_array($routes) || count($routes) === 0) {
@@ -65,7 +68,10 @@ class BlockChainController extends Controller
 
             $metadata = [
                 'name' => 'Bằng Chứng Vận Chuyển Đơn Hàng #' . $first['id_don_hang'],
+                'description' => 'Thông tin vận đơn',
                 'ma_hoa_don' => 'DH' . str_pad($first['id_don_hang'], 3, '0', STR_PAD_LEFT),
+                'ma_van_don' => $ma_van_don,
+                'ngay_giao_du_kien' => $ngay_giao,
                 'attributes' => $attributes
             ];
 
@@ -73,7 +79,9 @@ class BlockChainController extends Controller
             $metadataUri = $this->pinataService->uploadMetadata($metadata);
 
             // Lấy địa chỉ ví (có thể là đại lý hoặc NSX hoặc cố định)
-            $address = $request->input('wallet_address', 'TDyWikx2s9DpdLVi5jc1MLYrwiyihzcDRj');
+            $to_address = $request->dia_chi_vi;
+
+            $address = $request->input('wallet_address', $to_address);
 
             // Gọi API mint
             $txHash = $this->mintNFTtoApi($address, $metadataUri);

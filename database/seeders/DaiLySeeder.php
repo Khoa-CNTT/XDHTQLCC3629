@@ -24,6 +24,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 21.028511,
                 'kinh_do' => 105.804817,
+                'dia_chi_vi' => 'TA9yodjyC7YpDJSxLZF9mntnZGMaG8Eitb'
             ],
             [
                 'ten_cong_ty' => 'Công ty Cổ Phần Nam Á',
@@ -34,6 +35,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Minh Phát',
@@ -44,6 +46,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 16.0739,
                 'kinh_do' => 108.2240,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty Cổ Phần Đại Lộc',
@@ -54,6 +57,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 20.8600,
                 'kinh_do' => 106.6822,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Quốc Tế An Bình',
@@ -64,6 +68,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Thịnh Vượng',
@@ -74,6 +79,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty Cổ Phần Ánh Dương',
@@ -84,6 +90,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 16.0739,
                 'kinh_do' => 108.2240,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Phát Đạt',
@@ -94,6 +101,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 20.8600,
                 'kinh_do' => 106.6822,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Phúc An',
@@ -104,6 +112,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty Cổ Phần Tấn Tài',
@@ -114,6 +123,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Việt Hưng',
@@ -124,6 +134,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Lộc Phát',
@@ -134,6 +145,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty Cổ Phần Thành Đạt',
@@ -144,6 +156,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 16.0739,
                 'kinh_do' => 108.2240,
+                'dia_chi_vi' => '',
             ],
             [
                 'ten_cong_ty' => 'Công ty TNHH Bảo Long',
@@ -154,6 +167,7 @@ class DaiLySeeder extends Seeder
                 'loai_tai_khoan' => 'Đại Lý',
                 'vi_do' => 20.8600,
                 'kinh_do' => 106.6822,
+                'dia_chi_vi' => '',
             ],
         ]);
     }

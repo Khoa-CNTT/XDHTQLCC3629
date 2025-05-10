@@ -20,6 +20,7 @@ class DonViVanChuyen extends Authenticatable
         "dia_chi",
         "cuoc_van_chuyen",
         "tinh_trang",
-        "loai_tai_khoan"
+        "loai_tai_khoan",
+        "dia_chi_vi",
     ];
 }

@@ -39,7 +39,7 @@ class DonHangController extends Controller
                     'don_hangs.tinh_trang',
                     'don_hangs.tinh_trang_thanh_toan',
                     'don_hangs.id',
-                    'don_hangs.ma_don_hang',
+                    'don_hangs.ma_don_hang'
             )->get();
             return response()->json([
                 'status'    =>      true,
