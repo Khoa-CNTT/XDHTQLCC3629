@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlockChainForDonHang;
 use App\Models\DaiLy;
 use App\Models\DonHang;
 use App\Models\DonViVanChuyen;
@@ -139,20 +140,6 @@ class GioHangController extends Controller
             'status' => true,
             'message' => 'Xóa sản phẩm thành công'
         ]);
-    }
-
-    public function mintNFTtoApi($address, $metadataUri)
-    {
-        $client = new \GuzzleHttp\Client();
-        $res    = $client->post("http://localhost:3000/api/mint-nft", [
-            'json' => [
-                'recipient' => $address,
-                'tokenURI'  => $metadataUri
-            ]
-        ]);
-
-        $data = json_decode($res->getBody(), true);
-        return $data;
     }
 
     public function datHang(Request $request)
@@ -331,13 +318,17 @@ class GioHangController extends Controller
 
             $address = $request->input('wallet_address', $to_address);
 
-            $txHash = $this->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
+            $txHash = $pinataService->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
 
-            // Lưu vào đơn hàng
-            $donHang->transaction_hash = $txHash['transactionHash'];
-            $donHang->metadata_uri = $metadataUri;
-            $donHang->token_id = $txHash['tokenId'];
-            $donHang->save();
+            BlockChainForDonHang::create([
+                'id_don_hang'               =>  $donHang->id,
+                'action'                    =>  'Tạo đơn hàng',
+                'transaction_hash'          =>  $txHash['transactionHash'],
+                'metadata_uri'              =>  $metadataUri,
+                'token_id'                  =>  $txHash['tokenId'],
+                'id_user'                   =>  $request->user_id,
+                'loai_tai_khoan'            =>  $request->loai_tai_khoan
+            ]);
 
             DB::commit();
 

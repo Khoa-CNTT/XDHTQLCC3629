@@ -30,4 +30,18 @@ class PinataService
         $result = json_decode($response->getBody(), true);
         return "https://gateway.pinata.cloud/ipfs/{$result['IpfsHash']}";
     }
+
+    public function mintNFTtoApi($address, $metadataUri)
+    {
+        $client = new \GuzzleHttp\Client();
+        $res    = $client->post("http://localhost:3000/api/mint-nft", [
+            'json' => [
+                'recipient' => $address,
+                'tokenURI'  => $metadataUri
+            ]
+        ]);
+
+        $data = json_decode($res->getBody(), true);
+        return $data;
+    }
 }

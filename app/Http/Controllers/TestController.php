@@ -91,4 +91,80 @@ class TestController extends Controller
             ], 500);
         }
     }
+
+    public function huyDonHang(Request $request){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
+        } elseif($user && $user instanceof DaiLy) {
+            try {
+                $id_nguoi_thuc_hien = $user->id;
+                if ($request->input('v.tinh_trang') == 1 || $$request->input('v.tinh_trang') == 0) {
+                    $tinh_trang_moi = 4;
+                }
+
+                DonHang::where('id', $request->input('v.id') )->update([
+                    'tinh_trang'    =>  $tinh_trang_moi
+                ]);
+
+                LichSuDonHang::where('id_don_hang', $request->input('v.id') )->update([
+                    'tinh_trang'    =>  $tinh_trang_moi
+                ]);
+
+                $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
+                $metadata = [
+                    'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
+                    'description' => 'Đại lý hủy đơn hàng',
+                    'time' => $thoiGianCapNhat,
+                    'attributes' => [
+                        ['trait_type' => 'Người thực hiện', 'value' => $request->input('orderData.nguoi_thuc_hien')],
+                        ['trait_type' => 'Tổng tiền', 'value' => $request->input('v.tong_tien')],
+                        [
+                            'trait_type' => 'Tình trạng thanh toán',
+                            'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
+                            'Đã thanh toán' : 'Chưa thanh toán',
+                        ],
+                    ]
+                ];
+
+                $pinataService = new PinataService(); // Đảm bảo đã use đúng namespace
+                $metadataUri = $pinataService->uploadMetadata($metadata);
+
+                $to_address = $request->input('orderData.dia_chi_vi');
+
+                $address = $request->input('wallet_address', $to_address);
+
+                $txHash = $pinataService->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
+
+                BlockChainForDonHang::create([
+                    'id_don_hang'               =>  $request->input('v.id'),
+                    'action'                    =>  'Cancel order',
+                    'transaction_hash'          =>  $txHash['transactionHash'],
+                    'metadata_uri'              =>  $metadataUri,
+                    'token_id'                  =>  $txHash['tokenId'],
+                    'id_user'                   =>  $id_nguoi_thuc_hien,
+                    'loai_tai_khoan'            =>  $request->input('orderData.loai_tai_khoan')
+                ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Xác nhận đơn hàng thành công!',
+                    'transaction_hash' => $txHash['transactionHash'],
+                    'metadata_uri' => $metadataUri,
+                    'token_id' => $txHash['tokenId']
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lỗi xác nhận đơn hàng: ' . $e->getMessage()
+                ]);
+            }
+        }
+    }
 }
