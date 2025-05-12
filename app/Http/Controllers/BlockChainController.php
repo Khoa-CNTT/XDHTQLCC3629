@@ -86,8 +86,6 @@ class BlockChainController extends Controller
             // Gọi API mint
             $txHash = $this->mintNFTtoApi($address, $metadataUri);
 
-            // $data = $request->input('routes');
-
             // Kiểm tra xem mảng có phần tử nào không
             if (empty($routes) || !isset($routes[0])) {
                 return response()->json([
