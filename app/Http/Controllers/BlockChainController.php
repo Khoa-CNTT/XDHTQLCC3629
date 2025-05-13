@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DonHang;
 use App\Models\LichSuVanChuyen;
 use App\Services\PinataService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -33,7 +35,6 @@ class BlockChainController extends Controller
     public function mint(Request $request)
     {
         try {
-            $ngay_giao = now()->addDays(4);
             $ma_van_don = Str::uuid();
             $routes = $request->input('routes'); // lấy mảng hành trình
 
@@ -44,7 +45,29 @@ class BlockChainController extends Controller
                 ], 400);
             }
             // Tùy ý lấy thông tin từ phần tử đầu để hiển thị trên NFT
-            $first = $routes[0];
+            // $first = $routes[0];
+            $id_don_hang = $routes[0]['id_don_hang'] ?? null;
+
+            if (!$id_don_hang) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Không tìm thấy id đơn hàng trong hành trình'
+                ], 400);
+            }
+
+            // Lấy thông tin mã đơn hàng từ bảng don_hangs
+            $donHang = DonHang::where('id', $id_don_hang)->first();
+
+            if (!$donHang) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Không tìm thấy đơn hàng tương ứng'
+                ], 404);
+            }
+
+            $ma_don_hang = $donHang->ma_don_hang;
+            $ngay_dat = $donHang->ngay_dat;
+            $ngay_giao = $donHang->ngay_giao;
             // Tạo metadata từ toàn bộ tuyến
             $attributes = [];
             foreach ($routes as $index => $route) {
@@ -56,22 +79,25 @@ class BlockChainController extends Controller
                     $dia_chi = $route['dia_chi_kho'] ?? 'Không có địa chỉ kho';
                 }
                 $attributes[] = [
-                    'Chặng' => $index + 1,
-                    'Tuyến số' => $route['tuyen_so'] ?? null,
-                    'Mô tả' => $route['mo_ta'] ?? 'Không có mô tả',
-                    'Địa chỉ' => $dia_chi,
-                    'Thời gian đến' => $route['thoi_gian_den'] ?? 'N/A',
-                    'Thời gian đi' => $route['thoi_gian_di'] ?? 'Đã đến kho, chờ đại lý nhận hàng',
-                    'Vị trí tiếp theo' =>  $route['vi_tri_tiep_theo'] ?? null,
+                    'chang' => $index + 1,
+                    'tuyen_so' => $route['tuyen_so'] ?? null,
+                    'mo_ta' => $route['mo_ta'] ?? 'Không có mô tả',
+                    'dia_chi' => $dia_chi,
+                    'thoi_gian_den' => $route['thoi_gian_den'] ?? 'N/A',
+                    'thoi_gian_di' => $route['thoi_gian_di'] ?? 'Đã đến kho, chờ đại lý nhận hàng',
+                    'vi_tri_tiep_theo' =>  $route['vi_tri_tiep_theo'] ?? null,
                 ];
             }
-
+            $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
             $metadata = [
-                'name' => 'Bằng Chứng Vận Chuyển Đơn Hàng #' . $first['id_don_hang'],
+                'name' => 'Bằng chứng đơn vị vận chuyển giao đơn hàng',
+                'order_code' => $ma_don_hang,
+                'delivery_code' => $ma_van_don,
+                'time_of_execution' => $thoiGianCapNhat,
+                'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
+                'order_date' => $ngay_dat,
+                'delivery_date(expected)' => $ngay_giao,
                 'description' => 'Thông tin vận đơn',
-                'ma_hoa_don' => 'DH' . str_pad($first['id_don_hang'], 3, '0', STR_PAD_LEFT),
-                'ma_van_don' => $ma_van_don,
-                'ngay_giao_du_kien' => $ngay_giao,
                 'attributes' => $attributes
             ];
 
@@ -79,7 +105,7 @@ class BlockChainController extends Controller
             $metadataUri = $this->pinataService->uploadMetadata($metadata);
 
             // Lấy địa chỉ ví (có thể là đại lý hoặc NSX hoặc cố định)
-            $to_address = $request->dia_chi_vi;
+            $to_address = $request->input('orderData.dia_chi_vi');
 
             $address = $request->input('wallet_address', $to_address);
 
@@ -106,7 +132,8 @@ class BlockChainController extends Controller
                 [
                     'transaction_hash' => $txHash['transactionHash'],
                     'metadata_uri' => $metadataUri,
-                    'token_id' => $txHash['tokenId']
+                    'token_id' => $txHash['tokenId'],
+                    'ma_van_don' => $ma_van_don,
                 ]
             );
 
@@ -117,6 +144,7 @@ class BlockChainController extends Controller
                 'tokenId' => $txHash['tokenId'],
                 'id_don_hang' => $idDonHang,
                 'tuyen_so' => $tuyenSo,
+                'ma_van_don' => $ma_van_don,
             ]);
         } catch (\Exception $e) {
             return response()->json([

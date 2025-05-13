@@ -17,6 +17,7 @@ class LichSuDonHang extends Model
         "so_luong",
         "tinh_trang",
         "id_nha_san_xuat",
-        "cuoc_van_chuyen"
+        "cuoc_van_chuyen",
+        "huy_bo_boi",
     ];
 }

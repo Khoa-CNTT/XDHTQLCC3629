@@ -11,6 +11,7 @@ use App\Models\LichSuDonHang;
 use App\Models\NhaSanXuat;
 use App\Models\SanPham;
 use App\Services\PinataService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,11 +84,9 @@ class GioHangController extends Controller
                     'gio_hangs.id',
                     'nha_san_xuats.id as id_nha_san_xuat') //get để nhóm ở groupby
             ->get();
-            // $check = 2;
             return response()->json([
                 'status'    =>      true,
                 'data'      =>      $san_pham,
-                // 'check'     =>      $check,
             ]);
         }
     }
@@ -285,27 +284,37 @@ class GioHangController extends Controller
             }
 
             // 🔐 Mint dữ liệu lên blockchain
+            $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
             $metadata = [
-                'name' => 'Đơn hàng #' . $ma_don_hang,
-                'description' => 'Thông tin đơn hàng',
+                'name' => 'Bằng chứng đại lý đặt hàng',
+                'order_code' => $ma_don_hang,
+                'time_of_execution' => $thoiGianCapNhat,
+                'user_execution' => $request->ten_nguoi_nhan,
+                'status' => 'Đã đặt hàng thành công',
+                'description' => 'Thông tin đơn đặt hàng',
                 'attributes' => [
-                    ['trait_type' => 'Người nhận', 'value' => $request->ten_nguoi_nhan],
-                    ['trait_type' => 'Ngày đặt', 'value' => $ngay_dat],
-                    ['trait_type' => 'Ngày giao (dự kiến)', 'value' => $ngay_giao],
-                    ['trait_type' => 'Số điện thoại', 'value' => $request->so_dien_thoai],
-                    ['trait_type' => 'Tổng tiền', 'value' => $request->tong_tien],
-                    ['trait_type' => 'Tổng cước vận chuyển', 'value' => $request->cuoc_van_chuyen],
+                    [
+                        'trait_type' => 'Ngày đặt',
+                        'value' => $ngay_dat
+                    ],
+                    [
+                        'trait_type' => 'Ngày giao (dự kiến)',
+                        'value' => $ngay_giao
+                    ],
+                    [
+                        'trait_type' => 'Tổng tiền cần thanh toán',
+                        'value' => $request->tong_tien
+                    ],
                     [
                         'trait_type' => 'Cước vận chuyển thành phần',
                         'value' => $cuocVCthanhphans
                     ],
-                    ['trait_type' => 'Mã đơn hàng', 'value' => $ma_don_hang],
                     [
                         'trait_type' => 'Sản phẩm',
                         'value' => $sanPhams
                     ],
                     [
-                        'trait_type' => 'Thông tin ĐVVC chịu trách nhiệm vận chuyển hàng từ NSX',
+                        'trait_type' => 'Vận chuyển',
                         'value' => $donViVanChuyens
                     ]
                 ]

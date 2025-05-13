@@ -24,6 +24,7 @@ class DonHang extends Model
         "transaction_hash",
         "metadata_uri",
         "token_id",
+        "huy_bo_boi",
     ];
 
     protected static function boot()
