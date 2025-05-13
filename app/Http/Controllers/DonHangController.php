@@ -143,22 +143,28 @@ class DonHangController extends Controller
                 }
 
                 DonHang::where('id', $request->input('v.id') )->update([
-                    'tinh_trang'    =>  $tinh_trang_moi
+                    'tinh_trang'    =>  $tinh_trang_moi,
+                    'huy_bo_boi'    => 'dai_ly',
                 ]);
 
                 LichSuDonHang::where('id_don_hang', $request->input('v.id') )->update([
-                    'tinh_trang'    =>  $tinh_trang_moi
+                    'tinh_trang'    =>  $tinh_trang_moi,
+                    'huy_bo_boi'    => 'dai_ly',
                 ]);
 
                 $thoiGianCapNhat = Carbon::now("Asia/Ho_Chi_Minh");
                 $metadata = [
-                    'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
-                    'time' => $thoiGianCapNhat,
+                    'name' => 'Bằng chứng hủy đơn hàng của chủ đơn hàng',
+                    'order_code' => $request->input('v.ma_don_hang'),
+                    'time_of_execution' => $thoiGianCapNhat,
+                    'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
                     'status' => 'Đã hủy',
                     'description' => 'Đại lý hủy đơn hàng',
                     'attributes' => [
-                        ['trait_type' => 'Người thực hiện', 'value' => $request->input('orderData.nguoi_thuc_hien')],
-                        ['trait_type' => 'Tổng tiền', 'value' => $request->input('v.tong_tien')],
+                        [
+                            'trait_type' => 'Tổng tiền',
+                            'value' => $request->input('v.tong_tien_can_thanh_toan')
+                        ],
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
@@ -262,13 +268,17 @@ class DonHangController extends Controller
 
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
                 $metadata = [
-                    'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
-                    'time' => $thoiGianCapNhat,
+                    'name' => 'Bằng chứng xác nhận đã nhận được hàng của chủ đơn hàng',
+                    'order_code' => $request->input('v.ma_don_hang'),
+                    'time_of_execution' => $thoiGianCapNhat,
+                    'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
                     'status' => 'Đã hoàn thành',
-                    'description' => 'Đại lý xác nhận hoàn thành đơn hàng',
+                    'description' => 'Đại lý xác nhận đã nhận được hàng',
                     'attributes' => [
-                        ['trait_type' => 'Người thực hiện', 'value' => $request->input('orderData.nguoi_thuc_hien')],
-                        ['trait_type' => 'Tổng tiền', 'value' => $request->input('v.tong_tien')],
+                        [
+                            'trait_type' => 'Tổng tiền',
+                            'value' => $request->input('v.tong_tien_can_thanh_toan')
+                        ],
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
@@ -348,6 +358,8 @@ class DonHangController extends Controller
                 $ten = DB::table('nhan_viens')->where('id', $info->id_nguoi_thuc_hien)->value('ho_ten');
             } elseif ($info->loai_tai_khoan === 'Nhà Sản Xuất') {
                 $ten = DB::table('nha_san_xuats')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
+            } elseif ($info->loai_tai_khoan === 'Đơn vị vận chuyển') {
+                $ten = DB::table('don_vi_van_chuyens')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
             } else {
                 $ten = 'Không xác định';
             }
@@ -372,19 +384,22 @@ class DonHangController extends Controller
             $user_id = $user->id;
             // Lấy toàn bộ bản ghi ứng với đơn hàng và đại lý
             $records = LichSuVanChuyen::
-                        join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
-                        ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
-                        ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
-                        ->orderBy('lich_su_van_chuyens.tuyen_so')
-                        ->orderBy('lich_su_van_chuyens.id')
-                        ->select(
-                            'lich_su_van_chuyens.transaction_hash',
-                            'lich_su_van_chuyens.metadata_uri',
-                            'lich_su_van_chuyens.token_id',
-                            'lich_su_van_chuyens.tuyen_so',
-                            'don_hangs.ma_don_hang'
-                        )
-                        ->get();
+                join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
+                ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
+                ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
+                ->whereNotNull('lich_su_van_chuyens.transaction_hash')
+                ->whereNotNull('lich_su_van_chuyens.metadata_uri')
+                ->whereNotNull('lich_su_van_chuyens.token_id')
+                ->orderBy('lich_su_van_chuyens.tuyen_so')
+                ->orderBy('lich_su_van_chuyens.id')
+                ->select(
+                    'lich_su_van_chuyens.transaction_hash',
+                    'lich_su_van_chuyens.metadata_uri',
+                    'lich_su_van_chuyens.token_id',
+                    'lich_su_van_chuyens.tuyen_so',
+                    'don_hangs.ma_don_hang'
+                )
+                ->get();
 
             // Group theo `tuyen_so` và lấy hàng đầu tiên mỗi nhóm
             $filtered = $records->groupBy('tuyen_so')->map(function ($group) {
@@ -415,8 +430,9 @@ class DonHangController extends Controller
             ], 401);
         } elseif($user && $user instanceof NhanVien) {
             $list_don_hang = DonHang::
-            join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
-            ->select('don_hangs.ngay_dat',
+                join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
+                ->select(
+                    'don_hangs.ngay_dat',
                     'don_hangs.user_id',
                     'don_hangs.ngay_giao',
                     'don_hangs.tong_tien',
@@ -425,10 +441,12 @@ class DonHangController extends Controller
                     'don_hangs.id',
                     'dai_lies.ten_cong_ty as ten_dai_ly',
                     'don_hangs.ma_don_hang'
-            )->get();
+                )
+                ->get();
+
             return response()->json([
-                'status'    =>      true,
-                'data'      =>      $list_don_hang,
+                'status'    => true,
+                'data'      => $list_don_hang,
             ]);
         }
     }
@@ -447,22 +465,37 @@ class DonHangController extends Controller
                     $tinh_trang_moi = 4;
                 }
                 DonHang::where('id', $request->input('v.id'))->update([
-                    'tinh_trang'    =>  $tinh_trang_moi
+                    'tinh_trang'    =>  $tinh_trang_moi,
+                    'huy_bo_boi'    => 'nhan_vien',
                 ]);
                 LichSuDonHang::where('id_don_hang', $request->input('v.id'))->update([
-                    'tinh_trang'    =>  $tinh_trang_moi
+                    'tinh_trang'    =>  $tinh_trang_moi,
+                    'huy_bo_boi'    => 'nhan_vien',
                 ]);
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
                 $metadata = [
-                    'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
-                    'time' => $thoiGianCapNhat,
+                    'name' => 'Bằng chứng nhân viên hủy đơn hàng',
+                    'order_code' => $request->input('v.ma_don_hang'),
+                    'time_of_execution' => $thoiGianCapNhat,
                     'status' => 'Đã hủy',
                     'description' => 'Nhân viên hủy đơn hàng',
                     'attributes' => [
-                        ['trait_type' => 'Người thực hiện', 'value' => $request->input('orderData.nguoi_thuc_hien')],
-                        ['trait_type' => 'Chức vụ', 'value' => $request->input('orderData.loai_tai_khoan')],
-                        ['trait_type' => 'Chủ đơn hàng', 'value' => $request->input('v.ten_dai_ly')],
-                        ['trait_type' => 'Tổng tiền', 'value' => $request->input('v.tong_tien')],
+                        [
+                            'trait_type' => 'Người thực hiện',
+                            'value' => $request->input('orderData.nguoi_thuc_hien')
+                        ],
+                        [
+                            'trait_type' => 'Chức vụ',
+                            'value' => $request->input('orderData.loai_tai_khoan')
+                        ],
+                        [
+                            'trait_type' => 'Chủ đơn hàng',
+                            'value' => $request->input('v.ten_dai_ly')
+                        ],
+                        [
+                            'trait_type' => 'Tổng tiền',
+                            'value' => $request->input('v.tong_tien')
+                        ],
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
@@ -560,15 +593,28 @@ class DonHangController extends Controller
                 ]);
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
                 $metadata = [
-                    'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
-                    'time' => $thoiGianCapNhat,
+                    'name' => 'Bằng chứng nhân viên xác nhận đơn hàng',
+                    'order_code' => $request->input('v.ma_don_hang'),
+                    'time_of_execution' => $thoiGianCapNhat,
                     'status' => 'Đã xác nhận',
                     'description' => 'Nhân viên xác nhận đơn hàng',
                     'attributes' => [
-                        ['trait_type' => 'Người thực hiện', 'value' => $request->input('orderData.nguoi_thuc_hien')],
-                        ['trait_type' => 'Chức vụ', 'value' => $request->input('orderData.loai_tai_khoan')],
-                        ['trait_type' => 'Chủ đơn hàng', 'value' => $request->input('v.ten_dai_ly')],
-                        ['trait_type' => 'Tổng tiền', 'value' => $request->input('v.tong_tien')],
+                        [
+                            'trait_type' => 'Người thực hiện',
+                            'value' => $request->input('orderData.nguoi_thuc_hien')
+                        ],
+                        [
+                            'trait_type' => 'Chức vụ',
+                            'value' => $request->input('orderData.loai_tai_khoan')
+                        ],
+                        [
+                            'trait_type' => 'Chủ đơn hàng',
+                            'value' => $request->input('v.ten_dai_ly')
+                        ],
+                        [
+                            'trait_type' => 'Tổng tiền',
+                            'value' => $request->input('v.tong_tien')
+                        ],
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
@@ -666,28 +712,34 @@ class DonHangController extends Controller
                 $user_id = $user->id;
 
                 $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
-                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
-                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-                    ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
-                    ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
-                    ->select(
-                        'lich_su_don_hangs.*',
-                        'san_phams.ten_san_pham',
-                        'san_phams.hinh_anh',
-                        'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                        'dai_lies.ten_cong_ty as ten_khach_hang',
-                        'don_hangs.ngay_dat',
-                        'dai_lies.id as user_id',
-                        'don_hangs.tinh_trang_thanh_toan',
-                        'don_hangs.tinh_trang as tinh_trang_don_hang',
-                        'lich_su_don_hangs.id as id_lich_su_don_hang',
-                        'lich_su_don_hangs.tinh_trang as tinh_trang_chi_tiet_don_hang',
-                        'don_hangs.ma_don_hang',
-                        'don_hangs.ngay_giao',
-                        'don_vi_van_chuyens.id as id_dvvc'
-                    )
-                    ->get();
+                ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
+                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+                ->join('don_hangs', function ($join) {
+                    $join->on('don_hangs.id', '=', 'lich_su_don_hangs.id_don_hang')
+                        ->where(function ($query) {
+                            $query->whereNull('don_hangs.huy_bo_boi')
+                                ->orWhereNotIn('don_hangs.huy_bo_boi', ['dai_ly', 'nhan_vien']);
+                        });
+                })
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                    'dai_lies.ten_cong_ty as ten_khach_hang',
+                    'don_hangs.ngay_dat',
+                    'dai_lies.id as user_id',
+                    'don_hangs.tinh_trang_thanh_toan',
+                    'don_hangs.tinh_trang as tinh_trang_don_hang',
+                    'lich_su_don_hangs.id as id_lich_su_don_hang',
+                    'lich_su_don_hangs.tinh_trang as tinh_trang_chi_tiet_don_hang',
+                    'don_hangs.ma_don_hang',
+                    'don_hangs.ngay_giao',
+                    'don_vi_van_chuyens.id as id_dvvc'
+                )
+                ->get();
 
                 // Gộp lại theo đơn hàng
                 $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
@@ -805,9 +857,9 @@ class DonHangController extends Controller
                 $nsx = NhaSanXuat::find($sanPham['id_nha_san_xuat']);
                 $sanPham['ten_san_pham']        = $sanPham['ten_san_pham'] ?? 'Không rõ';
                 $sanPham['ten_nha_san_xuat']    = $nsx ? $nsx->ten_cong_ty : 'Không rõ';
-                $sanPham['dia_chi_nsx']         = $nsx ? $nsx->dia_chi : 'Không rõ';
-                $sanPham['email_nsx']           = $nsx ? $nsx->email : 'Không rõ';
-                $sanPham['so_dien_thoai_nsx']   = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
+                $sanPham['dia_chi']             = $nsx ? $nsx->dia_chi : 'Không rõ';
+                $sanPham['email']               = $nsx ? $nsx->email : 'Không rõ';
+                $sanPham['so_dien_thoai']       = $nsx ? $nsx->so_dien_thoai : 'Không rõ';
 
                 unset(
                     $sanPham['id_lich_su_don_hang'],
@@ -818,12 +870,21 @@ class DonHangController extends Controller
                 );
             }
 
-            $donViVC = DonViVanChuyen::find($request->input('v.id_dvvc'));
+            $id_dvvc = $request->input('v.id_dvvc');
+            $dvvc = DonViVanChuyen::find($id_dvvc);
+            $thongTinDonViVanChuyen = [
+                'ten_cong_ty'    => $dvvc->ten_cong_ty ?? 'Không rõ',
+                'dia_chi'        => $dvvc->dia_chi ?? 'Không rõ',
+                'email'          => $dvvc->email ?? 'Không rõ',
+                'so_dien_thoai'  => $dvvc->so_dien_thoai ?? 'Không rõ',
+            ];
 
             $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
             $metadata = [
-                'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
+                'name' => 'Bằng chứng nhà sản xuất xác nhận đơn hàng',
+                'order_code' => $request->input('v.ma_don_hang'),
                 'time_of_execution' => $thoiGianCapNhat,
+                'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
                 'status' => 'Đã xác nhận',
                 'description' => 'Thông tin đơn hàng',
                 'attributes' => [
@@ -853,27 +914,16 @@ class DonHangController extends Controller
                     ],
                     [
                         'trait_type' => 'Trạng thái thanh toán',
-                        'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ? 'Đã thanh toán' : 'Chưa thanh toán',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Tên công ty',
-                        'value' => $donViVC->ten_cong_ty ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Email',
-                        'value' => $donViVC->email ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Số điện thoại',
-                        'value' => $donViVC->so_dien_thoai ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Địa chỉ',
-                        'value' => $donViVC->dia_chi ?? 'Không rõ',
+                        'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
+                        'Đã thanh toán' : 'Chưa thanh toán',
                     ],
                     [
                         'trait_type' => 'Sản phẩm',
                         'value' => $sanPhams,
+                    ],
+                    [
+                        'trait_type' => 'Đơn vị vận chuyển',
+                        'value' => $thongTinDonViVanChuyen,
                     ],
                 ]
             ];
@@ -956,6 +1006,8 @@ class DonHangController extends Controller
                 $ten = DB::table('nhan_viens')->where('id', $info->id_nguoi_thuc_hien)->value('ho_ten');
             } elseif ($info->loai_tai_khoan === 'Nhà Sản Xuất') {
                 $ten = DB::table('nha_san_xuats')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
+            } elseif ($info->loai_tai_khoan === 'Đơn vị vận chuyển') {
+                $ten = DB::table('don_vi_van_chuyens')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
             } else {
                 $ten = 'Không xác định';
             }
@@ -1062,6 +1114,7 @@ class DonHangController extends Controller
             if ($count_sp_huy === $count_sp_tong) {
                 DonHang::where('id', $idDonHang)->update([
                     'tinh_trang' => 4, // đơn hàng bị hủy hoàn toàn
+                    'huy_bo_boi' => 'nha_san_xuat',
                 ]);
             }
             // Nếu có sản phẩm được xác nhận, và không còn sản phẩm đang chuẩn bị
@@ -1089,12 +1142,21 @@ class DonHangController extends Controller
                 );
             }
 
-            $donViVC = DonViVanChuyen::find($request->input('v.id_dvvc'));
+            $id_dvvc = $request->input('v.id_dvvc');
+            $dvvc = DonViVanChuyen::find($id_dvvc);
+            $thongTinDonViVanChuyen = [
+                'ten_cong_ty'    => $dvvc->ten_cong_ty ?? 'Không rõ',
+                'dia_chi'        => $dvvc->dia_chi ?? 'Không rõ',
+                'email'          => $dvvc->email ?? 'Không rõ',
+                'so_dien_thoai'  => $dvvc->so_dien_thoai ?? 'Không rõ',
+            ];
 
             $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
             $metadata = [
-                'name' => 'Đơn hàng #' . $request->input('v.ma_don_hang'),
+                'name' => 'Bằng chứng nhà sản xuất hủy đơn hàng',
+                'order_code' => $request->input('v.ma_don_hang'),
                 'time_of_execution' => $thoiGianCapNhat,
+                'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
                 'status' => 'Đã hủy',
                 'description' => 'Thông tin đơn hàng',
                 'attributes' => [
@@ -1124,27 +1186,16 @@ class DonHangController extends Controller
                     ],
                     [
                         'trait_type' => 'Trạng thái thanh toán',
-                        'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ? 'Đã thanh toán' : 'Chưa thanh toán',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Tên công ty',
-                        'value' => $donViVC->ten_cong_ty ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Email',
-                        'value' => $donViVC->email ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Số điện thoại',
-                        'value' => $donViVC->so_dien_thoai ?? 'Không rõ',
-                    ],
-                    [
-                        'trait_type' => 'Đơn vị vận chuyển - Địa chỉ',
-                        'value' => $donViVC->dia_chi ?? 'Không rõ',
+                        'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
+                        'Đã thanh toán' : 'Chưa thanh toán',
                     ],
                     [
                         'trait_type' => 'Sản phẩm',
                         'value' => $sanPhams,
+                    ],
+                    [
+                        'trait_type' => 'Đơn vị vận chuyển',
+                        'value' => $thongTinDonViVanChuyen,
                     ],
                 ]
             ];
@@ -1442,7 +1493,7 @@ class DonHangController extends Controller
 
                 $chiTietChang = [];
                 foreach ($cacChang as $chang) {
-                    $diaChiKho = $dsKho[$chang->id_kho_hang] ?? 'Không rõ';
+                    $diaChiKho = $dsKho[$chang->id_kho_hang] ?? 'Không có địa chỉ kho';
 
                     $chiTietChang[] = [
                         'vi_tri_can_den' => $chang->mo_ta,
@@ -1482,7 +1533,8 @@ class DonHangController extends Controller
 
             // 🔐 Mint dữ liệu lên blockchain
             $metadata = [
-                'name' => 'Đơn hàng #' . $request->input('v.id_don_hang.ma_don_hang'),
+                'name' => 'Bằng chứng đơn vị vận chuyển xác nhận đơn hàng',
+                'order_code' => $request->input('v.id_don_hang.ma_don_hang'),
                 'time_of_execution' => $thoiGianCapNhat,
                 'user_execution' => $request->input('orderData.nguoi_thuc_hien'),
                 'status' => 'Đã xác nhận vận chuyển',
@@ -1497,16 +1549,16 @@ class DonHangController extends Controller
                         'value' => $request->input('v.id_don_hang.dia_chi_dai_ly')
                     ],
                     [
+                        'trait_type' => 'Số điện thoại',
+                        'value' => $request->input('v.id_don_hang.so_dien_thoai_dai_ly')
+                    ],
+                    [
                         'trait_type' => 'Ngày đặt',
                         'value' => $request->input('v.id_don_hang.ngay_dat')
                     ],
                     [
                         'trait_type' => 'Ngày giao (dự kiến)',
                         'value' => $request->input('v.id_don_hang.ngay_giao')
-                    ],
-                    [
-                        'trait_type' => 'Số điện thoại',
-                        'value' => $request->input('v.id_don_hang.so_dien_thoai_dai_ly')
                     ],
                     [
                         'trait_type' => 'Tổng tiền',
@@ -1987,5 +2039,51 @@ class DonHangController extends Controller
             'status' => true,
             'data'   => $grouped,
         ]);
+    }
+
+    public function getDataOrderOnBlockChainForDVVC(Request $request){
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            return response()->json([
+                'message' => 'Bạn cần đăng nhập!',
+                'status'  => false,
+            ], 401);
         }
+
+        $list_info = BlockChainForDonHang::
+            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+            ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
+            ->where('block_chain_for_don_hangs.action', '!=', 'Hủy đơn hàng')
+            ->select(
+                'block_chain_for_don_hangs.transaction_hash',
+                'block_chain_for_don_hangs.metadata_uri',
+                'block_chain_for_don_hangs.token_id',
+                'don_hangs.ma_don_hang',
+                'block_chain_for_don_hangs.action',
+                'block_chain_for_don_hangs.loai_tai_khoan',
+                'block_chain_for_don_hangs.id_user as id_nguoi_thuc_hien'
+            )
+            ->get();
+
+        // Gắn thêm tên người thực hiện
+        foreach ($list_info as $info) {
+            if ($info->loai_tai_khoan === 'Đại Lý') {
+                $ten = DB::table('dai_lies')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
+            } elseif ($info->loai_tai_khoan === 'Nhân Viên') {
+                $ten = DB::table('nhan_viens')->where('id', $info->id_nguoi_thuc_hien)->value('ho_ten');
+            } elseif ($info->loai_tai_khoan === 'Nhà Sản Xuất') {
+                $ten = DB::table('nha_san_xuats')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
+            } elseif ($info->loai_tai_khoan === 'Đơn vị vận chuyển') {
+                $ten = DB::table('don_vi_van_chuyens')->where('id', $info->id_nguoi_thuc_hien)->value('ten_cong_ty');
+            } else {
+                $ten = 'Không xác định';
+            }
+            $info->nguoi_thuc_hien = $ten;
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $list_info,
+        ]);
+    }
 }

@@ -119,13 +119,6 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::delete('/xoa-chi-tiet-san-pham/{id}', [ChiTietSanPhamController::class, 'deleteChiTietSP']);
         Route::post('/doi-tinh-trang-chi-tiet-san-pham', [ChiTietSanPhamController::class, 'doiTinhTrangChiTietSP']);
     });
-    Route::group(['prefix'  =>  '/gio-hang'], function () {
-        Route::post('/them-vao-gio-hang', [GioHangController::class, 'themVaoGioHang']);
-        Route::get('/lay-du-lieu', [GioHangController::class, 'getData']);
-        Route::post('/cap-nhat-so-luong', [GioHangController::class, 'capNhatSoLuong']);
-        Route::post('/xoa-san-pham', [GioHangController::class, 'xoaSanPham']);
-        Route::post('/dat-hang', [GioHangController::class, 'datHang']);
-    });
 
     Route::group(['prefix'  =>  '/don-hang'], function () {
         Route::get('/lay-du-lieu', [DonHangController::class, 'getDataForAdmin']);
@@ -192,6 +185,7 @@ Route::group(['prefix'  =>  '/user', 'middleware' => 'auth:sanctum'], function (
             Route::post('/xac-nhan-da-den', [DonHangController::class, 'xacNhanDen']);
             Route::post('/xac-nhan-da-di', [DonHangController::class, 'xacNhanDi']);
             Route::post('/dvvc-mint', [BlockChainController::class, 'mint']);
+            Route::post('/lay-thong-tin-don-hang-blockchain', [DonHangController::class, 'getDataOrderOnBlockChainForDVVC']);
         });
     });
     Route::group(['prefix'  =>  '/don-vi-van-chuyen'], function () {

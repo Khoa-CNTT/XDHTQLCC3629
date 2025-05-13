@@ -24,5 +24,6 @@ class LichSuVanChuyen extends Model
         "transaction_hash",
         "metadata_uri",
         "token_id",
+        "ma_van_don",
     ];
 }
