@@ -169,6 +169,17 @@ class DaiLySeeder extends Seeder
                 'kinh_do' => 106.6822,
                 'dia_chi_vi' => '',
             ],
+            [
+                'ten_cong_ty' => 'Công ty TNHHMTV Le Xuan',
+                'email' =>  'leanhxuan26022003@gmail.com',
+                'password' => bcrypt('123123'),
+                'dia_chi' => '134 Đường 3/2, Đà Nẵng',
+                'so_dien_thoai' => '0328045024',
+                'loai_tai_khoan' => 'Đại Lý',
+                'vi_do' => 20.8600,
+                'kinh_do' => 106.6822,
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd',
+            ],
         ]);
     }
 }

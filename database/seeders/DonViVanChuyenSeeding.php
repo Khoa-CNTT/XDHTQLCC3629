@@ -24,7 +24,7 @@ class DonViVanChuyenSeeding extends Seeder
                 'password' => bcrypt('123456'),
                 'so_dien_thoai' => '0912345678',
                 'dia_chi' => '567 Đường Hai Bà Trưng',
-                'cuoc_van_chuyen' => '40000',
+                'cuoc_van_chuyen' => '3000',
                 'loai_tai_khoan' => 'Đơn vị vận chuyển',
                 'dia_chi_vi' => 'TUtmUFRyUP93fJPR4QPQTo2VU2MfzRWF5f'
             ],
