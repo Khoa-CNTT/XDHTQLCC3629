@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendMail;
 use App\Models\BlockChainForDonHang;
 use App\Models\DaiLy;
 use App\Models\DonHang;
@@ -21,11 +22,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Services\PathFindingService;
 use App\Services\PinataService;
+use Illuminate\Support\Facades\Mail;
 
 class DonHangController extends Controller
 {
     //đại lý
-    public function getData(){
+    public function getData()
+    {
         $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
@@ -33,7 +36,7 @@ class DonHangController extends Controller
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DaiLy) {
+        } elseif ($user && $user instanceof DaiLy) {
             $user_id = $user->id;
 
             // Lấy danh sách đơn hàng của đại lý
@@ -96,31 +99,31 @@ class DonHangController extends Controller
         ]);
     }
 
-    public function getDataChiTiet(Request $request){
+    public function getDataChiTiet(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DaiLy) {
+        } elseif ($user && $user instanceof DaiLy) {
             $user_id = $user->id;
-            $list_chi_tiet_don_hang = LichSuDonHang::
-            where('lich_su_don_hangs.user_id', $user_id)
-            ->where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
-            ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
-            ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
-            ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
-            ->select(
-                'lich_su_don_hangs.*',
-                'san_phams.ten_san_pham',
-                'san_phams.hinh_anh',
-                'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
-                'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                'don_vi_van_chuyens.cuoc_van_chuyen',
-                'lich_su_don_hangs.tinh_trang',
-            )
-            ->get();
+            $list_chi_tiet_don_hang = LichSuDonHang::where('lich_su_don_hangs.user_id', $user_id)
+                ->where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
+                ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
+                ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
+                ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
+                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                    'don_vi_van_chuyens.cuoc_van_chuyen',
+                    'lich_su_don_hangs.tinh_trang',
+                )
+                ->get();
             return response()->json([
                 'status'    =>      true,
                 'data'      =>      $list_chi_tiet_don_hang,
@@ -128,26 +131,27 @@ class DonHangController extends Controller
         }
     }
 
-    public function huyDonHang(Request $request){
+    public function huyDonHang(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof DaiLy) {
+        } elseif ($user && $user instanceof DaiLy) {
             try {
                 $id_nguoi_thuc_hien = $user->id;
                 if ($request->input('v.tinh_trang') == 1 || $request->input('v.tinh_trang') == 0) {
                     $tinh_trang_moi = 4;
                 }
 
-                DonHang::where('id', $request->input('v.id') )->update([
+                DonHang::where('id', $request->input('v.id'))->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
                     'huy_bo_boi'    => 'dai_ly',
                 ]);
 
-                LichSuDonHang::where('id_don_hang', $request->input('v.id') )->update([
+                LichSuDonHang::where('id_don_hang', $request->input('v.id'))->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
                     'huy_bo_boi'    => 'dai_ly',
                 ]);
@@ -168,7 +172,7 @@ class DonHangController extends Controller
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                            'Đã thanh toán' : 'Chưa thanh toán',
+                                'Đã thanh toán' : 'Chưa thanh toán',
                         ],
                     ]
                 ];
@@ -211,7 +215,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function xacNhanDonHangDaiLy(Request $request) {
+    public function xacNhanDonHangDaiLy(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -255,9 +260,9 @@ class DonHangController extends Controller
 
                 // Cập nhật tình trạng chặng cuối của lịch sử vận chuyển
                 $changCuois = LichSuVanChuyen::where('id_don_hang', $request->input('v.id'))
-                            ->whereNull('id_kho_hang')
-                            ->whereNull('thoi_gian_di')
-                            ->get();
+                    ->whereNull('id_kho_hang')
+                    ->whereNull('thoi_gian_di')
+                    ->get();
 
                 foreach ($changCuois as $changCuoi) {
                     $changCuoi->update([
@@ -282,7 +287,7 @@ class DonHangController extends Controller
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                            'Đã thanh toán' : 'Chưa thanh toán',
+                                'Đã thanh toán' : 'Chưa thanh toán',
                         ],
                     ]
                 ];
@@ -315,7 +320,6 @@ class DonHangController extends Controller
                     'metadata_uri' => $metadataUri,
                     'token_id' => $txHash['tokenId']
                 ]);
-
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Lỗi xác nhận của đại lý: ' . $e->getMessage());
@@ -327,7 +331,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function getDataOrderOnBlockChain(Request $request){
+    public function getDataOrderOnBlockChain(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -336,8 +341,7 @@ class DonHangController extends Controller
             ], 401);
         }
 
-        $list_info = BlockChainForDonHang::
-            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+        $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
             ->select(
                 'block_chain_for_don_hangs.transaction_hash',
@@ -372,7 +376,8 @@ class DonHangController extends Controller
         ]);
     }
 
-    public function getDataHistoryTransport(Request $request){
+    public function getDataHistoryTransport(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
@@ -383,8 +388,7 @@ class DonHangController extends Controller
         } else {
             $user_id = $user->id;
             // Lấy toàn bộ bản ghi ứng với đơn hàng và đại lý
-            $records = LichSuVanChuyen::
-                join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
+            $records = LichSuVanChuyen::join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
                 ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
                 ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
                 ->whereNotNull('lich_su_van_chuyens.transaction_hash')
@@ -406,7 +410,7 @@ class DonHangController extends Controller
                 $first = $group->first();
                 return [
                     'tuyen_so'        => $first->tuyen_so,
-                    'transaction_hash'=> $first->transaction_hash,
+                    'transaction_hash' => $first->transaction_hash,
                     'metadata_uri'    => $first->metadata_uri,
                     'token_id'        => $first->token_id,
                     'ma_don_hang'     => $first->ma_don_hang
@@ -421,16 +425,16 @@ class DonHangController extends Controller
     }
 
     //admin get dữ liệu
-    public function getDataForAdmin(){
+    public function getDataForAdmin()
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhanVien) {
-            $list_don_hang = DonHang::
-                join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
+        } elseif ($user && $user instanceof NhanVien) {
+            $list_don_hang = DonHang::join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
                 ->select(
                     'don_hangs.ngay_dat',
                     'don_hangs.user_id',
@@ -451,14 +455,15 @@ class DonHangController extends Controller
         }
     }
 
-    public function huyDonHangAdmin(Request $request){
+    public function huyDonHangAdmin(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhanVien) {
+        } elseif ($user && $user instanceof NhanVien) {
             try {
                 $id_nguoi_thuc_hien = $user->id;
                 if ($request->input('v.tinh_trang') == 1 || $request->input('v.tinh_trang') == 0) {
@@ -499,7 +504,7 @@ class DonHangController extends Controller
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                            'Đã thanh toán' : 'Chưa thanh toán',
+                                'Đã thanh toán' : 'Chưa thanh toán',
                         ],
                     ]
                 ];
@@ -542,28 +547,28 @@ class DonHangController extends Controller
         }
     }
 
-    public function getDataChiTietAdmin(Request $request){
+    public function getDataChiTietAdmin(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhanVien) {
-            $list_chi_tiet_don_hang = LichSuDonHang::
-            where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
-            ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
-            ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
-            ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
-            ->select(
-                'lich_su_don_hangs.*',
-                'san_phams.ten_san_pham',
-                'san_phams.hinh_anh',
-                'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
-                'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                'don_vi_van_chuyens.cuoc_van_chuyen',
-            )
-            ->get();
+        } elseif ($user && $user instanceof NhanVien) {
+            $list_chi_tiet_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
+                ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
+                ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
+                ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
+                ->select(
+                    'lich_su_don_hangs.*',
+                    'san_phams.ten_san_pham',
+                    'san_phams.hinh_anh',
+                    'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
+                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                    'don_vi_van_chuyens.cuoc_van_chuyen',
+                )
+                ->get();
             return response()->json([
                 'status'    =>      true,
                 'data'      =>      $list_chi_tiet_don_hang,
@@ -571,14 +576,15 @@ class DonHangController extends Controller
         }
     }
 
-    public function xacNhanDonHangAdmin(Request $request){
+    public function xacNhanDonHangAdmin(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhanVien) {
+        } elseif ($user && $user instanceof NhanVien) {
             try {
                 $id_nguoi_duyet = $user->id;
                 if ($request->input('v.tinh_trang') == 0) {
@@ -592,6 +598,23 @@ class DonHangController extends Controller
                     'tinh_trang'        =>  $tinh_trang_moi,
                 ]);
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
+
+
+                //gửi mail
+                $idDonHang = $request->input('v.id');   // lấy id của đơn hàng đang chọn
+                $donHang = DonHang::find($idDonHang);  // tìm đúng đơn hàng đó
+                $daiLy = DaiLy::find($donHang->user_id);  // tìm qua bên đại lý
+
+
+                $dataMail['ten_cong_ty'] = $daiLy->ten_cong_ty;
+                $dataMail['id_don_hang'] = $donHang->id;
+                $dataMail['tong_tien'] = $donHang->tong_tien;
+                $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHang->tong_tien . "&addInfo=TTDP" . $donHang->ma_don_hang;
+                $dataMail['ma_qr_code']     =  $link_qr;
+
+                Mail::to($daiLy->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
+                //done gửi mail
+
                 $metadata = [
                     'name' => 'Bằng chứng nhân viên xác nhận đơn hàng',
                     'order_code' => $request->input('v.ma_don_hang'),
@@ -618,7 +641,7 @@ class DonHangController extends Controller
                         [
                             'trait_type' => 'Tình trạng thanh toán',
                             'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                            'Đã thanh toán' : 'Chưa thanh toán',
+                                'Đã thanh toán' : 'Chưa thanh toán',
                         ],
                     ]
                 ];
@@ -662,17 +685,17 @@ class DonHangController extends Controller
     }
 
     // nhà sản xuất
-    public function getDataChiTietForNSX(Request $request){
+    public function getDataChiTietForNSX(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif($user && $user instanceof NhaSanXuat) {
+        } elseif ($user && $user instanceof NhaSanXuat) {
             $user_id = $user->id;
-            $list_don_hang = LichSuDonHang::
-                where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
+            $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
                 ->where('lich_su_don_hangs.tinh_trang', '!=', 0)
                 ->where('lich_su_don_hangs.id_don_hang', '=', $request->id_don_hang)
                 ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
@@ -697,7 +720,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function getDataForNSX(){
+    public function getDataForNSX()
+    {
         $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
@@ -712,34 +736,34 @@ class DonHangController extends Controller
                 $user_id = $user->id;
 
                 $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
-                ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
-                ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-                ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-                ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
-                ->join('don_hangs', function ($join) {
-                    $join->on('don_hangs.id', '=', 'lich_su_don_hangs.id_don_hang')
-                        ->where(function ($query) {
-                            $query->whereNull('don_hangs.huy_bo_boi')
-                                ->orWhereNotIn('don_hangs.huy_bo_boi', ['dai_ly', 'nhan_vien']);
-                        });
-                })
-                ->select(
-                    'lich_su_don_hangs.*',
-                    'san_phams.ten_san_pham',
-                    'san_phams.hinh_anh',
-                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                    'dai_lies.ten_cong_ty as ten_khach_hang',
-                    'don_hangs.ngay_dat',
-                    'dai_lies.id as user_id',
-                    'don_hangs.tinh_trang_thanh_toan',
-                    'don_hangs.tinh_trang as tinh_trang_don_hang',
-                    'lich_su_don_hangs.id as id_lich_su_don_hang',
-                    'lich_su_don_hangs.tinh_trang as tinh_trang_chi_tiet_don_hang',
-                    'don_hangs.ma_don_hang',
-                    'don_hangs.ngay_giao',
-                    'don_vi_van_chuyens.id as id_dvvc'
-                )
-                ->get();
+                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
+                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+                    ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+                    ->join('don_hangs', function ($join) {
+                        $join->on('don_hangs.id', '=', 'lich_su_don_hangs.id_don_hang')
+                            ->where(function ($query) {
+                                $query->whereNull('don_hangs.huy_bo_boi')
+                                    ->orWhereNotIn('don_hangs.huy_bo_boi', ['dai_ly', 'nhan_vien']);
+                            });
+                    })
+                    ->select(
+                        'lich_su_don_hangs.*',
+                        'san_phams.ten_san_pham',
+                        'san_phams.hinh_anh',
+                        'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                        'dai_lies.ten_cong_ty as ten_khach_hang',
+                        'don_hangs.ngay_dat',
+                        'dai_lies.id as user_id',
+                        'don_hangs.tinh_trang_thanh_toan',
+                        'don_hangs.tinh_trang as tinh_trang_don_hang',
+                        'lich_su_don_hangs.id as id_lich_su_don_hang',
+                        'lich_su_don_hangs.tinh_trang as tinh_trang_chi_tiet_don_hang',
+                        'don_hangs.ma_don_hang',
+                        'don_hangs.ngay_giao',
+                        'don_vi_van_chuyens.id as id_dvvc'
+                    )
+                    ->get();
 
                 // Gộp lại theo đơn hàng
                 $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
@@ -802,7 +826,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function xacNhanDonHangNSX(Request $request){
+    public function xacNhanDonHangNSX(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user || !($user instanceof NhaSanXuat)) {
             return response()->json([
@@ -915,7 +940,7 @@ class DonHangController extends Controller
                     [
                         'trait_type' => 'Trạng thái thanh toán',
                         'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                        'Đã thanh toán' : 'Chưa thanh toán',
+                            'Đã thanh toán' : 'Chưa thanh toán',
                     ],
                     [
                         'trait_type' => 'Sản phẩm',
@@ -965,7 +990,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function getDataOrderOnBlockChainForNSX(Request $request){
+    public function getDataOrderOnBlockChainForNSX(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -974,17 +1000,16 @@ class DonHangController extends Controller
             ], 401);
         }
 
-        $list_info = BlockChainForDonHang::
-            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+        $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
             ->where(function ($query) use ($request) {
                 $query->where(function ($q) {
                     // Các bản ghi KHÔNG PHẢI nhà sản xuất => cho xem
                     $q->where('block_chain_for_don_hangs.loai_tai_khoan', '!=', 'Nhà Sản Xuất');
-                })->orWhere(function ($q) use ($request){
+                })->orWhere(function ($q) use ($request) {
                     // Các bản ghi là NSX và chính người dùng đăng nhập tạo ra => cho xem
                     $q->where('block_chain_for_don_hangs.loai_tai_khoan', $request->loai_tai_khoan)
-                    ->where('block_chain_for_don_hangs.id_user', $request->id_nsx);
+                        ->where('block_chain_for_don_hangs.id_user', $request->id_nsx);
                 });
             })
             ->select(
@@ -1020,7 +1045,8 @@ class DonHangController extends Controller
         ]);
     }
 
-    public function getDataHistoryTransportForNSX(Request $request){
+    public function getDataHistoryTransportForNSX(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
@@ -1031,27 +1057,26 @@ class DonHangController extends Controller
         } else {
             $user_id = $user->id;
             // Lấy toàn bộ bản ghi ứng với đơn hàng và đại lý
-            $records = LichSuVanChuyen::
-                        join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
-                        ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
-                        ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
-                        ->orderBy('lich_su_van_chuyens.tuyen_so')
-                        ->orderBy('lich_su_van_chuyens.id')
-                        ->select(
-                            'lich_su_van_chuyens.transaction_hash',
-                            'lich_su_van_chuyens.metadata_uri',
-                            'lich_su_van_chuyens.token_id',
-                            'lich_su_van_chuyens.tuyen_so',
-                            'don_hangs.ma_don_hang'
-                        )
-                        ->get();
+            $records = LichSuVanChuyen::join('don_hangs', 'lich_su_van_chuyens.id_don_hang', '=', 'don_hangs.id')
+                ->where('lich_su_van_chuyens.id_dai_ly', $user_id)
+                ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
+                ->orderBy('lich_su_van_chuyens.tuyen_so')
+                ->orderBy('lich_su_van_chuyens.id')
+                ->select(
+                    'lich_su_van_chuyens.transaction_hash',
+                    'lich_su_van_chuyens.metadata_uri',
+                    'lich_su_van_chuyens.token_id',
+                    'lich_su_van_chuyens.tuyen_so',
+                    'don_hangs.ma_don_hang'
+                )
+                ->get();
 
             // Group theo `tuyen_so` và lấy hàng đầu tiên mỗi nhóm
             $filtered = $records->groupBy('tuyen_so')->map(function ($group) {
                 $first = $group->first();
                 return [
                     'tuyen_so'        => $first->tuyen_so,
-                    'transaction_hash'=> $first->transaction_hash,
+                    'transaction_hash' => $first->transaction_hash,
                     'metadata_uri'    => $first->metadata_uri,
                     'token_id'        => $first->token_id,
                     'ma_don_hang'     => $first->ma_don_hang
@@ -1065,7 +1090,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function huyDonHangNSX(Request $request){
+    public function huyDonHangNSX(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user || !($user instanceof NhaSanXuat)) {
             return response()->json([
@@ -1187,7 +1213,7 @@ class DonHangController extends Controller
                     [
                         'trait_type' => 'Trạng thái thanh toán',
                         'value' => $request->input('v.tinh_trang_thanh_toan') == 1 ?
-                        'Đã thanh toán' : 'Chưa thanh toán',
+                            'Đã thanh toán' : 'Chưa thanh toán',
                     ],
                     [
                         'trait_type' => 'Sản phẩm',
@@ -1238,7 +1264,8 @@ class DonHangController extends Controller
     }
 
     //đơn vị vận chuyển
-    public function getDataForDVVC() {
+    public function getDataForDVVC()
+    {
         $user = Auth::guard('sanctum')->user();
 
         if (!$user) {
@@ -1438,7 +1465,7 @@ class DonHangController extends Controller
                         $idKho = (int) Str::after($diem, 'kho_');
                         $moTa = $tuyen[0]['path_names'][$index] ?? 'Kho trung chuyển';
 
-                         $lichSuTaoMoi[] = LichSuVanChuyen::create([
+                        $lichSuTaoMoi[] = LichSuVanChuyen::create([
                             'id_don_hang'          => $donHang->id,
                             'id_kho_hang'          => $idKho,
                             'id_don_vi_van_chuyen' => $user->id,
@@ -1455,7 +1482,7 @@ class DonHangController extends Controller
                 }
 
                 // 3. Điểm cuối: Đại lý
-                 $lichSuTaoMoi[] = LichSuVanChuyen::create([
+                $lichSuTaoMoi[] = LichSuVanChuyen::create([
                     'id_don_hang'          => $donHang->id,
                     'id_kho_hang'          => null,
                     'id_don_vi_van_chuyen' => $user->id,
@@ -1474,13 +1501,13 @@ class DonHangController extends Controller
             DB::commit();
 
             $dsNSX = NhaSanXuat::whereIn('id', collect($lichSuTaoMoi)
-                                ->pluck('id_nha_san_xuat'))
-                                ->select('id', 'ten_cong_ty', 'dia_chi', 'email')
-                                ->get()
-                                ->keyBy('id');
+                ->pluck('id_nha_san_xuat'))
+                ->select('id', 'ten_cong_ty', 'dia_chi', 'email')
+                ->get()
+                ->keyBy('id');
             $dsKho = KhoTrungChuyen::whereIn('id', collect($lichSuTaoMoi)
-                                ->pluck('id_kho_hang'))
-                                ->pluck('dia_chi', 'id');
+                ->pluck('id_kho_hang'))
+                ->pluck('dia_chi', 'id');
 
             // Nhóm các chặng theo tuyến
             $nhomTuyen = collect($lichSuTaoMoi)->groupBy('tuyen_so');
@@ -1605,7 +1632,6 @@ class DonHangController extends Controller
                 'metadata_uri' => $metadataUri,
                 'token_id' => $txHash['tokenId']
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Lỗi xác nhận đơn vị vận chuyển: ' . $e->getMessage());
@@ -1617,7 +1643,8 @@ class DonHangController extends Controller
         }
     }
 
-    public function getDataChiTietForDVVC(Request $request){
+    public function getDataChiTietForDVVC(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -1628,34 +1655,33 @@ class DonHangController extends Controller
         if ($user instanceof DonViVanChuyen) {
             $user_id = $user->id;
             $tinh_trang_huy = 4;
-            try{
-                $list_chi_tiet_don_hang = LichSuDonHang::
-                where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
-                ->where('lich_su_don_hangs.tinh_trang', '!=', $tinh_trang_huy)
-                ->where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
-                ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
-                ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
-                ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
-                // ->join('don_hangs', 'don_hangs.id', '=', 'lich_su_don_hangs.id_don_hang')
-                // ->join('dai_lies', 'dai_lies.id', '=', 'lich_su_don_hangs.user_id')
-                ->select(
-                    'lich_su_don_hangs.*',
-                    'san_phams.ten_san_pham',
-                    'san_phams.hinh_anh',
-                    'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
-                    'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                    'don_vi_van_chuyens.cuoc_van_chuyen',
-                    'lich_su_don_hangs.tinh_trang',
-                    'nha_san_xuats.dia_chi as dia_chi_nsx',
-                    'nha_san_xuats.id as id_nsx',
-                    // 'lich_su_don_hangs.user_id as id_dai_ly',
-                    // 'dai_lies.dia_chi as dia_chi_dai_ly',
-                    // 'don_hangs.ma_don_hang',
-                    // 'don_hangs.id as id_don_hang',
-                    // 'don_hangs.ngay_giao',
-                    // 'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly'
-                )
-                ->get();
+            try {
+                $list_chi_tiet_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
+                    ->where('lich_su_don_hangs.tinh_trang', '!=', $tinh_trang_huy)
+                    ->where('lich_su_don_hangs.id_don_hang', $request->id_don_hang)
+                    ->join('san_phams', 'lich_su_don_hangs.id_san_pham', '=', 'san_phams.id')
+                    ->join('nha_san_xuats', 'lich_su_don_hangs.id_nha_san_xuat', '=', 'nha_san_xuats.id')
+                    ->join('don_vi_van_chuyens', 'lich_su_don_hangs.id_don_vi_van_chuyen', '=', 'don_vi_van_chuyens.id')
+                    // ->join('don_hangs', 'don_hangs.id', '=', 'lich_su_don_hangs.id_don_hang')
+                    // ->join('dai_lies', 'dai_lies.id', '=', 'lich_su_don_hangs.user_id')
+                    ->select(
+                        'lich_su_don_hangs.*',
+                        'san_phams.ten_san_pham',
+                        'san_phams.hinh_anh',
+                        'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
+                        'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                        'don_vi_van_chuyens.cuoc_van_chuyen',
+                        'lich_su_don_hangs.tinh_trang',
+                        'nha_san_xuats.dia_chi as dia_chi_nsx',
+                        'nha_san_xuats.id as id_nsx',
+                        // 'lich_su_don_hangs.user_id as id_dai_ly',
+                        // 'dai_lies.dia_chi as dia_chi_dai_ly',
+                        // 'don_hangs.ma_don_hang',
+                        // 'don_hangs.id as id_don_hang',
+                        // 'don_hangs.ngay_giao',
+                        // 'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly'
+                    )
+                    ->get();
                 return response()->json([
                     'status'    =>      true,
                     'data'      =>      $list_chi_tiet_don_hang,
@@ -1689,8 +1715,8 @@ class DonHangController extends Controller
         $nhaSanXuatIds = $request->danh_sach_nha_san_xuat;
         $daiLyId = $request->id_dai_ly;
         $nhaSanXuatNames = \App\Models\NhaSanXuat::whereIn('id', $nhaSanXuatIds)
-                                                ->pluck('ten_cong_ty', 'id')
-                                                ->toArray();
+            ->pluck('ten_cong_ty', 'id')
+            ->toArray();
         $results = $this->pathFindingService->findShortestPathMultipleNSX($nhaSanXuatIds, $daiLyId);
         if (empty($results)) {
             return response()->json([
@@ -1715,23 +1741,26 @@ class DonHangController extends Controller
         $key = "%" . $request->abc . "%";
 
         $data = DonHang::join('dai_lies', 'dai_lies.id', 'don_hangs.user_id')
-                        ->where('ten_cong_ty', 'like', $key)
-                        ->select('don_hangs.ngay_dat',
-                                'don_hangs.user_id',
-                                'don_hangs.ngay_giao',
-                                'don_hangs.tong_tien',
-                                'don_hangs.tinh_trang',
-                                'don_hangs.tinh_trang_thanh_toan',
-                                'don_hangs.id',
-                                'dai_lies.ten_cong_ty as ten_dai_ly')
-                        ->get();
+            ->where('ten_cong_ty', 'like', $key)
+            ->select(
+                'don_hangs.ngay_dat',
+                'don_hangs.user_id',
+                'don_hangs.ngay_giao',
+                'don_hangs.tong_tien',
+                'don_hangs.tinh_trang',
+                'don_hangs.tinh_trang_thanh_toan',
+                'don_hangs.id',
+                'dai_lies.ten_cong_ty as ten_dai_ly'
+            )
+            ->get();
         return response()->json([
             'status'    =>      true,
             'data'      =>      $data,
         ]);
     }
 
-    public function getLichTrinh(Request $request){
+    public function getLichTrinh(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -1741,24 +1770,23 @@ class DonHangController extends Controller
         }
         if ($user instanceof DonViVanChuyen) {
             $user_id = $user->id;
-            try{
-                $list_lich_trinh = LichSuVanChuyen::
-                where('lich_su_van_chuyens.id_don_vi_van_chuyen', $user_id)
-                ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
-                ->leftJoin('kho_trung_chuyens', 'lich_su_van_chuyens.id_kho_hang', '=', 'kho_trung_chuyens.id')
-                ->leftJoin('dai_lies', 'lich_su_van_chuyens.id_dai_ly', '=', 'dai_lies.id')
-                ->leftJoin('nha_san_xuats', 'lich_su_van_chuyens.id_nha_san_xuat', '=', 'nha_san_xuats.id')
-                ->select(
-                    'lich_su_van_chuyens.*',
-                    'kho_trung_chuyens.ten_kho',
-                    'kho_trung_chuyens.dia_chi as dia_chi_kho',
-                    'nha_san_xuats.dia_chi as dia_chi_nsx',
-                    'dai_lies.dia_chi as dia_chi_dai_ly',
-                    'lich_su_van_chuyens.transaction_hash',
-                    'lich_su_van_chuyens.metadata_uri',
-                    'lich_su_van_chuyens.token_id',
-                )
-                ->get();
+            try {
+                $list_lich_trinh = LichSuVanChuyen::where('lich_su_van_chuyens.id_don_vi_van_chuyen', $user_id)
+                    ->where('lich_su_van_chuyens.id_don_hang', $request->id_don_hang)
+                    ->leftJoin('kho_trung_chuyens', 'lich_su_van_chuyens.id_kho_hang', '=', 'kho_trung_chuyens.id')
+                    ->leftJoin('dai_lies', 'lich_su_van_chuyens.id_dai_ly', '=', 'dai_lies.id')
+                    ->leftJoin('nha_san_xuats', 'lich_su_van_chuyens.id_nha_san_xuat', '=', 'nha_san_xuats.id')
+                    ->select(
+                        'lich_su_van_chuyens.*',
+                        'kho_trung_chuyens.ten_kho',
+                        'kho_trung_chuyens.dia_chi as dia_chi_kho',
+                        'nha_san_xuats.dia_chi as dia_chi_nsx',
+                        'dai_lies.dia_chi as dia_chi_dai_ly',
+                        'lich_su_van_chuyens.transaction_hash',
+                        'lich_su_van_chuyens.metadata_uri',
+                        'lich_su_van_chuyens.token_id',
+                    )
+                    ->get();
                 return response()->json([
                     'status'    =>      true,
                     'data'      =>      $list_lich_trinh,
@@ -1892,26 +1920,26 @@ class DonHangController extends Controller
         $key = "%" . $request->abc . "%";
 
         $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_nha_san_xuat', $user_id)
-        ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
-        ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-        ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-        ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
-        ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
-        ->where('dai_lies.ten_cong_ty', 'like', $key)
-        ->select(
-            'lich_su_don_hangs.*',
-            'san_phams.ten_san_pham',
-            'san_phams.hinh_anh',
-            'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-            'dai_lies.ten_cong_ty as ten_khach_hang',
-            'don_hangs.ngay_dat',
-            'dai_lies.id as user_id',
-            'don_hangs.tinh_trang_thanh_toan',
-            'don_hangs.tinh_trang as tinh_trang_don_hang',
-            'lich_su_don_hangs.id as id_lich_su_don_hang'
-        )
-        ->get();
-                // Gộp lại theo đơn hàng
+            ->whereNotIn('lich_su_don_hangs.tinh_trang', [0])
+            ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+            ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+            ->join('don_vi_van_chuyens', 'don_vi_van_chuyens.id', 'lich_su_don_hangs.id_don_vi_van_chuyen')
+            ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+            ->where('dai_lies.ten_cong_ty', 'like', $key)
+            ->select(
+                'lich_su_don_hangs.*',
+                'san_phams.ten_san_pham',
+                'san_phams.hinh_anh',
+                'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
+                'dai_lies.ten_cong_ty as ten_khach_hang',
+                'don_hangs.ngay_dat',
+                'dai_lies.id as user_id',
+                'don_hangs.tinh_trang_thanh_toan',
+                'don_hangs.tinh_trang as tinh_trang_don_hang',
+                'lich_su_don_hangs.id as id_lich_su_don_hang'
+            )
+            ->get();
+        // Gộp lại theo đơn hàng
         $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
             $first = $items->first();
 
@@ -1966,33 +1994,33 @@ class DonHangController extends Controller
         $key = "%" . $request->abc . "%";
 
         $list_don_hang = LichSuDonHang::where('lich_su_don_hangs.id_don_vi_van_chuyen', $user_id)
-                    ->whereNotIn('lich_su_don_hangs.tinh_trang', [0, 1])
-                    ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
-                    ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
-                    ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
-                    ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
-                    ->where('dai_lies.ten_cong_ty', 'like', $key)
-                    ->select(
-                        'lich_su_don_hangs.*',
-                        'san_phams.ten_san_pham',
-                        'san_phams.hinh_anh',
-                        'nha_san_xuats.ten_cong_ty as ten_nsx',
-                        'dai_lies.ten_cong_ty as ten_khach_hang',
-                        'don_hangs.ngay_dat',
-                        'dai_lies.id as user_id',
-                        'don_hangs.tinh_trang_thanh_toan',
-                        'don_hangs.tinh_trang as tinh_trang_don_hang',
-                        'lich_su_don_hangs.id as id_lich_su_don_hang',
-                        'don_hangs.ma_don_hang',
-                        'don_hangs.id as id_don_hang',
-                        'don_hangs.ngay_giao',
-                        'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly'
-                    )
-                    ->get();
+            ->whereNotIn('lich_su_don_hangs.tinh_trang', [0, 1])
+            ->join('san_phams', 'san_phams.id', 'lich_su_don_hangs.id_san_pham')
+            ->join('dai_lies', 'dai_lies.id', 'lich_su_don_hangs.user_id')
+            ->join('nha_san_xuats', 'nha_san_xuats.id', 'lich_su_don_hangs.id_nha_san_xuat')
+            ->join('don_hangs', 'don_hangs.id', 'lich_su_don_hangs.id_don_hang')
+            ->where('dai_lies.ten_cong_ty', 'like', $key)
+            ->select(
+                'lich_su_don_hangs.*',
+                'san_phams.ten_san_pham',
+                'san_phams.hinh_anh',
+                'nha_san_xuats.ten_cong_ty as ten_nsx',
+                'dai_lies.ten_cong_ty as ten_khach_hang',
+                'don_hangs.ngay_dat',
+                'dai_lies.id as user_id',
+                'don_hangs.tinh_trang_thanh_toan',
+                'don_hangs.tinh_trang as tinh_trang_don_hang',
+                'lich_su_don_hangs.id as id_lich_su_don_hang',
+                'don_hangs.ma_don_hang',
+                'don_hangs.id as id_don_hang',
+                'don_hangs.ngay_giao',
+                'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly'
+            )
+            ->get();
 
-            // Gộp lại theo đơn hàng
-            $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
-                $first = $items->first();
+        // Gộp lại theo đơn hàng
+        $grouped = $list_don_hang->groupBy('id_don_hang')->map(function ($items, $id) {
+            $first = $items->first();
 
             // Tổng tiền sản phẩm = ∑ (giá × số lượng)
             $tong_tien_san_pham = $items->sum(function ($item) {
@@ -2041,7 +2069,8 @@ class DonHangController extends Controller
         ]);
     }
 
-    public function getDataOrderOnBlockChainForDVVC(Request $request){
+    public function getDataOrderOnBlockChainForDVVC(Request $request)
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -2050,8 +2079,7 @@ class DonHangController extends Controller
             ], 401);
         }
 
-        $list_info = BlockChainForDonHang::
-            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+        $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
             ->where('block_chain_for_don_hangs.action', '!=', 'Hủy đơn hàng')
             ->select(

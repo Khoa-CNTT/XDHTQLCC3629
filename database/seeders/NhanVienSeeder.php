@@ -32,7 +32,7 @@ class NhanVienSeeder extends Seeder
                 'password' => bcrypt('123456'),
                 'id_chuc_vu' => '1',
                 'loai_tai_khoan' => 'Nhân Viên',
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ho_ten' => 'Văn Quý Hưng',
@@ -40,7 +40,7 @@ class NhanVienSeeder extends Seeder
                 'password' => bcrypt('123456'),
                 'id_chuc_vu' => '1',
                 'loai_tai_khoan' => 'Nhân Viên',
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TKJ1sdrvJA4bWmpj8xrr1a4G6RmB6xTyqC'
             ],
             [
                 'ho_ten' => 'Nguyễn Hữu Thiên',
@@ -48,7 +48,7 @@ class NhanVienSeeder extends Seeder
                 'password' => bcrypt('123456'),
                 'id_chuc_vu' => '1',
                 'loai_tai_khoan' => 'Nhân Viên',
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TDhhmqVkYGBWp8ihRdf2ddMWc5woggZXne'
             ],
         ]);
     }
