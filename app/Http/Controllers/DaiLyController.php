@@ -48,7 +48,8 @@ class DaiLyController extends Controller
             'password'      =>  bcrypt($request->password),
             'dia_chi'       =>  $request->dia_chi,
             'so_dien_thoai' =>  $request->so_dien_thoai,
-            'tinh_trang'    =>  $request->tinh_trang
+            'tinh_trang'    =>  $request->tinh_trang,
+            'dia_chi_vi'    =>  "TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd"
         ]);
         return response()->json([
             'status'    =>  true,
