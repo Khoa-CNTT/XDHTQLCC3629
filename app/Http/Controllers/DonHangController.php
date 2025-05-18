@@ -1304,7 +1304,8 @@ class DonHangController extends Controller
                         'don_hangs.ma_don_hang',
                         'don_hangs.id as id_don_hang',
                         'don_hangs.ngay_giao',
-                        'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly'
+                        'dai_lies.so_dien_thoai as so_dien_thoai_dai_ly',
+                        'lich_su_don_hangs.tinh_trang as tinh_trang_lich_su_don_hang'
                     )
                     ->get();
 
@@ -1342,6 +1343,7 @@ class DonHangController extends Controller
                         'id_don_hang'            => $first->id_don_hang,
                         'ngay_giao'              => $first->ngay_giao,
                         'so_dien_thoai_dai_ly'   => $first->so_dien_thoai_dai_ly,
+                        'tinh_trang_lich_su_don_hang' => $first->tinh_trang_lich_su_don_hang,
                         'san_phams'              => $items->map(function ($item) {
                             return [
                                 'id_san_pham'       => $item->id_san_pham,
@@ -1403,7 +1405,9 @@ class DonHangController extends Controller
 
             // Kiểm tra còn sản phẩm nào chưa được NSX chuẩn bị xong hay không
             $sanPhamsChuaXong = LichSuDonHang::where('id_don_hang', $data_res["id_don_hang"])
-                ->whereIn('tinh_trang', [0, 1])
+                ->where('id_don_vi_van_chuyen', $data_res["id_dvvc"]) // chỉ sản phẩm của đơn vị vận chuyển hiện tại
+                ->whereIn('id_nha_san_xuat', $data_res["id_cac_nsx"]) // chỉ các NSX mà ĐVVC phụ trách
+                ->whereIn('tinh_trang', [0, 1]) // chưa xác nhận hoặc đang chuẩn bị
                 ->count();
 
             if ($sanPhamsChuaXong > 0) {
@@ -1415,16 +1419,27 @@ class DonHangController extends Controller
 
             // Cập nhật trạng thái đơn hàng và sản phẩm
             $tinhTrangMoi = 5;
-            $donHang->update(['tinh_trang' => $tinhTrangMoi]);
+            $idDonHang = $request->input('v.id_don_hang.id_don_hang');
+            $idDvvc = $request->input('v.id_don_hang.id_dvvc');
 
-            foreach ($data_res['san_phams'] as $sp) {
-                if (isset($sp['id_lich_su_don_hang'])) {
-                    LichSuDonHang::where('id', $sp['id_lich_su_don_hang'])->update([
-                        'tinh_trang' => $tinhTrangMoi,
-                    ]);
-                }
+            // Bước 1: Cập nhật trạng thái sản phẩm do đơn vị vận chuyển này phụ trách
+            LichSuDonHang::where('id_don_hang', $idDonHang)
+                ->where('id_don_vi_van_chuyen', $idDvvc)
+                ->update([
+                    'tinh_trang' => $tinhTrangMoi,
+                ]);
+
+            // Bước 2: Kiểm tra còn sản phẩm nào của đơn hàng chưa được xác nhận (khác trạng thái 5)
+            $con_sp_chua_duoc_dvvc_khac_xac_nhan = LichSuDonHang::where('id_don_hang', $idDonHang)
+                ->where('tinh_trang', '!=', $tinhTrangMoi)
+                ->exists();
+
+            // Bước 3: Nếu không còn sản phẩm nào chưa được xác nhận → cập nhật đơn hàng
+            if (!$con_sp_chua_duoc_dvvc_khac_xac_nhan) {
+                DonHang::where('id', $idDonHang)->update([
+                    'tinh_trang' => $tinhTrangMoi,
+                ]);
             }
-
             // Lấy danh sách NSX và đại lý
             $danhSachNhaSanXuat = $data_res['id_cac_nsx'];
             $idDaiLy = $request->input('v.id_dai_ly');
