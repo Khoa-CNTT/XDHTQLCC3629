@@ -11,9 +11,14 @@ use Illuminate\Support\Facades\Log;
 
 class NguyenLieuController extends Controller
 {
-    public function getData()
+    public function getDataforAdmin()
     {
-        $data = NguyenLieu::get();
+        $data = NguyenLieu::join('nha_san_xuats', 'nha_san_xuats.id', '=', 'nguyen_lieus.id_nha_san_xuat')
+        ->select(
+                'nguyen_lieus.*',
+                'nha_san_xuats.ten_cong_ty',
+            )
+            ->get();
 
         return response()->json([
             'status'    =>  true,
@@ -23,23 +28,30 @@ class NguyenLieuController extends Controller
     public function changeTrangthai(Request $request)
     {
         try {
-            if ($request->tinh_trang == 1) {
-                $tinh_trang_moi = 0;
+            if ($request->tinh_trang == 1 || $request->tinh_trang == 0) {
+                if ($request->tinh_trang == 1) {
+                    $tinh_trang_moi = 0;
+                } else {
+                    $tinh_trang_moi = 1;
+                }
+                NguyenLieu::where('id', $request->id)->update([
+                    'tinh_trang' => $tinh_trang_moi
+                ]);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Đã đổi trạng thái thành công',
+                ]);
             } else {
-                $tinh_trang_moi = 1;
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Sản phẩm đang chờ được duyệt từ admin',
+                ]);
             }
-            NguyenLieu::where('id', $request->id)->update([
-                'tinh_trang'    =>  $tinh_trang_moi
-            ]);
-            return response()->json([
-                'status'            =>   true,
-                'message'           =>   'Đã đổi trạng thái thành công',
-            ]);
         } catch (Exception $e) {
-            Log::info("Lỗi", $e);
+            Log::error("Lỗi đổi trạng thái sản phẩm", ['error' => $e]);
             return response()->json([
-                'status'            =>   false,
-                'message'           =>   'Có lỗi khi đổi trạng thái',
+                'status' => false,
+                'message' => 'Có lỗi khi đổi trạng thái',
             ]);
         }
     }
@@ -57,7 +69,7 @@ class NguyenLieuController extends Controller
             'don_vi_tinh'           =>  $request->don_vi_tinh,
             'ngay_san_xuat'         =>  $request->ngay_san_xuat,
             'han_su_dung'           =>  $request->han_su_dung,
-            'tinh_trang'            =>  $request->tinh_trang
+            'tinh_trang'            =>  2,
         ]);
         return response()->json([
             'status'    =>  true,
@@ -162,5 +174,52 @@ class NguyenLieuController extends Controller
             ]);
         }
         return response()->json([], 401);
+    }
+
+    public function changeTrangthaiAdmin(Request $request) {
+        try {
+            if ($request->tinh_trang == 1 || $request->tinh_trang == 2) {
+                if ($request->tinh_trang == 1) {
+                    $tinh_trang_moi = 2;
+                }
+                else {
+                    $tinh_trang_moi = 1;
+                }
+                NguyenLieu::where('id', $request->id)->update([
+                    'tinh_trang'    =>  $tinh_trang_moi
+                ]);
+                return response()->json([
+                    'status'            =>   true,
+                    'message'           =>   'Đã đổi trạng thái duyệt thành công',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không thể thay đổi nguyên liệu đã dừng hoạt động',
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::info("Lỗi", $e);
+            return response()->json([
+                'status'            =>   false,
+                'message'           =>   'Có lỗi khi đổi trạng thái',
+            ]);
+        }
+    }
+    public function searchNguyenLieuAdmin(Request $request)
+    {
+        $key = "%" . $request->abc . "%";
+
+        $data = NguyenLieu::join('nha_san_xuats', 'nha_san_xuats.id', '=', 'nguyen_lieus.id_nha_san_xuat')
+            ->where('ten_nguyen_lieu', 'like', $key)
+            ->select(
+                'nguyen_lieus.*',
+                'nha_san_xuats.ten_cong_ty',
+            )
+            ->get();
+        return response()->json([
+            'status'    =>  true,
+            'nguyen_lieu'  =>  $data,
+        ]);
     }
 }
