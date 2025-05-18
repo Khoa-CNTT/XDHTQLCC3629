@@ -148,6 +148,7 @@ class DonHangController extends Controller
 
                 DonHang::where('id', $request->input('v.id'))->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
+                    'tinh_trang_thanh_toan'    =>  3,
                     'huy_bo_boi'    => 'dai_ly',
                 ]);
 
@@ -471,6 +472,7 @@ class DonHangController extends Controller
                 }
                 DonHang::where('id', $request->input('v.id'))->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
+                    'tinh_trang_thanh_toan'    =>  3,
                     'huy_bo_boi'    => 'nhan_vien',
                 ]);
                 LichSuDonHang::where('id_don_hang', $request->input('v.id'))->update([
@@ -1750,6 +1752,7 @@ class DonHangController extends Controller
                 'don_hangs.tinh_trang',
                 'don_hangs.tinh_trang_thanh_toan',
                 'don_hangs.id',
+                'don_hangs.ma_don_hang',
                 'dai_lies.ten_cong_ty as ten_dai_ly'
             )
             ->get();
