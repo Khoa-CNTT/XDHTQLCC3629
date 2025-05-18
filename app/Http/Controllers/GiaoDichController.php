@@ -58,10 +58,16 @@ class GiaoDichController extends Controller
                         'total_updated' => count($matched)
                     ]);
                 } else {
-                    return response()->json(['status' => 'false', 'message' => 'Không có dữ liệu.']);
+                    return response()->json([
+                        'status' => 'false',
+                        'message' => 'Không có dữ liệu.'
+                    ]);
                 }
             } else {
-                return response()->json(['status' => 'false', 'message' => 'Lỗi kết nối API.']);
+                return response()->json([
+                    'status' => 'false',
+                    'message' => 'Lỗi kết nối API.'
+                ]);
             }
         } catch (\Exception $e) {
             return response()->json(['status' => 'false', 'message' => 'Exception: ' . $e->getMessage()]);
