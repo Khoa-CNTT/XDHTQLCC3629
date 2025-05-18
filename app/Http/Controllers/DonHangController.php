@@ -602,20 +602,20 @@ class DonHangController extends Controller
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
 
 
-                //gửi mail
-                $idDonHang = $request->input('v.id');   // lấy id của đơn hàng đang chọn
-                $donHang = DonHang::find($idDonHang);  // tìm đúng đơn hàng đó
-                $daiLy = DaiLy::find($donHang->user_id);  // tìm qua bên đại lý
+                // //gửi mail
+                // $idDonHang = $request->input('v.id');   // lấy id của đơn hàng đang chọn
+                // $donHang = DonHang::find($idDonHang);  // tìm đúng đơn hàng đó
+                // $daiLy = DaiLy::find($donHang->user_id);  // tìm qua bên đại lý
 
 
-                $dataMail['ten_cong_ty'] = $daiLy->ten_cong_ty;
-                $dataMail['id_don_hang'] = $donHang->id;
-                $dataMail['tong_tien'] = $donHang->tong_tien;
-                $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHang->tong_tien . "&addInfo=TTDP" . $donHang->ma_don_hang;
-                $dataMail['ma_qr_code']     =  $link_qr;
+                // $dataMail['ten_cong_ty'] = $daiLy->ten_cong_ty;
+                // $dataMail['id_don_hang'] = $donHang->id;
+                // $dataMail['tong_tien'] = $donHang->tong_tien;
+                // $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHang->tong_tien . "&addInfo=TTDP" . $donHang->ma_don_hang;
+                // $dataMail['ma_qr_code']     =  $link_qr;
 
-                Mail::to($daiLy->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
-                //done gửi mail
+                // Mail::to($daiLy->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
+                // //done gửi mail
 
                 $metadata = [
                     'name' => 'Bằng chứng nhân viên xác nhận đơn hàng',
@@ -1516,6 +1516,22 @@ class DonHangController extends Controller
             }
 
             DB::commit();
+
+
+            //gửi mail
+            //$idDonHangDangChonMail = $donHang->id;   // lấy id của đơn hàng đang chọn
+            $donHangDangChonMail = $donHang;  // tìm đúng đơn hàng đó
+            $daiLyDangChonMail = DaiLy::find($donHangDangChonMail->user_id);  // tìm qua bên đại lý
+
+            $dataMail['ten_cong_ty'] = $daiLyDangChonMail->ten_cong_ty;
+            $dataMail['id_don_hang'] = $donHangDangChonMail->id;
+            $dataMail['tong_tien'] = $donHangDangChonMail->tong_tien;
+            $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHangDangChonMail->tong_tien . "&addInfo=TTDP" . str_replace('-', '', $donHangDangChonMail->ma_don_hang);;
+            $dataMail['ma_qr_code']     =  $link_qr;
+
+            Mail::to($daiLyDangChonMail->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
+            //done gửi mail
+
 
             $dsNSX = NhaSanXuat::whereIn('id', collect($lichSuTaoMoi)
                 ->pluck('id_nha_san_xuat'))
