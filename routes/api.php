@@ -6,6 +6,7 @@ use App\Http\Controllers\DaiLyController;
 use App\Http\Controllers\DanhMucSanPhamController;
 use App\Http\Controllers\DonViVanChuyenController;
 use App\Http\Controllers\DonHangController;
+use App\Http\Controllers\GiaoDichController;
 use App\Http\Controllers\GioHangController;
 use App\Http\Controllers\NguyenLieuController;
 use App\Http\Controllers\NguyenLieuSanPhamController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\SanPhamNSXController;
 use Illuminate\Support\Facades\Route;
 
+Route::get("/check-giao-dich", [GiaoDichController::class, 'checkPaid']);
 Route::get('/check-nguoi-dung', [NhanVienController::class, 'checkNguoiDung']);
 
 //auth user
