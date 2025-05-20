@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\DaiLy;
+use App\Models\QuanHuyen;
+use App\Models\TinhThanh;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -42,13 +44,19 @@ class DaiLyController extends Controller
      */
     public function createDaiLy(Request $request)
     {
+        $ten_tinh =  TinhThanh::find($request->tinh_thanh_id);
+        $ten_huyen =  QuanHuyen::where("id", $request->quan_huyen_id)
+            ->value("ten_quan_huyen");
         DaiLy::create([
             'ten_cong_ty'   =>  $request->ten_cong_ty,
             'email'         =>  $request->email,
             'password'      =>  bcrypt($request->password),
-            'dia_chi'       =>  $request->dia_chi,
+            'dia_chi'       =>  $request->dia_chi . ', ' . $ten_huyen . ', ' . $ten_tinh->ten_tinh_thanh,
             'so_dien_thoai' =>  $request->so_dien_thoai,
             'tinh_trang'    =>  $request->tinh_trang,
+            'kinh_do'       =>  $ten_tinh->kinh_do,
+            'vi_do'         =>  $ten_tinh->vi_do,
+            'loai_tai_khoan'   => 'Đại Lý',
             'dia_chi_vi'    =>  "TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd"
         ]);
         return response()->json([
@@ -100,13 +108,18 @@ class DaiLyController extends Controller
 
     public function updateDaiLy(Request $request)
     {
+        $ten_tinh =  TinhThanh::find($request->tinh_thanh_id);
+        $ten_huyen =  QuanHuyen::where("id", $request->quan_huyen_id)
+            ->value("ten_quan_huyen");
         try {
             DaiLy::where('id', $request->id)
                 ->update([
                     'ten_cong_ty'   =>  $request->ten_cong_ty,
                     'email'         =>  $request->email,
-                    'dia_chi'       =>  $request->dia_chi,
+                    'dia_chi'       =>  $request->dia_chi . ', ' . $ten_huyen . ', ' . $ten_tinh->ten_tinh_thanh,
                     'so_dien_thoai' =>  $request->so_dien_thoai,
+                    'kinh_do'       =>  $ten_tinh->kinh_do,
+                    'vi_do'         =>  $ten_tinh->vi_do,
                     'tinh_trang'    =>  $request->tinh_trang
                 ]);
             return response()->json([

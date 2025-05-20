@@ -183,7 +183,7 @@ class NhanVienController extends Controller
             $user instanceof \App\Models\DaiLy ||
             $user instanceof \App\Models\NhaSanXuat ||  $user instanceof \App\Models\DonViVanChuyen
         ) {
-            
+
         $so_du = null;
 
         if (
@@ -209,17 +209,6 @@ class NhanVienController extends Controller
     //admin - quản lý nhân viên
     public function getData()
     {
-        // $id_chuc_nang   = ;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         $data = NhanVien::get();
 
         return response()->json([
@@ -246,7 +235,9 @@ class NhanVienController extends Controller
             'email'  =>  $request->email,
             'password'       =>  bcrypt($request->password),
             'id_chuc_vu' =>  $request->id_chuc_vu,
-            'tinh_trang'    =>  $request->tinh_trang
+            'tinh_trang'    =>  $request->tinh_trang,
+            'loai_tai_khoan'   => 'Nhân Viên',
+            'dia_chi_vi'    =>  "TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd"
         ]);
         return response()->json([
             'status'    =>  true,
