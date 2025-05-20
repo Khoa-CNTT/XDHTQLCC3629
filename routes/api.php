@@ -76,8 +76,6 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/doi-tinh-trang', [NguyenLieuController::class, 'changeTrangthaiAdmin']);
         Route::post('/tim-nguyen-lieu', [NguyenLieuController::class, 'searchNguyenLieuAdmin']);
         Route::delete('/xoa-nguyen-lieu/{id}', [NguyenLieuController::class, 'deleteNguyenLieu']);
-      //  Route::post('/them-moi-nguyen-lieu', [NguyenLieuController::class, 'createNguyenLieu']);
-      //  Route::post('/cap-nhat-nguyen-lieu', [NguyenLieuController::class, 'updateNguyenLieu']);
     });
     Route::group(['prefix'  =>  '/nguyen-lieu-san-pham'], function () {
         Route::get('/lay-du-lieu', [NguyenLieuSanPhamController::class, 'getData']);

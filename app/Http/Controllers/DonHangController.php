@@ -69,7 +69,7 @@ class DonHangController extends Controller
                     });
 
                 return [
-                    'id'                        => $don_hang->id,
+                    'id'                       => $don_hang->id,
                     'ma_don_hang'              => $don_hang->ma_don_hang,
                     'ngay_dat'                 => $don_hang->ngay_dat,
                     'ngay_giao'                => $don_hang->ngay_giao,
@@ -120,7 +120,7 @@ class DonHangController extends Controller
                     'san_phams.hinh_anh',
                     'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
                     'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                    'don_vi_van_chuyens.cuoc_van_chuyen',
+                    'lich_su_don_hangs.cuoc_van_chuyen',
                     'lich_su_don_hangs.tinh_trang',
                 )
                 ->get();
@@ -145,16 +145,37 @@ class DonHangController extends Controller
                 if ($request->input('v.tinh_trang') == 1 || $request->input('v.tinh_trang') == 0) {
                     $tinh_trang_moi = 4;
                 }
-
-                DonHang::where('id', $request->input('v.id'))->update([
+                $id_don_hang = $request->input('v.id');
+                // 1. Lấy danh sách sản phẩm trong đơn hàng
+                $sanPhamsTrongDonHang = DB::table('lich_su_don_hangs')
+                    ->where('id_don_hang', $id_don_hang)
+                    ->get();
+                // 2. Hoàn lại số lượng vào bảng san_phams
+                foreach ($sanPhamsTrongDonHang as $sp) {
+                    DB::table('san_phams')
+                        ->where('id', $sp->id_san_pham)
+                        ->increment('so_luong_ton_kho', $sp->so_luong);
+                }
+                // 3. Cập nhật đơn hàng và lịch sử
+                DonHang::where('id', $id_don_hang)->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
                     'tinh_trang_thanh_toan'    =>  3,
                     'huy_bo_boi'    => 'dai_ly',
                 ]);
 
-                LichSuDonHang::where('id_don_hang', $request->input('v.id'))->update([
+                LichSuDonHang::where('id_don_hang', $id_don_hang)->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
                     'huy_bo_boi'    => 'dai_ly',
+                ]);
+                // 4. Đặt tổng tiền đơn hàng và cước vận chuyển về 0
+                DonHang::where('id', $id_don_hang)->update([
+                    'tong_tien' => 0,
+                    'cuoc_van_chuyen' => 0,
+                ]);
+
+                LichSuDonHang::where('id_don_hang', $id_don_hang)->update([
+                    'cuoc_van_chuyen' => 0,
+                    'don_gia' => 0,
                 ]);
 
                 $thoiGianCapNhat = Carbon::now("Asia/Ho_Chi_Minh");
@@ -201,7 +222,7 @@ class DonHangController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Xác nhận đơn hàng thành công!',
+                    'message' => 'Hủy đơn hàng thành công!',
                     'transaction_hash' => $txHash['transactionHash'],
                     'metadata_uri' => $metadataUri,
                     'token_id' => $txHash['tokenId']
@@ -210,7 +231,7 @@ class DonHangController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Lỗi xác nhận đơn hàng: ' . $e->getMessage()
+                    'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
                 ]);
             }
         }
@@ -470,14 +491,34 @@ class DonHangController extends Controller
                 if ($request->input('v.tinh_trang') == 1 || $request->input('v.tinh_trang') == 0) {
                     $tinh_trang_moi = 4;
                 }
-                DonHang::where('id', $request->input('v.id'))->update([
+                $id_don_hang = $request->input('v.id');
+                // 1. Lấy danh sách sản phẩm trong đơn hàng
+                $sanPhamsTrongDonHang = DB::table('lich_su_don_hangs')
+                    ->where('id_don_hang', $id_don_hang)
+                    ->get();
+                // 2. Hoàn lại số lượng vào bảng san_phams
+                foreach ($sanPhamsTrongDonHang as $sp) {
+                    DB::table('san_phams')
+                        ->where('id', $sp->id_san_pham)
+                        ->increment('so_luong_ton_kho', $sp->so_luong);
+                }
+                // 3. Cập nhật đơn hàng và lịch sử
+                DonHang::where('id', $id_don_hang)->update([
+                    'tinh_trang'                =>  $tinh_trang_moi,
+                    'tinh_trang_thanh_toan'     =>  3,
+                    'huy_bo_boi'                => 'nhan_vien',
+                ]);
+                LichSuDonHang::where('id_don_hang', $id_don_hang)->update([
                     'tinh_trang'    =>  $tinh_trang_moi,
-                    'tinh_trang_thanh_toan'    =>  3,
                     'huy_bo_boi'    => 'nhan_vien',
                 ]);
-                LichSuDonHang::where('id_don_hang', $request->input('v.id'))->update([
-                    'tinh_trang'    =>  $tinh_trang_moi,
-                    'huy_bo_boi'    => 'nhan_vien',
+                // 4. Đặt tổng tiền đơn hàng và cước vận chuyển về 0
+                DonHang::where('id', $id_don_hang)->update([
+                    'tong_tien' => 0,
+                    'cuoc_van_chuyen' => 0,
+                ]);
+                LichSuDonHang::where('id_don_hang', $id_don_hang)->update([
+                    'cuoc_van_chuyen' => 0,
                 ]);
                 $thoiGianCapNhat = Carbon::now('Asia/Ho_Chi_Minh');
                 $metadata = [
@@ -543,7 +584,7 @@ class DonHangController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => 'Lỗi Hủy đơn hàng: ' . $e->getMessage()
+                    'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
                 ]);
             }
         }
@@ -1111,7 +1152,17 @@ class DonHangController extends Controller
                     'status'  => false,
                 ]);
             }
-
+            $idDonHang = $request->input('v.id_don_hang');
+            // 1. Lấy danh sách sản phẩm trong đơn hàng
+            $sanPhamsTrongDonHang = DB::table('lich_su_don_hangs')
+                ->where('id_don_hang', $idDonHang)
+                ->get();
+            // 2. Hoàn lại số lượng vào bảng san_phams
+            foreach ($sanPhamsTrongDonHang as $sp) {
+                DB::table('san_phams')
+                    ->where('id', $sp->id_san_pham)
+                    ->increment('so_luong_ton_kho', $sp->so_luong);
+            }
             $tinh_trang_moi_nsx = 4;
 
             // Cập nhật các sản phẩm của nhà sản xuất hiện tại
@@ -1122,8 +1173,6 @@ class DonHangController extends Controller
                     ]);
                 }
             }
-
-            $idDonHang = $request->input('v.id_don_hang');
 
             $count_sp_tong = LichSuDonHang::where('id_don_hang', $idDonHang)->count();
             $count_sp_huy = LichSuDonHang::where('id_don_hang', $idDonHang)
@@ -1151,6 +1200,49 @@ class DonHangController extends Controller
                     'tinh_trang' => 2, // đã chuẩn bị xong
                 ]);
             }
+
+            $cuocVanChuyenBiTru = LichSuDonHang::where('id_don_hang', $idDonHang)
+            ->where('id_nha_san_xuat', $user->id)
+            ->sum('cuoc_van_chuyen');
+
+            LichSuDonHang::where('id_don_hang', $idDonHang)
+            ->where('id_nha_san_xuat', $user->id)
+            ->where('tinh_trang', 4) // chỉ áp dụng với sản phẩm đã được hủy
+            ->update([
+                'don_gia' => 0,
+                'so_luong' => 0,
+                'cuoc_van_chuyen' => 0,
+            ]);
+
+            // Tính lại tổng tiền đơn hàng sau khi NSX hủy một phần
+            $nsxStillHasProduct = LichSuDonHang::where('id_don_hang', $idDonHang)
+                ->where('id_nha_san_xuat', $user->id)
+                ->where('tinh_trang', '!=', 4)
+                ->exists();
+
+            if (!$nsxStillHasProduct && $cuocVanChuyenBiTru > 0) {
+                DonHang::where('id', $idDonHang)->decrement('tong_tien', $cuocVanChuyenBiTru);
+            }
+
+            $tongTienMoi = LichSuDonHang::where('id_don_hang', $idDonHang)
+                ->where('tinh_trang', '!=', 4)
+                ->sum(DB::raw('don_gia * so_luong + cuoc_van_chuyen'));
+
+            DonHang::where('id', $idDonHang)->update([
+                'tong_tien' => $tongTienMoi,
+            ]);
+
+            $tongCuocVanChuyenMoi = LichSuDonHang::where('id_don_hang', $idDonHang)
+                ->where('tinh_trang', '!=', 4) // loại sản phẩm đã hủy
+                ->select('id_nha_san_xuat', DB::raw('MAX(cuoc_van_chuyen) as cuoc_van_chuyen'))
+                ->groupBy('id_nha_san_xuat')
+                ->get()
+                ->sum('cuoc_van_chuyen');
+
+            // Cập nhật lại tổng cước vào đơn hàng nếu có cột riêng
+            DonHang::where('id', $idDonHang)->update([
+                'cuoc_van_chuyen' => $tongCuocVanChuyenMoi,
+            ]);
 
             $sanPhams = $request->input('v.san_phams');
             foreach ($sanPhams as &$sanPham) {
@@ -1251,7 +1343,7 @@ class DonHangController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Xác nhận đơn hàng thành công!',
+                'message' => 'Hủy đơn hàng thành công!',
                 'transaction_hash' => $txHash['transactionHash'],
                 'metadata_uri' => $metadataUri,
                 'token_id' => $txHash['tokenId']
@@ -1260,7 +1352,7 @@ class DonHangController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Lỗi xác nhận đơn hàng: ' . $e->getMessage()
+                'message' => 'Lỗi khi hủy đơn hàng: ' . $e->getMessage()
             ]);
         }
     }
@@ -1425,18 +1517,21 @@ class DonHangController extends Controller
             // Bước 1: Cập nhật trạng thái sản phẩm do đơn vị vận chuyển này phụ trách
             LichSuDonHang::where('id_don_hang', $idDonHang)
                 ->where('id_don_vi_van_chuyen', $idDvvc)
+                ->where('tinh_trang', '!=', 4)
                 ->update([
                     'tinh_trang' => $tinhTrangMoi,
                 ]);
 
             // Bước 2: Kiểm tra còn sản phẩm nào của đơn hàng chưa được xác nhận (khác trạng thái 5)
             $con_sp_chua_duoc_dvvc_khac_xac_nhan = LichSuDonHang::where('id_don_hang', $idDonHang)
-                ->where('tinh_trang', '!=', $tinhTrangMoi)
+                ->whereNotIn('tinh_trang', [$tinhTrangMoi, 4])
                 ->exists();
 
             // Bước 3: Nếu không còn sản phẩm nào chưa được xác nhận → cập nhật đơn hàng
             if (!$con_sp_chua_duoc_dvvc_khac_xac_nhan) {
-                DonHang::where('id', $idDonHang)->update([
+                DonHang::where('id', $idDonHang)
+                // ->where('tinh_trang', '!=', 4)
+                ->update([
                     'tinh_trang' => $tinhTrangMoi,
                 ]);
             }
@@ -1517,8 +1612,40 @@ class DonHangController extends Controller
 
             DB::commit();
 
+            // //gửi mail
+            // $donHang->refresh();
 
-            //gửi mail
+            // // Lấy sản phẩm đã hoàn thành
+            // $sanPhamDaHoanThanh = LichSuDonHang::where('id_don_hang', $donHang->id)
+            //     ->where('tinh_trang', 5)
+            //     ->get();
+
+            // // Tính tổng tiền sản phẩm
+            // $tongTienSanPham = $sanPhamDaHoanThanh->reduce(function ($carry, $sp) {
+            //     return $carry + ($sp->so_luong * $sp->don_gia);
+            // }, 0);
+
+            // // Lấy danh sách đơn vị vận chuyển duy nhất
+            // $nhomCuocDuyNhat = $sanPhamDaHoanThanh
+            //     ->map(function ($item) {
+            //         return [
+            //             'id_don_vi_van_chuyen' => $item->id_don_vi_van_chuyen,
+            //             'id_nha_san_xuat' => $item->id_nha_san_xuat,
+            //             'cuoc_van_chuyen' => $item->cuoc_van_chuyen,
+            //         ];
+            //     })
+            //     ->unique(function ($item) {
+            //         return $item['id_don_vi_van_chuyen'] . '-' . $item['id_nha_san_xuat'];
+            //     });
+
+            // $tongCuoc = $nhomCuocDuyNhat->sum('cuoc_van_chuyen');
+
+            // // Gán lại tổng tiền
+            // $donHang->tong_tien = $tongTienSanPham + $tongCuoc;
+            // $donHang->cuoc_van_chuyen = $tongCuoc;
+            // $donHang->save();
+            // $donHangDangChonMail = $donHang;
+
             $donHang->refresh(); // Load lại đơn hàng để hắn cập nhật tình trạng là 5
             $donHangDangChonMail = $donHang;  // tìm đúng đơn hàng đó
             $daiLyDangChonMail = DaiLy::find($donHangDangChonMail->user_id);  // tìm qua bên đại lý
@@ -1533,7 +1660,6 @@ class DonHangController extends Controller
                 Mail::to($daiLyDangChonMail->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
             }
             //done gửi mail
-
 
             $dsNSX = NhaSanXuat::whereIn('id', collect($lichSuTaoMoi)
                 ->pluck('id_nha_san_xuat'))
@@ -2115,9 +2241,10 @@ class DonHangController extends Controller
             ], 401);
         }
 
-        $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+        $list_info = BlockChainForDonHang::
+            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
-            ->where('block_chain_for_don_hangs.action', '!=', 'Hủy đơn hàng')
+            ->where('block_chain_for_don_hangs.action', 'not like', '%Hủy đơn hàng%')
             ->select(
                 'block_chain_for_don_hangs.transaction_hash',
                 'block_chain_for_don_hangs.metadata_uri',
@@ -2125,7 +2252,7 @@ class DonHangController extends Controller
                 'don_hangs.ma_don_hang',
                 'block_chain_for_don_hangs.action',
                 'block_chain_for_don_hangs.loai_tai_khoan',
-                'block_chain_for_don_hangs.id_user as id_nguoi_thuc_hien'
+                'block_chain_for_don_hangs.id_user as id_nguoi_thuc_hien',
             )
             ->get();
 

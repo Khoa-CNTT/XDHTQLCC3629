@@ -87,7 +87,8 @@ class GiaoDichController extends Controller
                         'status' => 'true',
                         'message' => 'Đã cập nhật các hóa đơn khớp giao dịch.',
                         'matched_hoa_don' => $matched,
-                        'total_updated' => count($matched)
+                        'total_updated' => count($matched),
+                        'message_void' => 'Chưa có giao dịch được thanh toán.',
                     ]);
                 } else {
                     return response()->json([
@@ -102,7 +103,10 @@ class GiaoDichController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            return response()->json(['status' => 'false', 'message' => 'Exception: ' . $e->getMessage()]);
+            return response()->json([
+                'status' => 'false',
+                'message' => 'Exception: ' . $e->getMessage()
+            ]);
         }
     }
 
