@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('ngay_tao')->nullable();
             $table->date('ngay_cap_nhat')->nullable();
             $table->integer('tinh_trang')->default(1);
+            $table->decimal('so_du_tai_khoan',15)->nullable();
             $table->timestamps();
         });
     }
