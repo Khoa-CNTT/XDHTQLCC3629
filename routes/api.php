@@ -13,8 +13,10 @@ use App\Http\Controllers\NguyenLieuSanPhamController;
 use App\Http\Controllers\NhanVienController;
 use App\Http\Controllers\NhaSanXuatController;
 use App\Http\Controllers\PhuongTienController;
+use App\Http\Controllers\QuanHuyenController;
 use App\Http\Controllers\SanPhamController;
 use App\Http\Controllers\SanPhamNSXController;
+use App\Http\Controllers\TinhThanhController;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/check-giao-dich", [GiaoDichController::class, 'checkPaid']);
@@ -45,6 +47,12 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::delete('/xoa-dai-ly/{id}', [DaiLyController::class, 'deleteDaiLy']);
         Route::post('/cap-nhat-dai-ly', [DaiLyController::class, 'updateDaiLy']);
         Route::post('/doi-tinh-trang-dai-ly', [DaiLyController::class, 'doiTinhTrangDaiLy']);
+    });
+    Route::group(['prefix'  =>  '/tinh-thanh'], function () {
+        Route::get('/lay-du-lieu-tinh', [TinhThanhController::class, 'getData']);
+    });
+    Route::group(['prefix'  =>  '/quan-huyen'], function () {
+        Route::get('/lay-du-lieu-qh', [QuanHuyenController::class, 'getData']);
     });
     Route::group(['prefix'  =>  '/danh-muc-sp'], function () {
         Route::get('/lay-du-lieu', [DanhMucSanPhamController::class, 'getData']);
