@@ -1519,17 +1519,19 @@ class DonHangController extends Controller
 
 
             //gửi mail
-            //$idDonHangDangChonMail = $donHang->id;   // lấy id của đơn hàng đang chọn
+            $donHang->refresh(); // Load lại đơn hàng để hắn cập nhật tình trạng là 5
             $donHangDangChonMail = $donHang;  // tìm đúng đơn hàng đó
             $daiLyDangChonMail = DaiLy::find($donHangDangChonMail->user_id);  // tìm qua bên đại lý
 
-            $dataMail['ten_cong_ty'] = $daiLyDangChonMail->ten_cong_ty;
-            $dataMail['id_don_hang'] = $donHangDangChonMail->id;
-            $dataMail['tong_tien'] = $donHangDangChonMail->tong_tien;
-            $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHangDangChonMail->tong_tien . "&addInfo=TTDP" . str_replace('-', '', $donHangDangChonMail->ma_don_hang);;
-            $dataMail['ma_qr_code']     =  $link_qr;
+            if ($donHangDangChonMail->tinh_trang==5) {
+                $dataMail['ten_cong_ty'] = $daiLyDangChonMail->ten_cong_ty;
+                $dataMail['id_don_hang'] = $donHangDangChonMail->id;
+                $dataMail['tong_tien'] = $donHangDangChonMail->tong_tien;
+                $link_qr  = "https://img.vietqr.io/image/MB-0328045024-compact2.jpg?amount=" . $donHangDangChonMail->tong_tien . "&addInfo=TTDP" . str_replace('-', '', $donHangDangChonMail->ma_don_hang);;
+                $dataMail['ma_qr_code']     =  $link_qr;
 
-            Mail::to($daiLyDangChonMail->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
+                Mail::to($daiLyDangChonMail->email)->send(new SendMail('THANH TOÁN ĐƠN ĐẶT HÀNG', 'form_thanh_toan', $dataMail));
+            }
             //done gửi mail
 
 

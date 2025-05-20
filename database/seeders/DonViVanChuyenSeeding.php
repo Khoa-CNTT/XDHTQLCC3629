@@ -46,7 +46,7 @@ class DonViVanChuyenSeeding extends Seeder
                 'dia_chi' => '456 Đường Trần Hưng Đạo',
                 'cuoc_van_chuyen' => '35000',
                 'loai_tai_khoan' => 'Đơn vị vận chuyển',
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Công ty Vận Tải ABC',
@@ -56,7 +56,7 @@ class DonViVanChuyenSeeding extends Seeder
                 'dia_chi' => '123 Đường Lê Lợi',
                 'cuoc_van_chuyen' => '30000',
                 'loai_tai_khoan' => 'Đơn vị vận chuyển',
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
         ]);
     }

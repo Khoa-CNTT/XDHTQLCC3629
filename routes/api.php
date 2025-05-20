@@ -128,6 +128,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangAdmin']);
         Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietAdmin']);
         Route::post('/tim-don-hang', [DonHangController::class, 'searchDonHangAdmin']);
+        Route::post('/xem-hoa-don-giao-dich', [GiaoDichController::class, 'getDataChiTietHoaDonGiaoDichAdmin']);
     });
 });
 //user

@@ -29,15 +29,15 @@ class NhanVienController extends Controller
             DaiLy::class,
             DonViVanChuyen::class
         ];
-        for ($i=0; $i < count($list); $i++) {
+        for ($i = 0; $i < count($list); $i++) {
             $check = Auth::guard($list[$i])->attempt([ //thử xác thực đăng nhập với từng loại tài khoản.
                 'email'     => $request->email,
                 'password'  => $request->password,
             ]);
 
-            if($check) {
+            if ($check) {
                 $user =  Auth::guard($list[$i])->user(); //Lấy thông tin người dùng theo guard tương ứng
-                if($user && $user instanceof $list_model[$i]) {
+                if ($user && $user instanceof $list_model[$i]) {
                     return response()->json([
                         'status'    => true,
                         'message'   => 'Đăng nhập thành công!',
@@ -85,13 +85,19 @@ class NhanVienController extends Controller
             ], 401);
         }
 
+        //lấy được số dư của nsx, đvvc
+        $so_du_tai_khoan = null;
+
+        if ($check_user->tokenable_type === "App\\Models\\NhaSanXuat" || $check_user->tokenable_type === "App\\Models\\DonViVanChuyen") {
+            $so_du_tai_khoan = $user->so_du_tai_khoan;
+        }
         DB::table('personal_access_tokens')
             ->where('id', $user->currentAccessToken()->id)
             ->update([
                 'ip'         => request()->ip(),
                 'device'     => $device,
                 'os'         => $os,
-                'trinh_duyet'=> $browser,
+                'trinh_duyet' => $browser,
             ]);
 
         return response()->json([
@@ -102,7 +108,8 @@ class NhanVienController extends Controller
             'so_dien_thoai'     =>      $user->so_dien_thoai,
             'dia_chi'           =>      $user->dia_chi,
             'user_id'           =>      $user->id,
-            'dia_chi_vi'        =>      $user->dia_chi_vi
+            'dia_chi_vi'        =>      $user->dia_chi_vi,
+            'so_du_tai_khoan'   =>      $so_du_tai_khoan
         ], 200);
     }
 
@@ -171,14 +178,27 @@ class NhanVienController extends Controller
         // Lấy thông tin từ Authorization: 'Bearer ' gửi lên
         $user = Auth::guard('sanctum')->user();
 
-        if ($user instanceof \App\Models\NhanVien ||
+        if (
+            $user instanceof \App\Models\NhanVien ||
             $user instanceof \App\Models\DaiLy ||
-            $user instanceof \App\Models\NhaSanXuat ||  $user instanceof \App\Models\DonViVanChuyen) {
-            return response()->json([
-                'status'  => true,
-                'message' => "Oke, bạn có thể đi qua",
-            ]);
+            $user instanceof \App\Models\NhaSanXuat ||  $user instanceof \App\Models\DonViVanChuyen
+        ) {
+            
+        $so_du = null;
+
+        if (
+            $user instanceof \App\Models\NhaSanXuat ||
+            $user instanceof \App\Models\DonViVanChuyen
+        ) {
+            $so_du = $user->so_du_tai_khoan;
         }
+
+        return response()->json([
+            'status'  => true,
+            'message' => "Oke, bạn có thể đi qua",
+            'so_du_tai_khoan' => $so_du,
+        ]);
+    }
 
         return response()->json([
             'status'  => false,
@@ -352,11 +372,11 @@ class NhanVienController extends Controller
     {
         $user = Auth::guard('sanctum')->user();
         $check = 0; // mặc định đầu tiên hắn là admin trước
-        if($user &&  $user instanceof NhaSanXuat) {
+        if ($user &&  $user instanceof NhaSanXuat) {
             $check = 1; // hắn là nsx
-        } elseif ($user &&  $user instanceof DaiLy){
+        } elseif ($user &&  $user instanceof DaiLy) {
             $check = 2; // hắn là đại lý
-        } elseif ($user &&  $user instanceof DonViVanChuyen){
+        } elseif ($user &&  $user instanceof DonViVanChuyen) {
             $check = 3; // hắn là đại lý
         }
 

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('so_dien_thoai')->nullable();
             $table->string('dia_chi')->nullable();
             $table->decimal('cuoc_van_chuyen', 15, 3)->nullable();
+            $table->decimal('so_du_tai_khoan', 15, 3)->nullable();
             $table->integer('tinh_trang')->default(1);
             $table->string('loai_tai_khoan')->default('Đơn vị vận chuyển');
             $table->timestamps();

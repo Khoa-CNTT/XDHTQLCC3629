@@ -64,7 +64,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 10.8911,
                 'kinh_do' => 106.5903,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Nike',
@@ -77,7 +77,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 17.4689,
                 'kinh_do' => 106.6223,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Zara',
@@ -90,7 +90,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Nhã Nam',
@@ -103,7 +103,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 21.0381,
                 'kinh_do' => 105.9118,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Toyota',
@@ -116,7 +116,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 16.0739,
                 'kinh_do' => 108.2240,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Fisher-Price',
@@ -129,7 +129,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 15.1201,
                 'kinh_do' => 108.7923,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
                 'ten_cong_ty' => 'Blackmores',
@@ -142,7 +142,7 @@ class NhaSanXuatSeeder extends Seeder
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
                 'vi_do' => 14.4200,
                 'kinh_do' => 109.0000,
-                'dia_chi_vi' => ''
+                'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
         ]);
     }
