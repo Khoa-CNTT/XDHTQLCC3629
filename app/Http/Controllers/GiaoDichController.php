@@ -3,19 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlockChainForDonHang;
 use App\Models\DonHang;
 use App\Models\DonViVanChuyen;
 use App\Models\GiaoDich;
 use App\Models\LichSuDonHang;
 use App\Models\NhanVien;
 use App\Models\NhaSanXuat;
+use App\Services\PinataService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class GiaoDichController extends Controller
 {
-    public function checkPaid()
+    public function checkPaid(Request $request)
     {
         $url = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhdaB5q-cMV_glq1bhF5RxaVDq-SWno4oRzkTvUOth51H16WtqweG8ghSNX0-UdktXSmADEpf5TO_zqYEhNDy-Vx4rHyIzoRVISEXkCQ94TvrdFoVzSZPFr9UmZrGtE1f3Xq0iYOTG9hVSfZrrHRIKHwrD7OOzec0Qcr5VuFR742I0EXQg5xHeVbVm1p2qNg-Wu_lEsq4AxsYzGF4Pau2aSzYhjXTwCPEOj0PTW9f_X9MsK4ZAXRmrbfGaGfApzr4C3NpEBWzFg9zkZ8E6MdEg9KC0MWxtp7L_8wMgX&lib=MbkYxf-q3Y3DolfYq64ZautuNnwycQPwH";
         $danhSachDonHang = DonHang::where('tinh_trang_thanh_toan', 0)->get();
@@ -47,8 +50,63 @@ class GiaoDichController extends Controller
                                     'ma_tham_chieu'            =>  $gd["Mã tham chiếu"],
                                 ]);
 
+                                // $daiLy = DB::table('dai_lies')
+                                //                 ->where('id', $dsDonHang->user_id)
+                                //                 ->first();
+                                // $tenDaiLy = $daiLy->ten_cong_ty ?? 'Không xác định';
+
+                                // $metadata = [
+                                //     'name' => 'Bằng chứng đại lý đã thanh toán đơn hàng',
+                                //     'order_code' => $dsDonHang->ma_don_hang,
+                                //     'time_of_execution' => $gd["Ngày diễn ra"],
+                                //     'payer' => $tenDaiLy,
+                                //     'status' => 'Đã thanh toán',
+                                //     'description' => 'Thông tin thanh toán',
+                                //     'attributes' => [
+                                //         [
+                                //             'trait_type' => 'Mã giao dịch',
+                                //             'value' => $gd["Mã GD"],
+                                //         ],
+                                //         [
+                                //             'trait_type' => 'Nội dung chuyển tiền',
+                                //             'value' => $gd["Mô tả"],
+                                //         ],
+                                //         [
+                                //             'trait_type' => 'Số tiền (VNĐ)',
+                                //             'value' => $gd["Giá trị"],
+                                //         ],
+                                //         [
+                                //             'trait_type' => 'Số tài khoản',
+                                //             'value' => $gd["Mã GD"],
+                                //         ],
+                                //         [
+                                //             'trait_type' => 'Mã tham chiếu',
+                                //             'value' => $gd["Mã tham chiếu"],
+                                //         ],
+                                //     ]
+                                // ];
+
+                                // $pinataService = new PinataService();
+                                // $metadataUri = $pinataService->uploadMetadata($metadata);
+
+                                // $to_address = $request->dia_chi_vi;
+
+                                // $address = $request->input('wallet_address', $to_address);
+
+                                // $txHash = $pinataService->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
+                                // BlockChainForDonHang::create([
+                                //     'id_don_hang'               =>  $dsDonHang->id_don_hang,
+                                //     'action'                    =>  'Kiểm tra thanh toán',
+                                //     'transaction_hash'          =>  $txHash['transactionHash'],
+                                //     'metadata_uri'              =>  $metadataUri,
+                                //     'token_id'                  =>  $txHash['tokenId'],
+                                //     'id_user'                   =>  $daiLy->id,
+                                //     'loai_tai_khoan'            =>  $daiLy->loai_tai_khoan,
+                                // ]);
+
                                 // cập nhật số dư tài khoản cho nhà sản xuất
-                                $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)->get();
+                                $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)
+                                                                    ->get();
 
                                 foreach ($lichSuDonHangList as $lichSuDH) {
                                     $nhaSanXuat = NhaSanXuat::find($lichSuDH->id_nha_san_xuat);
@@ -85,10 +143,13 @@ class GiaoDichController extends Controller
                     }
                     return response()->json([
                         'status' => 'true',
-                        'message' => 'Đã cập nhật các hóa đơn khớp giao dịch.',
+                        'message' => 'Đã cập nhật các hóa đơn mới khớp giao dịch.',
                         'matched_hoa_don' => $matched,
                         'total_updated' => count($matched),
-                        'message_void' => 'Chưa có giao dịch được thanh toán.',
+                        'message_void' => 'Chưa có giao dịch mới được thanh toán.',
+                        // 'transaction_hash' => $txHash['transactionHash'],
+                        // 'metadata_uri' => $metadataUri,
+                        // 'token_id' => $txHash['tokenId']
                     ]);
                 } else {
                     return response()->json([
@@ -112,7 +173,7 @@ class GiaoDichController extends Controller
 
 
 
-    public function getDataChiTietHoaDonGiaoDichAdmin(Request $request)
+    public function getDataChiTietHoaDonGiaoDich(Request $request)
     {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
@@ -120,7 +181,7 @@ class GiaoDichController extends Controller
                 'message' => 'Bạn cần đăng nhập!',
                 'status'  => false,
             ], 401);
-        } elseif ($user && $user instanceof NhanVien) {
+        } else {
             $list_chi_tiet_giao_dich = GiaoDich::where('giao_dichs.ma_don_hang', $request->ma_don_hang)
                 ->select(
                     'giao_dichs.*',
