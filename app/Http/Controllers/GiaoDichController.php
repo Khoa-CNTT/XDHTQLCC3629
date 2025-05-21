@@ -106,14 +106,24 @@ class GiaoDichController extends Controller
 
                                 // cập nhật số dư tài khoản cho nhà sản xuất
                                 $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)
-                                                                    ->get();
-
+                                    ->get();
+                                $donHang = DonHang::find($dsDonHang->id);
+                                $admin = $donHang && $donHang->id_nguoi_duyet ? NhanVien::find($donHang->id_nguoi_duyet) : null;
                                 foreach ($lichSuDonHangList as $lichSuDH) {
                                     $nhaSanXuat = NhaSanXuat::find($lichSuDH->id_nha_san_xuat);
+                                    $thanhTien = $lichSuDH->don_gia * $lichSuDH->so_luong;
 
                                     if ($nhaSanXuat) {
-                                        $nhaSanXuat->so_du_tai_khoan = $nhaSanXuat->so_du_tai_khoan + ($lichSuDH->don_gia * $lichSuDH->so_luong); // Cộng dồn đơn giá vào số dư
+                                        $nhaSanXuat->so_du_tai_khoan += $thanhTien * 0.95;
                                         $nhaSanXuat->save();
+                                    }
+                                    $donHang = DonHang::find($lichSuDH->id_don_hang);
+                                    if ($donHang && $donHang->id_nguoi_duyet) {
+                                        $admin = NhanVien::find($donHang->id_nguoi_duyet);
+                                        if ($admin) {
+                                            $admin->so_du_tai_khoan += $thanhTien * 0.05; // 5%
+                                            $admin->save();
+                                        }
                                     }
                                 }
 
@@ -126,10 +136,18 @@ class GiaoDichController extends Controller
                                     $donViVanChuyen = DonViVanChuyen::find($idDonViVanChuyen);
 
                                     if ($donViVanChuyen) {
-                                        $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen;
+                                        $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen * 0.95;
                                         $donViVanChuyen->save();
                                     }
+                                    if ($admin) {
+                                        $admin->so_du_tai_khoan += $cuocVanChuyen * 0.05;
+                                        $admin->save();
+                                    }
                                 }
+                                //done chia tiền cho admin
+
+
+
 
                                 $matched[] = [
                                     'ma_don_hang' => $maDonHangKhongDau,

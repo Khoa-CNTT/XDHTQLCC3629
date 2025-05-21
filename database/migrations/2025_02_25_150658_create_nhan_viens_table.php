@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('password')->nullable();
             $table->integer('id_chuc_vu')->nullable();
             $table->integer('tinh_trang')->default(1);
+            $table->decimal('so_du_tai_khoan',15)->nullable();
             $table->timestamps();
         });
     }
