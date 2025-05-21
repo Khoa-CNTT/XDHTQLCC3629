@@ -19,7 +19,7 @@ use App\Http\Controllers\SanPhamNSXController;
 use App\Http\Controllers\TinhThanhController;
 use Illuminate\Support\Facades\Route;
 
-Route::get("/check-giao-dich", [GiaoDichController::class, 'checkPaid']);
+Route::post("/check-giao-dich", [GiaoDichController::class, 'checkPaid']);
 Route::get('/check-nguoi-dung', [NhanVienController::class, 'checkNguoiDung']);
 
 //auth user
@@ -134,7 +134,7 @@ Route::group(['prefix'  =>  '/admin'], function () {
         Route::post('/xac-nhan-don-hang', [DonHangController::class, 'xacNhanDonHangAdmin']);
         Route::post('/chi-tiet', [DonHangController::class, 'getDataChiTietAdmin']);
         Route::post('/tim-don-hang', [DonHangController::class, 'searchDonHangAdmin']);
-        Route::post('/xem-hoa-don-giao-dich', [GiaoDichController::class, 'getDataChiTietHoaDonGiaoDichAdmin']);
+        Route::post('/xem-hoa-don-giao-dich', [GiaoDichController::class, 'getDataChiTietHoaDonGiaoDich']);
     });
 });
 //user
