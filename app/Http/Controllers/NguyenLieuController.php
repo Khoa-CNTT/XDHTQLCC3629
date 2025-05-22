@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NguyenLieuCuaNSXRequest;
 use App\Models\NguyenLieu;
 use App\Models\NhaSanXuat;
 use Exception;
@@ -55,7 +56,7 @@ class NguyenLieuController extends Controller
             ]);
         }
     }
-    public function createNguyenLieu(Request $request)
+    public function createNguyenLieu(NguyenLieuCuaNSXRequest $request)
     {
         $user = auth()->user();
         $nhaSanXuat = NhaSanXuat::where('loai_tai_khoan', 'Nhà Sản Xuất')

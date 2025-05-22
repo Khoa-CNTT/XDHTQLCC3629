@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DonViVanChuyenRequest;
 use App\Models\DonViVanChuyen;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class DonViVanChuyenController extends Controller
             'data' => $data
         ]);
     }
-    public function createDVVC(Request $request)
+    public function createDVVC(DonViVanChuyenRequest $request)
     {
         DonViVanChuyen::create([
             'ten_cong_ty'        =>  $request->ten_cong_ty,
