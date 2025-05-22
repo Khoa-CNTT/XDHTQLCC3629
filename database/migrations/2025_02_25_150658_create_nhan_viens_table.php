@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('nhan_viens', function (Blueprint $table) {
             $table->id();
-            $table->string('ho_ten')->nullable();
-            $table->string('email')->nullable();
-            $table->string('password')->nullable();
+            $table->string('ho_ten');
+            $table->string('email');
+            $table->string('password');
             $table->integer('id_chuc_vu')->nullable();
-            $table->integer('tinh_trang')->default(1);
-            $table->decimal('so_du_tai_khoan',15)->nullable();
+            $table->integer('tinh_trang');
+            $table->decimal('so_du_tai_khoan', 15)->nullable();
             $table->timestamps();
         });
     }

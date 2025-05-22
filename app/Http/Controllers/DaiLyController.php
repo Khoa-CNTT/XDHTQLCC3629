@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DaiLyRequest;
 use App\Models\DaiLy;
 use App\Models\QuanHuyen;
 use App\Models\TinhThanh;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class DaiLyController extends Controller
 {
@@ -21,17 +23,6 @@ class DaiLyController extends Controller
 
     public function getData()
     {
-        // $id_chuc_nang   = 1;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         $data = DaiLy::get();
 
         return response()->json([
@@ -39,30 +30,36 @@ class DaiLyController extends Controller
             'dai_ly' => $data
         ]);
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function createDaiLy(Request $request)
+
+    public function createDaiLy(DaiLyRequest $request)
     {
-        $ten_tinh =  TinhThanh::find($request->tinh_thanh_id);
-        $ten_huyen =  QuanHuyen::where("id", $request->quan_huyen_id)
-            ->value("ten_quan_huyen");
-        DaiLy::create([
-            'ten_cong_ty'   =>  $request->ten_cong_ty,
-            'email'         =>  $request->email,
-            'password'      =>  bcrypt($request->password),
-            'dia_chi'       =>  $request->dia_chi . ', ' . $ten_huyen . ', ' . $ten_tinh->ten_tinh_thanh,
-            'so_dien_thoai' =>  $request->so_dien_thoai,
-            'tinh_trang'    =>  $request->tinh_trang,
-            'kinh_do'       =>  $ten_tinh->kinh_do,
-            'vi_do'         =>  $ten_tinh->vi_do,
-            'loai_tai_khoan'   => 'Đại Lý',
-            'dia_chi_vi'    =>  "TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd"
-        ]);
-        return response()->json([
-            'status'    =>  true,
-            'message'   =>  'Đã tạo mới đại lý thành công!'
-        ]);
+        try {
+            $ten_tinh = TinhThanh::find($request->tinh_thanh_id);
+            $ten_huyen = QuanHuyen::where("id", $request->quan_huyen_id)->value("ten_quan_huyen");
+
+            DaiLy::create([
+                'ten_cong_ty'     => $request->ten_cong_ty,
+                'email'           => $request->email,
+                'password'        => bcrypt($request->password),
+                'dia_chi'         => $request->dia_chi . ', ' . $ten_huyen . ', ' . $ten_tinh->ten_tinh_thanh,
+                'so_dien_thoai'   => $request->so_dien_thoai,
+                'tinh_trang'      => $request->tinh_trang,
+                'kinh_do'         => $ten_tinh->kinh_do,
+                'vi_do'           => $ten_tinh->vi_do,
+                'loai_tai_khoan'  => 'Đại Lý',
+                'dia_chi_vi'      => "TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd",
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Đã tạo mới đại lý thành công!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Lỗi khi thêm đại lý: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function searchDaiLy(Request $request)
@@ -80,17 +77,6 @@ class DaiLyController extends Controller
 
     public function deleteDaiLy($id)
     {
-        // $id_chuc_nang   = 4;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         try {
             DaiLy::where('id', $id)->delete();
             return response()->json([

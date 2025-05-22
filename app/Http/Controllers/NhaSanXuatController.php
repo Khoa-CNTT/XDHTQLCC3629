@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NhaSanXuatRequest;
 use App\Models\NhaSanXuat;
 use App\Models\QuanHuyen;
 use App\Models\TinhThanh;
@@ -40,7 +41,7 @@ class NhaSanXuatController extends Controller
         ]);
     }
 
-    public function createNhaSanXuat(Request $request)
+    public function createNhaSanXuat(NhaSanXuatRequest $request)
     {
         $ten_tinh =  TinhThanh::find($request->tinh_thanh_id);
         $ten_huyen =  QuanHuyen::where("id", $request->quan_huyen_id)

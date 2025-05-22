@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\NhanVienRequest;
 use App\Models\DaiLy;
 use App\Models\DonViVanChuyen;
 use App\Models\NhanVien;
@@ -29,28 +30,40 @@ class NhanVienController extends Controller
             DaiLy::class,
             DonViVanChuyen::class
         ];
+
         for ($i = 0; $i < count($list); $i++) {
-            $check = Auth::guard($list[$i])->attempt([ //thử xác thực đăng nhập với từng loại tài khoản.
+            $check = Auth::guard($list[$i])->attempt([
                 'email'     => $request->email,
                 'password'  => $request->password,
             ]);
 
             if ($check) {
-                $user =  Auth::guard($list[$i])->user(); //Lấy thông tin người dùng theo guard tương ứng
+                $user = Auth::guard($list[$i])->user();
+
+                // ✅ Kiểm tra nếu tài khoản bị tạm dừng
+                if ($user && isset($user->tinh_trang) && $user->tinh_trang == 0) {
+                    return response()->json([
+                        'status'  => false,
+                        'message' => 'Tài khoản của bạn đã bị tạm dừng!'
+                    ], 403); // trả về mã lỗi 403 (forbidden)
+                }
+
                 if ($user && $user instanceof $list_model[$i]) {
                     return response()->json([
-                        'status'    => true,
-                        'message'   => 'Đăng nhập thành công!',
-                        'token'     => $user->createToken($list_token[$i])->plainTextToken //tạo token tương ứng
+                        'status'  => true,
+                        'message' => 'Đăng nhập thành công!',
+                        'token'   => $user->createToken($list_token[$i])->plainTextToken
                     ]);
                 }
             }
         }
+
         return response()->json([
             'status'  => false,
             'message' => 'Đăng nhập thất bại!'
         ]);
     }
+
 
     public function check(Request $request)
     {
@@ -91,6 +104,7 @@ class NhanVienController extends Controller
         if ($check_user->tokenable_type === "App\\Models\\NhaSanXuat" || $check_user->tokenable_type === "App\\Models\\DonViVanChuyen") {
             $so_du_tai_khoan = $user->so_du_tai_khoan;
         }
+
         DB::table('personal_access_tokens')
             ->where('id', $user->currentAccessToken()->id)
             ->update([
@@ -184,21 +198,21 @@ class NhanVienController extends Controller
             $user instanceof \App\Models\NhaSanXuat ||  $user instanceof \App\Models\DonViVanChuyen
         ) {
 
-        $so_du = null;
+            $so_du = null;
 
-        if (
-            $user instanceof \App\Models\NhaSanXuat ||
-            $user instanceof \App\Models\DonViVanChuyen
-        ) {
-            $so_du = $user->so_du_tai_khoan;
+            if (
+                $user instanceof \App\Models\NhaSanXuat ||
+                $user instanceof \App\Models\DonViVanChuyen || $user instanceof \App\Models\NhanVien
+            ) {
+                $so_du = $user->so_du_tai_khoan;
+            }
+
+            return response()->json([
+                'status'  => true,
+                'message' => "Oke, bạn có thể đi qua",
+                'so_du_tai_khoan' => $so_du,
+            ]);
         }
-
-        return response()->json([
-            'status'  => true,
-            'message' => "Oke, bạn có thể đi qua",
-            'so_du_tai_khoan' => $so_du,
-        ]);
-    }
 
         return response()->json([
             'status'  => false,
@@ -217,19 +231,8 @@ class NhanVienController extends Controller
         ]);
     }
 
-    public function createNhanVien(Request $request)
+    public function createNhanVien(NhanVienRequest $request)
     {
-        // $id_chuc_nang   = ;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         NhanVien::create([
             'ho_ten'    =>  $request->ho_ten,
             'email'  =>  $request->email,
@@ -247,17 +250,6 @@ class NhanVienController extends Controller
 
     public function updateNhanVien(Request $request)
     {
-        // $id_chuc_nang   = ;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //                             ->where('id_chuc_nang', $id_chuc_nang)
-        //                             ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         try {
             $data   = $request->all();
             NhanVien::find($request->id)->update($data);
@@ -275,17 +267,6 @@ class NhanVienController extends Controller
     }
     public function deleteNhanVien($id)
     {
-        // $id_chuc_nang   = ;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         try {
             NhanVien::where('id', $id)->delete();
             return response()->json([
@@ -302,17 +283,6 @@ class NhanVienController extends Controller
     }
     public function searchNhanVien(Request $request)
     {
-        // $id_chuc_nang   = 2;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         $key = "%" . $request->abc . "%";
 
         $data   = NhanVien::where('ho_ten', 'like', $key)
@@ -326,17 +296,6 @@ class NhanVienController extends Controller
 
     public function doiTinhTrangNhanVien(Request $request)
     {
-        // $id_chuc_nang   = ;
-        // $user   =  Auth::guard('sanctum')->user();
-        // $check  =   ChiTietChucNang::where('id_chuc_vu', $user->id_chuc_vu)
-        //     ->where('id_chuc_nang', $id_chuc_nang)
-        //     ->first();
-        // if (!$check) {
-        //     return response()->json([
-        //         'status'    =>  false,
-        //         'message'   =>  'Bạn không đủ quyền truy cập chức năng này!',
-        //     ]);
-        // }
         try {
             if ($request->tinh_trang == 1) {
                 $tinh_trang_moi = 0;

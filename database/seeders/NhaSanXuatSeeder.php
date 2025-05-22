@@ -18,14 +18,13 @@ class NhaSanXuatSeeder extends Seeder
             [
                 'ten_cong_ty' => 'Vinamilk',
                 'loai_doi_tac' =>  '1',
-                'dia_chi' => '10 Tân Lập, Bình Thạnh, TP.HCM',
+                'dia_chi' => '10 Tân Lập, Long Biên, Hà Nội',
                 'so_dien_thoai' => '0912345679',
                 'email' => 'contact@vinamilk.com.vn',
                 'ngay_cap_nhat' => '2025-03-10',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 10.8911,
-                'kinh_do' => 106.5903,
+                'vi_do' => 21.0285, 'kinh_do' => 105.8542,
                 'dia_chi_vi' => 'TVkbgRQW9C1XBawpj5skDmUutCwXXbVR9P'
             ],
             [
@@ -36,34 +35,31 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-11',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 21.0381,
-                'kinh_do' => 105.9118,
+                'vi_do' => 21.0285, 'kinh_do' => 105.8542,
                 'dia_chi_vi' => 'TUtmUFRyUP93fJPR4QPQTo2VU2MfzRWF5f'
             ],
             [
                 'ten_cong_ty' => 'Sony Electronics',
                 'loai_doi_tac' =>  '1',
-                'dia_chi' => 'Tòa nhà Sony, Quận 1, TP.HCM',
+                'dia_chi' => 'Tòa nhà Sony, Hồng Lĩnh, Hà Tĩnh',
                 'so_dien_thoai' => '0912345681',
                 'email' => 'support@sony.com.vn',
                 'ngay_cap_nhat' => '2025-03-12',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 10.8911,
-                'kinh_do' => 106.5903,
+                'vi_do' => 18.3559, 'kinh_do' => 105.8875,
                 'dia_chi_vi' => 'TRsGW93gQvsVzsRfnHDxjXLMxCzon4Gmtr'
             ],
             [
                 'ten_cong_ty' => 'Unilever',
                 'loai_doi_tac' =>  '1',
-                'dia_chi' => '156 Nguyễn Lương Bằng, Q.7, TP.HCM',
+                'dia_chi' => '156 Nguyễn Lương Bằng, Cao Phong, Hòa Bình',
                 'so_dien_thoai' => '0912345682',
                 'email' => 'hotro@unilever.com',
                 'ngay_cap_nhat' => '2025-03-13',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 10.8911,
-                'kinh_do' => 106.5903,
+                'vi_do' => 20.8170, 'kinh_do' => 105.3376,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -75,8 +71,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-14',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 17.4689,
-                'kinh_do' => 106.6223,
+                'vi_do' => 17.4689, 'kinh_do' => 106.6223,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -88,8 +83,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-15',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 21.0381,
-                'kinh_do' => 105.9118,
+                'vi_do' => 21.0285, 'kinh_do' => 105.8542,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -101,8 +95,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-16',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 21.0381,
-                'kinh_do' => 105.9118,
+                'vi_do' => 21.0285, 'kinh_do' => 105.8542,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -114,8 +107,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-17',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 16.0739,
-                'kinh_do' => 108.2240,
+                'vi_do' => 16.0471, 'kinh_do' => 108.2062,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -127,8 +119,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-18',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 15.1201,
-                'kinh_do' => 108.7923,
+                'vi_do' => 15.1200, 'kinh_do' => 108.8000,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
             [
@@ -140,8 +131,7 @@ class NhaSanXuatSeeder extends Seeder
                 'ngay_cap_nhat' => '2025-03-19',
                 'password' => bcrypt('123456'),
                 'loai_tai_khoan' => 'Nhà Sản Xuất',
-                'vi_do' => 14.4200,
-                'kinh_do' => 109.0000,
+                'vi_do' => 13.7820, 'kinh_do' => 109.2190,
                 'dia_chi_vi' => 'TGdU79UeooERfKuVYm9RPLJXRbG9zPBHSd'
             ],
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SanPhamCuaNSXRequest;
 use App\Models\DaiLy;
 use App\Models\DanhMucSanPham;
 use App\Models\NhaSanXuat;
@@ -101,13 +102,13 @@ class SanPhamController extends Controller
         }
     }
 
-    public function doiTinhTrangSanPham(Request $request) {
+    public function doiTinhTrangSanPham(Request $request)
+    {
         try {
             if ($request->tinh_trang == 1 || $request->tinh_trang == 2) {
                 if ($request->tinh_trang == 1) {
                     $tinh_trang_moi = 2;
-                }
-                else {
+                } else {
                     $tinh_trang_moi = 1;
                 }
                 SanPham::where('id', $request->id)->update([
@@ -133,7 +134,8 @@ class SanPhamController extends Controller
     }
 
     //get data theo id nhà sản xuất
-    public function getDataByUser() {
+    public function getDataByUser()
+    {
         $user = Auth::guard('sanctum')->user();
         if (!$user) {
             return response()->json([
@@ -202,7 +204,8 @@ class SanPhamController extends Controller
         return response()->json([], 401);
     }
 
-    public function createSanPhamCuaNSX(Request $request) {
+    public function createSanPhamCuaNSX(SanPhamCuaNSXRequest $request)
+    {
         $user = auth()->user();
         $nhaSanXuat = NhaSanXuat::where('loai_tai_khoan', 'Nhà Sản Xuất')
             ->where('id', $user->id)
