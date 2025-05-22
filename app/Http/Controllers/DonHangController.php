@@ -1045,6 +1045,7 @@ class DonHangController extends Controller
 
         $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
+            ->where('block_chain_for_don_hangs.action', 'not like', '%Kiểm tra thanh toán%')
             ->where(function ($query) use ($request) {
                 $query->where(function ($q) {
                     // Các bản ghi KHÔNG PHẢI nhà sản xuất => cho xem
@@ -1202,17 +1203,17 @@ class DonHangController extends Controller
             }
 
             $cuocVanChuyenBiTru = LichSuDonHang::where('id_don_hang', $idDonHang)
-            ->where('id_nha_san_xuat', $user->id)
-            ->sum('cuoc_van_chuyen');
+                ->where('id_nha_san_xuat', $user->id)
+                ->sum('cuoc_van_chuyen');
 
             LichSuDonHang::where('id_don_hang', $idDonHang)
-            ->where('id_nha_san_xuat', $user->id)
-            ->where('tinh_trang', 4) // chỉ áp dụng với sản phẩm đã được hủy
-            ->update([
-                'don_gia' => 0,
-                'so_luong' => 0,
-                'cuoc_van_chuyen' => 0,
-            ]);
+                ->where('id_nha_san_xuat', $user->id)
+                ->where('tinh_trang', 4) // chỉ áp dụng với sản phẩm đã được hủy
+                ->update([
+                    'don_gia' => 0,
+                    'so_luong' => 0,
+                    'cuoc_van_chuyen' => 0,
+                ]);
 
             // Tính lại tổng tiền đơn hàng sau khi NSX hủy một phần
             $nsxStillHasProduct = LichSuDonHang::where('id_don_hang', $idDonHang)
@@ -1530,10 +1531,10 @@ class DonHangController extends Controller
             // Bước 3: Nếu không còn sản phẩm nào chưa được xác nhận → cập nhật đơn hàng
             if (!$con_sp_chua_duoc_dvvc_khac_xac_nhan) {
                 DonHang::where('id', $idDonHang)
-                // ->where('tinh_trang', '!=', 4)
-                ->update([
-                    'tinh_trang' => $tinhTrangMoi,
-                ]);
+                    // ->where('tinh_trang', '!=', 4)
+                    ->update([
+                        'tinh_trang' => $tinhTrangMoi,
+                    ]);
             }
             // Lấy danh sách NSX và đại lý
             $danhSachNhaSanXuat = $data_res['id_cac_nsx'];
@@ -1613,44 +1614,44 @@ class DonHangController extends Controller
             DB::commit();
 
             // //gửi mail
-            // $donHang->refresh();
+            $donHang->refresh();
 
-            // // Lấy sản phẩm đã hoàn thành
-            // $sanPhamDaHoanThanh = LichSuDonHang::where('id_don_hang', $donHang->id)
-            //     ->where('tinh_trang', 5)
-            //     ->get();
+            // Lấy sản phẩm đã hoàn thành
+            $sanPhamDaHoanThanh = LichSuDonHang::where('id_don_hang', $donHang->id)
+                ->where('tinh_trang', 5)
+                ->get();
 
-            // // Tính tổng tiền sản phẩm
-            // $tongTienSanPham = $sanPhamDaHoanThanh->reduce(function ($carry, $sp) {
-            //     return $carry + ($sp->so_luong * $sp->don_gia);
-            // }, 0);
+            // Tính tổng tiền sản phẩm
+            $tongTienSanPham = $sanPhamDaHoanThanh->reduce(function ($carry, $sp) {
+                return $carry + ($sp->so_luong * $sp->don_gia);
+            }, 0);
 
-            // // Lấy danh sách đơn vị vận chuyển duy nhất
-            // $nhomCuocDuyNhat = $sanPhamDaHoanThanh
-            //     ->map(function ($item) {
-            //         return [
-            //             'id_don_vi_van_chuyen' => $item->id_don_vi_van_chuyen,
-            //             'id_nha_san_xuat' => $item->id_nha_san_xuat,
-            //             'cuoc_van_chuyen' => $item->cuoc_van_chuyen,
-            //         ];
-            //     })
-            //     ->unique(function ($item) {
-            //         return $item['id_don_vi_van_chuyen'] . '-' . $item['id_nha_san_xuat'];
-            //     });
+            // Lấy danh sách đơn vị vận chuyển duy nhất
+            $nhomCuocDuyNhat = $sanPhamDaHoanThanh
+                ->map(function ($item) {
+                    return [
+                        'id_don_vi_van_chuyen' => $item->id_don_vi_van_chuyen,
+                        'id_nha_san_xuat' => $item->id_nha_san_xuat,
+                        'cuoc_van_chuyen' => $item->cuoc_van_chuyen,
+                    ];
+                })
+                ->unique(function ($item) {
+                    return $item['id_don_vi_van_chuyen'] . '-' . $item['id_nha_san_xuat'];
+                });
 
-            // $tongCuoc = $nhomCuocDuyNhat->sum('cuoc_van_chuyen');
+            $tongCuoc = $nhomCuocDuyNhat->sum('cuoc_van_chuyen');
 
-            // // Gán lại tổng tiền
-            // $donHang->tong_tien = $tongTienSanPham + $tongCuoc;
-            // $donHang->cuoc_van_chuyen = $tongCuoc;
-            // $donHang->save();
-            // $donHangDangChonMail = $donHang;
+            // Gán lại tổng tiền
+            $donHang->tong_tien = $tongTienSanPham + $tongCuoc;
+            $donHang->cuoc_van_chuyen = $tongCuoc;
+            $donHang->save();
+            $donHangDangChonMail = $donHang;
 
-            $donHang->refresh(); // Load lại đơn hàng để hắn cập nhật tình trạng là 5
-            $donHangDangChonMail = $donHang;  // tìm đúng đơn hàng đó
+            // $donHang->refresh(); // Load lại đơn hàng để hắn cập nhật tình trạng là 5
+            // $donHangDangChonMail = $donHang;  // tìm đúng đơn hàng đó
             $daiLyDangChonMail = DaiLy::find($donHangDangChonMail->user_id);  // tìm qua bên đại lý
 
-            if ($donHangDangChonMail->tinh_trang==5) {
+            if ($donHangDangChonMail->tinh_trang == 5) {
                 $dataMail['ten_cong_ty'] = $daiLyDangChonMail->ten_cong_ty;
                 $dataMail['id_don_hang'] = $donHangDangChonMail->id;
                 $dataMail['tong_tien'] = $donHangDangChonMail->tong_tien;
@@ -2241,10 +2242,10 @@ class DonHangController extends Controller
             ], 401);
         }
 
-        $list_info = BlockChainForDonHang::
-            join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
+        $list_info = BlockChainForDonHang::join('don_hangs', 'don_hangs.id', 'block_chain_for_don_hangs.id_don_hang')
             ->where('block_chain_for_don_hangs.id_don_hang', $request->id_don_hang)
             ->where('block_chain_for_don_hangs.action', 'not like', '%Hủy đơn hàng%')
+            ->where('block_chain_for_don_hangs.action', 'not like', '%Kiểm tra thanh toán%')
             ->select(
                 'block_chain_for_don_hangs.transaction_hash',
                 'block_chain_for_don_hangs.metadata_uri',
