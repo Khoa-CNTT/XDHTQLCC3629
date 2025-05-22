@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DanhMucRequest;
 use App\Models\DanhMucSanPham;
 use Exception;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class DanhMucSanPhamController extends Controller
         ]);
     }
 
-    public function createDanhMuc(Request $request)
+    public function createDanhMuc(DanhMucRequest $request)
     {
         DanhMucSanPham::create([
             'ma_danh_muc'   =>  $request->ma_danh_muc,
