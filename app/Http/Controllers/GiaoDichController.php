@@ -30,6 +30,7 @@ class GiaoDichController extends Controller
                 $matched = [];
                 if (isset($data['data']) && count($data['data']) > 0) {
                     $giaoDich = $data['data'];
+                    $nftResults = [];
                     foreach ($danhSachDonHang as $dsDonHang) {
                         foreach ($giaoDich as $gd) {
                             $moTaKhongDau = str_replace('-', '', $gd["Mô tả"]);
@@ -50,65 +51,76 @@ class GiaoDichController extends Controller
                                     'ma_tham_chieu'            =>  $gd["Mã tham chiếu"],
                                 ]);
 
-                                // $daiLy = DB::table('dai_lies')
-                                //                 ->where('id', $dsDonHang->user_id)
-                                //                 ->first();
-                                // $tenDaiLy = $daiLy->ten_cong_ty ?? 'Không xác định';
+                                $daiLy = DB::table('dai_lies')
+                                    ->where('id', $dsDonHang->user_id)
+                                    ->first();
+                                $tenDaiLy = $daiLy->ten_cong_ty ?? 'Không xác định';
 
-                                // $metadata = [
-                                //     'name' => 'Bằng chứng đại lý đã thanh toán đơn hàng',
-                                //     'order_code' => $dsDonHang->ma_don_hang,
-                                //     'time_of_execution' => $gd["Ngày diễn ra"],
-                                //     'payer' => $tenDaiLy,
-                                //     'status' => 'Đã thanh toán',
-                                //     'description' => 'Thông tin thanh toán',
-                                //     'attributes' => [
-                                //         [
-                                //             'trait_type' => 'Mã giao dịch',
-                                //             'value' => $gd["Mã GD"],
-                                //         ],
-                                //         [
-                                //             'trait_type' => 'Nội dung chuyển tiền',
-                                //             'value' => $gd["Mô tả"],
-                                //         ],
-                                //         [
-                                //             'trait_type' => 'Số tiền (VNĐ)',
-                                //             'value' => $gd["Giá trị"],
-                                //         ],
-                                //         [
-                                //             'trait_type' => 'Số tài khoản',
-                                //             'value' => $gd["Mã GD"],
-                                //         ],
-                                //         [
-                                //             'trait_type' => 'Mã tham chiếu',
-                                //             'value' => $gd["Mã tham chiếu"],
-                                //         ],
-                                //     ]
-                                // ];
+                                $metadata = [
+                                    'name' => 'Bằng chứng đại lý đã thanh toán đơn hàng',
+                                    'order_code' => $dsDonHang->ma_don_hang,
+                                    'time_of_execution' => $gd["Ngày diễn ra"],
+                                    'payer' => $tenDaiLy,
+                                    'status' => 'Đã thanh toán',
+                                    'description' => 'Thông tin thanh toán',
+                                    'attributes' => [
+                                        [
+                                            'trait_type' => 'Mã giao dịch',
+                                            'value' => $gd["Mã GD"],
+                                        ],
+                                        [
+                                            'trait_type' => 'Nội dung chuyển tiền',
+                                            'value' => $gd["Mô tả"],
+                                        ],
+                                        [
+                                            'trait_type' => 'Số tiền (VNĐ)',
+                                            'value' => $gd["Giá trị"],
+                                        ],
+                                        [
+                                            'trait_type' => 'Số tài khoản',
+                                            'value' => $gd["Mã GD"],
+                                        ],
+                                        [
+                                            'trait_type' => 'Mã tham chiếu',
+                                            'value' => $gd["Mã tham chiếu"],
+                                        ],
+                                    ]
+                                ];
 
-                                // $pinataService = new PinataService();
-                                // $metadataUri = $pinataService->uploadMetadata($metadata);
+                                $pinataService = new PinataService();
+                                $metadataUri = $pinataService->uploadMetadata($metadata);
 
-                                // $to_address = $request->dia_chi_vi;
+                                $to_address = $request->dia_chi_vi;
 
-                                // $address = $request->input('wallet_address', $to_address);
+                                $address = $request->input('wallet_address', $to_address);
 
-                                // $txHash = $pinataService->mintNFTtoApi($address, $metadataUri); // truyền từ frontend
-                                // BlockChainForDonHang::create([
-                                //     'id_don_hang'               =>  $dsDonHang->id_don_hang,
-                                //     'action'                    =>  'Kiểm tra thanh toán',
-                                //     'transaction_hash'          =>  $txHash['transactionHash'],
-                                //     'metadata_uri'              =>  $metadataUri,
-                                //     'token_id'                  =>  $txHash['tokenId'],
-                                //     'id_user'                   =>  $daiLy->id,
-                                //     'loai_tai_khoan'            =>  $daiLy->loai_tai_khoan,
-                                // ]);
+                                $txHash = $pinataService->mintNFTtoApi($address, $metadataUri);
+                                BlockChainForDonHang::create([
+                                    'id_don_hang'               =>  $dsDonHang->id,
+                                    'action'                    =>  'Kiểm tra thanh toán',
+                                    'transaction_hash'          =>  $txHash['transactionHash'],
+                                    'metadata_uri'              =>  $metadataUri,
+                                    'token_id'                  =>  $txHash['tokenId'],
+                                    'id_user'                   =>  $daiLy->id,
+                                    'loai_tai_khoan'            =>  $daiLy->loai_tai_khoan,
+                                ]);
+
+                                $nftResults[] = [
+                                    'transaction_hash' => $txHash['transactionHash'],
+                                    'metadata_uri' => $metadataUri,
+                                    'token_id' => $txHash['tokenId'],
+                                    'ma_don_hang' => $dsDonHang->ma_don_hang,
+                                    'dia_chi_vi' => $request->dia_chi_vi
+                                ];
 
                                 // cập nhật số dư tài khoản cho nhà sản xuất
                                 $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)
+                                    ->where('tinh_trang', '!=', 4) // chỉ lấy lịch sử đơn hàng chưa bị hủy
                                     ->get();
+
                                 $donHang = DonHang::find($dsDonHang->id);
                                 $admin = $donHang && $donHang->id_nguoi_duyet ? NhanVien::find($donHang->id_nguoi_duyet) : null;
+
                                 foreach ($lichSuDonHangList as $lichSuDH) {
                                     $nhaSanXuat = NhaSanXuat::find($lichSuDH->id_nha_san_xuat);
                                     $thanhTien = $lichSuDH->don_gia * $lichSuDH->so_luong;
@@ -117,9 +129,8 @@ class GiaoDichController extends Controller
                                         $nhaSanXuat->so_du_tai_khoan += $thanhTien * 0.95;
                                         $nhaSanXuat->save();
                                     }
-                                    $donHang = DonHang::find($lichSuDH->id_don_hang);
+
                                     if ($donHang && $donHang->id_nguoi_duyet) {
-                                        $admin = NhanVien::find($donHang->id_nguoi_duyet);
                                         if ($admin) {
                                             $admin->so_du_tai_khoan += $thanhTien * 0.05; // 5%
                                             $admin->save();
@@ -145,10 +156,6 @@ class GiaoDichController extends Controller
                                     }
                                 }
                                 //done chia tiền cho admin
-
-
-
-
                                 $matched[] = [
                                     'ma_don_hang' => $maDonHangKhongDau,
                                     'tong_tien' => $dsDonHang->tong_tien,
@@ -164,10 +171,8 @@ class GiaoDichController extends Controller
                         'message' => 'Đã cập nhật các hóa đơn mới khớp giao dịch.',
                         'matched_hoa_don' => $matched,
                         'total_updated' => count($matched),
+                        'nft_results' => $nftResults,
                         'message_void' => 'Chưa có giao dịch mới được thanh toán.',
-                        // 'transaction_hash' => $txHash['transactionHash'],
-                        // 'metadata_uri' => $metadataUri,
-                        // 'token_id' => $txHash['tokenId']
                     ]);
                 } else {
                     return response()->json([
