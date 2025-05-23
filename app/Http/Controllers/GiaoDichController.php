@@ -20,7 +20,7 @@ class GiaoDichController extends Controller
 {
     public function checkPaid(Request $request)
     {
-        $url = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhdaB5q-cMV_glq1bhF5RxaVDq-SWno4oRzkTvUOth51H16WtqweG8ghSNX0-UdktXSmADEpf5TO_zqYEhNDy-Vx4rHyIzoRVISEXkCQ94TvrdFoVzSZPFr9UmZrGtE1f3Xq0iYOTG9hVSfZrrHRIKHwrD7OOzec0Qcr5VuFR742I0EXQg5xHeVbVm1p2qNg-Wu_lEsq4AxsYzGF4Pau2aSzYhjXTwCPEOj0PTW9f_X9MsK4ZAXRmrbfGaGfApzr4C3NpEBWzFg9zkZ8E6MdEg9KC0MWxtp7L_8wMgX&lib=MbkYxf-q3Y3DolfYq64ZautuNnwycQPwH";
+        $url = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh0u-HD36Gpd6GWpnXi4WLw3Iy_wqJtS0lTDmC_ITnbbkPtl1m3O9Ulf835DYtLyACTqPOOH0sChPch0X-GRaEsHKBqqkMcS5yba_Gi2BZ8hSZx0h_elycaTONfteHBsVl2VxpV1bsSHI2hl5JM-Gj0Hw8zlx6Gyz557EKf37jdvgxHGOGYPHqX_H8YAaVlV8wVq5YcWnO4I2LOiWEP6_aLdiL5ZA3yQEzKZjobDvDpIn8hAJlBSgXgBkAplTwWR4GDE3eKEuQHEU90c0cHjduUussk1w&lib=MOUtsjnPOVSGPAxAONMEt_j_jpFl-Glvw";
         $danhSachDonHang = DonHang::where('tinh_trang_thanh_toan', 0)->get();
         try {
             $response = Http::get($url);
@@ -49,6 +49,7 @@ class GiaoDichController extends Controller
                                     'ngay_thuc_hien'           =>  $gd["Ngày diễn ra"],
                                     'so_tai_khoan'             =>  $gd["Số tài khoản"],
                                     'ma_tham_chieu'            =>  $gd["Mã tham chiếu"],
+                                    'so_tai_khoan_doi_ung'     =>  $gd["Số tài khoản đối ứng"],
                                 ]);
 
                                 $daiLy = DB::table('dai_lies')
