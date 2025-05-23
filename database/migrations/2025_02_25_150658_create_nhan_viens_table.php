@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('password');
             $table->integer('id_chuc_vu')->nullable();
-            $table->integer('tinh_trang');
+            $table->integer('tinh_trang')->nullable();
             $table->decimal('so_du_tai_khoan', 15)->nullable();
             $table->timestamps();
         });

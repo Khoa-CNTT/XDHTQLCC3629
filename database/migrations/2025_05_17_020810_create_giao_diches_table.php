@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('ngay_thuc_hien')->nullable();
             $table->string('so_tai_khoan')->nullable();
             $table->string('ma_tham_chieu')->nullable();
+            $table->string('so_tai_khoan_doi_ung')->nullable();
             $table->timestamps();
         });
     }

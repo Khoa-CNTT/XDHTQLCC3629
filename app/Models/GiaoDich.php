@@ -17,6 +17,7 @@ class GiaoDich extends Model
         'gia_tri',
         'ngay_thuc_hien',
         'so_tai_khoan',
-        'ma_tham_chieu'
+        'ma_tham_chieu',
+        'so_tai_khoan_doi_ung'
     ];
 }
