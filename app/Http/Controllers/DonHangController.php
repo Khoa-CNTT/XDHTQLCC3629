@@ -609,7 +609,6 @@ class DonHangController extends Controller
                     'san_phams.hinh_anh',
                     'nha_san_xuats.ten_cong_ty as ten_nha_san_xuat',
                     'don_vi_van_chuyens.ten_cong_ty as ten_dvvc',
-                    'don_vi_van_chuyens.cuoc_van_chuyen',
                 )
                 ->get();
             return response()->json([
