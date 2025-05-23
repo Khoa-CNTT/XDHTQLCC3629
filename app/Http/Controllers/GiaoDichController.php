@@ -20,10 +20,12 @@ class GiaoDichController extends Controller
 {
     public function checkPaid(Request $request)
     {
-        $url = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh0u-HD36Gpd6GWpnXi4WLw3Iy_wqJtS0lTDmC_ITnbbkPtl1m3O9Ulf835DYtLyACTqPOOH0sChPch0X-GRaEsHKBqqkMcS5yba_Gi2BZ8hSZx0h_elycaTONfteHBsVl2VxpV1bsSHI2hl5JM-Gj0Hw8zlx6Gyz557EKf37jdvgxHGOGYPHqX_H8YAaVlV8wVq5YcWnO4I2LOiWEP6_aLdiL5ZA3yQEzKZjobDvDpIn8hAJlBSgXgBkAplTwWR4GDE3eKEuQHEU90c0cHjduUussk1w&lib=MOUtsjnPOVSGPAxAONMEt_j_jpFl-Glvw";
+
+        $urlMB = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhfOc3Ea5r9drFS3wYDhOwHYKGZEUjqzbOuKDP9a2sJCDyDgx3_bIGECDg9PTgj_KtEBK-Updlt_oQmgSt4QgCEmKW2HF3yjcOe3MpEqHt7UP1PV65a-Sd-6r_Qch87231b09XLHGJnrXAsdjb5ET4vIkPruqcWs-I3M9Fgu20wyGtDh-4PEaJC0Ffk1mpvrRCHL6dwAT7SE_T97L26p-M4zpUUAMZ6w1BEZb1xNzNlVwk0YsCwVFh_hqibYBEs7uN7coNVcD-rUYdCxnihkv80lkDopk0eG-S4k_1x&lib=MbkYxf-q3Y3DolfYq64ZautuNnwycQPwH";
+        //vietinbank $url = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLh0u-HD36Gpd6GWpnXi4WLw3Iy_wqJtS0lTDmC_ITnbbkPtl1m3O9Ulf835DYtLyACTqPOOH0sChPch0X-GRaEsHKBqqkMcS5yba_Gi2BZ8hSZx0h_elycaTONfteHBsVl2VxpV1bsSHI2hl5JM-Gj0Hw8zlx6Gyz557EKf37jdvgxHGOGYPHqX_H8YAaVlV8wVq5YcWnO4I2LOiWEP6_aLdiL5ZA3yQEzKZjobDvDpIn8hAJlBSgXgBkAplTwWR4GDE3eKEuQHEU90c0cHjduUussk1w&lib=MOUtsjnPOVSGPAxAONMEt_j_jpFl-Glvw";
         $danhSachDonHang = DonHang::where('tinh_trang_thanh_toan', 0)->get();
         try {
-            $response = Http::get($url);
+            $response = Http::get($urlMB);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -140,17 +142,15 @@ class GiaoDichController extends Controller
                                 }
 
                                 // cập nhật số dư tài khoản đơn vị vậN chuyển
-                                $donViVanChuyenGroup = $lichSuDonHangList->groupBy('id_don_vi_van_chuyen');
-
-                                foreach ($donViVanChuyenGroup as $idDonViVanChuyen => $items) {
-                                    $cuocVanChuyen = $items->first()->cuoc_van_chuyen;
-
-                                    $donViVanChuyen = DonViVanChuyen::find($idDonViVanChuyen);
+                                foreach ($lichSuDonHangList as $lichSuDH) {
+                                    $cuocVanChuyen = $lichSuDH->cuoc_van_chuyen;
+                                    $donViVanChuyen = DonViVanChuyen::find($lichSuDH->id_don_vi_van_chuyen);
 
                                     if ($donViVanChuyen) {
                                         $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen * 0.95;
                                         $donViVanChuyen->save();
                                     }
+
                                     if ($admin) {
                                         $admin->so_du_tai_khoan += $cuocVanChuyen * 0.05;
                                         $admin->save();
