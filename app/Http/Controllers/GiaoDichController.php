@@ -116,47 +116,129 @@ class GiaoDichController extends Controller
                                     'dia_chi_vi' => $request->dia_chi_vi
                                 ];
 
-                                // cập nhật số dư tài khoản cho nhà sản xuất
+
+                                // cập nhật số dư tài khoản
                                 $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)
                                     ->where('tinh_trang', '!=', 4) // chỉ lấy lịch sử đơn hàng chưa bị hủy
                                     ->get();
+
+                                $soDuNhaSanXuat = [];
+                                $daXuLyVanChuyen = [];
+                                $tongTienAdmin = 0;
 
                                 $donHang = DonHang::find($dsDonHang->id);
                                 $admin = $donHang && $donHang->id_nguoi_duyet ? NhanVien::find($donHang->id_nguoi_duyet) : null;
 
                                 foreach ($lichSuDonHangList as $lichSuDH) {
-                                    $nhaSanXuat = NhaSanXuat::find($lichSuDH->id_nha_san_xuat);
                                     $thanhTien = $lichSuDH->don_gia * $lichSuDH->so_luong;
+                                    $cuocVanChuyen = $lichSuDH->cuoc_van_chuyen;
 
+                                    // Cộng cho nhà sản xuất (vẫn cộng từng dòng)
+                                    if (!isset($soDuNhaSanXuat[$lichSuDH->id_nha_san_xuat])) {
+                                        $soDuNhaSanXuat[$lichSuDH->id_nha_san_xuat] = 0;
+                                    }
+                                    $soDuNhaSanXuat[$lichSuDH->id_nha_san_xuat] += $thanhTien * 0.95;
+
+                                    // Mỗi id_nha_san_xuat chỉ xử lý cước vận chuyển 1 lần
+                                    if (!in_array($lichSuDH->id_nha_san_xuat, $daXuLyVanChuyen)) {
+                                        $donViVanChuyen = DonViVanChuyen::find($lichSuDH->id_don_vi_van_chuyen);
+                                        if ($donViVanChuyen) {
+                                            $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen * 0.95;
+                                            $donViVanChuyen->save();
+                                        }
+                                        // Admin cũng chỉ cộng tương ứng 1 lần
+                                        if ($admin) {
+                                            $tongTienAdmin += $cuocVanChuyen * 0.05;
+                                        }
+                                        $daXuLyVanChuyen[] = $lichSuDH->id_nha_san_xuat;
+                                    }
+                                    // Admin nhận tiền từ sản phẩm (vẫn cộng từng dòng)
+                                    if ($admin) {
+                                        $tongTienAdmin += $thanhTien * 0.05;
+                                    }
+                                }
+
+                                // Cập nhật số dư nhà sản xuất
+                                foreach ($soDuNhaSanXuat as $id => $tien) {
+                                    $nhaSanXuat = NhaSanXuat::find($id);
                                     if ($nhaSanXuat) {
-                                        $nhaSanXuat->so_du_tai_khoan += $thanhTien * 0.95;
+                                        $nhaSanXuat->so_du_tai_khoan += $tien;
                                         $nhaSanXuat->save();
                                     }
-
-                                    if ($donHang && $donHang->id_nguoi_duyet) {
-                                        if ($admin) {
-                                            $admin->so_du_tai_khoan += $thanhTien * 0.05; // 5%
-                                            $admin->save();
-                                        }
-                                    }
                                 }
 
-                                // cập nhật số dư tài khoản đơn vị vậN chuyển
-                                foreach ($lichSuDonHangList as $lichSuDH) {
-                                    $cuocVanChuyen = $lichSuDH->cuoc_van_chuyen;
-                                    $donViVanChuyen = DonViVanChuyen::find($lichSuDH->id_don_vi_van_chuyen);
-
-                                    if ($donViVanChuyen) {
-                                        $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen * 0.95;
-                                        $donViVanChuyen->save();
-                                    }
-
-                                    if ($admin) {
-                                        $admin->so_du_tai_khoan += $cuocVanChuyen * 0.05;
-                                        $admin->save();
-                                    }
+                                // Cập nhật số dư admin
+                                if ($admin && $tongTienAdmin > 0) {
+                                    $admin->so_du_tai_khoan += $tongTienAdmin;
+                                    $admin->save();
                                 }
+
+
+                                // cập nhật số dư tài khoản cho nhà sản xuất
+                                // $lichSuDonHangList = LichSuDonHang::where('id_don_hang', $dsDonHang->id)
+                                //     ->where('tinh_trang', '!=', 4) // chỉ lấy lịch sử đơn hàng chưa bị hủy
+                                //     ->get();
+
+                                // $donHang = DonHang::find($dsDonHang->id);
+                                // $admin = $donHang && $donHang->id_nguoi_duyet ? NhanVien::find($donHang->id_nguoi_duyet) : null;
+
+                                // foreach ($lichSuDonHangList as $lichSuDH) {
+                                //     $nhaSanXuat = NhaSanXuat::find($lichSuDH->id_nha_san_xuat);
+                                //     $thanhTien = $lichSuDH->don_gia * $lichSuDH->so_luong;
+
+                                //     if ($nhaSanXuat) {
+                                //         $nhaSanXuat->so_du_tai_khoan += $thanhTien * 0.95;
+                                //         $nhaSanXuat->save();
+                                //     }
+
+                                //     if ($donHang && $donHang->id_nguoi_duyet) {
+                                //         if ($admin) {
+                                //             $admin->so_du_tai_khoan += $thanhTien * 0.05; // 5%
+                                //             $admin->save();
+                                //         }
+                                //     }
+                                // }
+
+                                // // cập nhật số dư tài khoản đơn vị vậN chuyển
+                                // $soDuVanChuyen = [];
+
+                                // foreach ($lichSuDonHangList as $lichSuDH) {
+                                //     $cuocVanChuyen = $lichSuDH->cuoc_van_chuyen;
+                                //     if (!isset($soDuVanChuyen[$lichSuDH->id_don_vi_van_chuyen])) {
+                                //         $soDuVanChuyen[$lichSuDH->id_don_vi_van_chuyen] = 0;
+                                //     }
+                                //     $soDuVanChuyen[$lichSuDH->id_don_vi_van_chuyen] += $cuocVanChuyen * 0.95;
+
+                                //     if ($admin) {
+                                //         $admin->so_du_tai_khoan += $cuocVanChuyen * 0.05;
+                                //     }
+                                // }
+
+                                // foreach ($soDuVanChuyen as $id => $tien) {
+                                //     $donViVanChuyen = DonViVanChuyen::find($id);
+                                //     if ($donViVanChuyen) {
+                                //         $donViVanChuyen->so_du_tai_khoan += $tien;
+                                //         $donViVanChuyen->save();
+                                //     }
+                                // }
+
+
+                                // foreach ($lichSuDonHangList as $lichSuDH) {
+                                //     $cuocVanChuyen = $lichSuDH->cuoc_van_chuyen;
+                                //     $donViVanChuyen = DonViVanChuyen::find($lichSuDH->id_don_vi_van_chuyen);
+
+                                //     if ($donViVanChuyen) {
+                                //         $donViVanChuyen->so_du_tai_khoan += $cuocVanChuyen * 0.95;
+                                //         $donViVanChuyen->save();
+                                //     }
+
+                                //     if ($admin) {
+                                //         $admin->so_du_tai_khoan += $cuocVanChuyen * 0.05;
+                                //         $admin->save();
+                                //     }
+                                // }
                                 //done chia tiền cho admin
+
                                 $matched[] = [
                                     'ma_don_hang' => $maDonHangKhongDau,
                                     'tong_tien' => $dsDonHang->tong_tien,
